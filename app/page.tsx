@@ -55,13 +55,6 @@ export default async function HomePage() {
           )}
         </div>
       </div>
-
-      <Link
-        href="/admin"
-        className="absolute bottom-6 left-6 z-20 text-sm text-white/80 drop-shadow hover:text-white"
-      >
-        관리자
-      </Link>
     </main>
   );
 }

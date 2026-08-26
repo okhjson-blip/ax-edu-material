@@ -13,13 +13,6 @@ const nextConfig: NextConfig = {
       "./content/categories/**/*.html",
     ],
     "/c/[slug]/cover": ["./content/registry.json"],
-    "/admin": ["./content/registry.json"],
-    "/admin/new": ["./content/registry.json"],
-    "/admin/[slug]/edit": [
-      "./content/registry.json",
-      "./contents/*.html",
-      "./content/categories/**/*.html",
-    ],
   },
 };
 
