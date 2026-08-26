@@ -6,10 +6,10 @@ import sharp from "sharp";
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 const CONTENT_MAX_WIDTH = 1600;
-const COVER_MAX_WIDTH = 1280;
+const COVER_MAX_WIDTH = 960;
 const HOME_BG_MAX_WIDTH = 1920;
 const CONTENT_MIN_BYTES = 100 * 1024;
-const COVER_JPEG_MIN_BYTES = 200 * 1024;
+const COVER_JPEG_MIN_BYTES = 80 * 1024;
 
 async function walk(dir, out = []) {
   let entries;
@@ -26,12 +26,23 @@ async function walk(dir, out = []) {
   return out;
 }
 
+async function replaceFile(file, buffer) {
+  const tmp = `${file}.${process.pid}.tmp`;
+  await fs.writeFile(tmp, buffer);
+  try {
+    await fs.rename(tmp, file);
+  } catch {
+    await fs.copyFile(tmp, file);
+    await fs.unlink(tmp).catch(() => {});
+  }
+}
+
 async function writeIfSmaller(file, buffer, note) {
   const before = (await fs.stat(file)).size;
   if (buffer.length >= before * 0.98) {
     return { file, before, after: before, skipped: true, note: "already small" };
   }
-  await fs.writeFile(file, buffer);
+  await replaceFile(file, buffer);
   return { file, before, after: buffer.length, skipped: false, note };
 }
 
@@ -55,8 +66,11 @@ async function convertToJpeg(srcPng, destJpg, maxWidth, quality = 82) {
     .resize({ width: maxWidth, withoutEnlargement: true })
     .jpeg({ quality, mozjpeg: true })
     .toBuffer();
-  await fs.writeFile(destJpg, buffer);
-  if (path.resolve(srcPng) !== path.resolve(destJpg)) {
+  const samePath = path.resolve(srcPng) === path.resolve(destJpg);
+  if (samePath) {
+    await replaceFile(destJpg, buffer);
+  } else {
+    await fs.writeFile(destJpg, buffer);
     await fs.unlink(srcPng);
   }
   return { file: destJpg, before, after: buffer.length, skipped: false, note: `jpeg q${quality}` };
@@ -121,7 +135,6 @@ async function main() {
   if (await exists(homeBgPng)) {
     results.push(await convertToJpeg(homeBgPng, homeBgJpg, HOME_BG_MAX_WIDTH, 80));
   } else if (await exists(homeBgJpg)) {
-    const before = (await fs.stat(homeBgJpg)).size;
     const buffer = await sharp(homeBgJpg)
       .resize({ width: HOME_BG_MAX_WIDTH, withoutEnlargement: true })
       .jpeg({ quality: 80, mozjpeg: true })

@@ -10,7 +10,7 @@ export default async function HomePage() {
     <main className="relative min-h-screen">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/home-bg.jpg?v=20260826')" }}
+        style={{ backgroundImage: "url('/home-bg.jpg?v=20260826c')" }}
         aria-hidden
       />
       <div className="absolute inset-0 bg-slate-950/35" aria-hidden />
@@ -32,7 +32,7 @@ export default async function HomePage() {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={`${publicCoverUrl(item.slug, item.cover)}?v=20260826`}
+                      src={`${publicCoverUrl(item.slug, item.cover)}?v=20260826c`}
                       alt={item.title}
                       decoding="async"
                       className="absolute inset-0 h-full w-full object-cover object-center transition duration-300 group-hover:scale-[1.03]"

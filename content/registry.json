@@ -12,7 +12,7 @@
       "slug": "ax-framework",
       "title": "AX Framework",
       "description": "AX를 수행하는 데 필요한 5단계 실행 여정",
-      "cover": "cover.png",
+      "cover": "cover.jpg",
       "htmlFile": "contents/ax_framework.html",
       "showCaption": true
     },
@@ -28,7 +28,7 @@
       "slug": "gemini-cursor",
       "title": "Gemini · Antigravity · Cursor",
       "description": "",
-      "cover": "cover.png",
+      "cover": "cover.jpg",
       "htmlFile": "contents/Gemini_Antigravity_Cursor.html",
       "showCaption": true
     },
@@ -36,7 +36,7 @@
       "slug": "chatgpt-codex",
       "title": "ChatGPT · Work · Codex",
       "description": "",
-      "cover": "cover.png",
+      "cover": "cover.jpg",
       "htmlFile": "contents/ChatGPT_Work_Codex.html",
       "showCaption": true
     },
@@ -44,7 +44,7 @@
       "slug": "claude",
       "title": "Claude Code",
       "description": "",
-      "cover": "cover.png",
+      "cover": "cover.jpg",
       "htmlFile": "contents/Claude_Code.html",
       "showCaption": true
     },
