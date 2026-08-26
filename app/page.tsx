@@ -23,7 +23,7 @@ export default async function HomePage() {
               등록된 카테고리가 없습니다.
             </p>
           ) : (
-            <ul className="grid w-[62.4%] min-w-[256px] max-w-5xl grid-cols-3 gap-3">
+            <ul className="grid w-[62.4%] min-w-[256px] max-w-5xl translate-y-10 grid-cols-3 gap-3">
               {categories.map((item) => (
                 <li key={item.slug}>
                   <Link
@@ -34,6 +34,7 @@ export default async function HomePage() {
                     <img
                       src={`${publicCoverUrl(item.slug, item.cover)}?v=20260826`}
                       alt={item.title}
+                      decoding="async"
                       className="absolute inset-0 h-full w-full object-cover object-center transition duration-300 group-hover:scale-[1.03]"
                     />
                     {item.showCaption !== false ? (

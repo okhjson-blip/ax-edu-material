@@ -141,6 +141,7 @@
       gap: 8px;
       padding: 8px 10px;
       margin: 2px 0;
+      border: 1px solid transparent;
       border-radius: 6px;
       font-size: var(--font-caption);
       color: rgba(255, 255, 255, 0.72);
@@ -164,6 +165,11 @@
       font-weight: 700;
       border: 1px solid rgba(255, 255, 255, 0.10);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.17);
+    }
+
+    .agenda-item:focus,
+    .agenda-item:focus-visible {
+      outline: none;
     }
 
     .agenda-item .item-num {
@@ -729,7 +735,7 @@
     .case-study-card .case-study-content {
       min-height: 0;
       display: grid;
-      grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.35fr);
+      grid-template-rows: minmax(0, 1fr);
       align-items: stretch;
       justify-content: stretch;
       gap: 12px;
@@ -739,6 +745,7 @@
     .case-study-block {
       min-width: 0;
       min-height: 0;
+      height: 100%;
       padding: 12px;
       display: flex;
       flex-direction: column;
@@ -766,8 +773,14 @@
       min-height: 0;
       overflow: auto;
       overscroll-behavior: contain;
+      scrollbar-gutter: stable;
       scrollbar-width: thin;
       scrollbar-color: #94A3B8 #1E1E1E;
+    }
+
+    .case-study-code-card .case-study-code-scroll {
+      /* 구현 코드 페이지는 스크롤바를 항상 유지 */
+      overflow-y: scroll;
     }
 
     .case-study-prompt-scroll::-webkit-scrollbar,
@@ -808,13 +821,13 @@
       }
 
       .case-study-card .case-study-content {
-        grid-template-rows: auto auto;
-        overflow: visible;
+        grid-template-rows: minmax(0, 1fr);
+        overflow: hidden;
       }
 
       .case-study-prompt-scroll,
       .case-study-code-scroll {
-        max-height: 220px;
+        max-height: none;
       }
     }
   </style>
@@ -2426,7 +2439,7 @@ if st.button("계산하기"):
 
   <script>
     (function() {
-      // 1. Merge each prompt and implementation sequence into one Case Study card.
+      // 1. Split each prompt + implementation sequence into 2 Case Study pages.
       document.querySelectorAll('li').forEach((item) => {
         const bulletText = Array.from(item.childNodes).find((node) =>
           node.nodeType === Node.TEXT_NODE && /^\s*•\s*/.test(node.nodeValue || '')
@@ -2447,22 +2460,50 @@ if st.button("계산하기"):
 
       const caseStudyGroups = [
         {
-          title: 'VBA Case Study · 프롬프트와 구현 코드',
+          promptTitle: 'VBA Case Study · 프롬프트',
+          codeTitle: 'VBA Case Study · 구현 코드',
           slides: ['VBA 프롬프트 작성법', 'VBA 구현: 모듈 및 집계 로직', 'VBA 구현: 결과 출력 및 서식']
         },
         {
-          title: 'Python RPA Case Study · 프롬프트와 구현 코드',
+          promptTitle: 'Python RPA Case Study · 프롬프트',
+          codeTitle: 'Python RPA Case Study · 구현 코드',
           slides: ['RPA 프롬프트 작성법', 'RPA 구현: 경로 및 폴더 생성', 'RPA 구현: 복사 및 중복 방지']
         },
         {
-          title: 'HTML 대시보드 Case Study · 프롬프트와 구현 코드',
+          promptTitle: 'HTML 대시보드 Case Study · 프롬프트',
+          codeTitle: 'HTML 대시보드 Case Study · 구현 코드',
           slides: ['HTML 대시보드 프롬프트', 'HTML 구조 및 CSS 레이아웃', 'JS 데이터 렌더링 함수']
         },
         {
-          title: '웹앱 Case Study · 프롬프트와 구현 코드',
+          promptTitle: '웹앱 Case Study · 프롬프트',
+          codeTitle: '웹앱 Case Study · 구현 코드',
           slides: ['웹앱 프롬프트 4대 요소', '실습 1: 기본 계산기 만들기', '실습 2: 계산기 기능 확장']
         }
       ];
+
+      function buildCaseStudyBlock(kind, titleText) {
+        const block = document.createElement('section');
+        block.className = `case-study-block case-study-${kind}-block`;
+        const title = document.createElement('h3');
+        title.className = 'case-study-block-title';
+        title.textContent = titleText;
+        const scroll = document.createElement('div');
+        scroll.className = `case-study-${kind}-scroll`;
+        block.append(title, scroll);
+        return { block, scroll };
+      }
+
+      function applyCaseStudyShell(slide, pageTitle, kindClass) {
+        slide.classList.add('case-study-card', kindClass);
+        slide.setAttribute('data-title', pageTitle);
+        const titleEl = slide.querySelector('.slide-title-main');
+        if (titleEl) titleEl.textContent = pageTitle;
+        const subtitle = slide.querySelector('.slide-subtitle');
+        if (subtitle) subtitle.remove();
+        const body = slide.querySelector('.slide-body');
+        if (body) body.classList.add('case-study-content');
+        return body;
+      }
 
       caseStudyGroups.forEach((group) => {
         const groupSlides = group.slides
@@ -2470,46 +2511,54 @@ if st.button("계산하기"):
           .filter(Boolean);
         if (groupSlides.length !== group.slides.length) return;
 
-        const primarySlide = groupSlides[0];
-        const primaryBody = primarySlide.querySelector('.slide-body');
-        if (!primaryBody) return;
+        const promptSlide = groupSlides[0];
+        const codeSlide = groupSlides[1];
+        const implementSlides = groupSlides.slice(1);
 
-        const promptBlock = document.createElement('section');
-        promptBlock.className = 'case-study-block case-study-prompt-block';
-        const promptTitle = document.createElement('h3');
-        promptTitle.className = 'case-study-block-title';
-        promptTitle.textContent = '프롬프트';
-        const promptScroll = document.createElement('div');
-        promptScroll.className = 'case-study-prompt-scroll';
-        while (primaryBody.firstChild) promptScroll.appendChild(primaryBody.firstChild);
-        promptBlock.append(promptTitle, promptScroll);
+        const promptBodyEl = promptSlide.querySelector('.slide-body');
+        const promptNodes = [];
+        while (promptBodyEl && promptBodyEl.firstChild) {
+          promptNodes.push(promptBodyEl.removeChild(promptBodyEl.firstChild));
+        }
 
-        const codeBlock = document.createElement('section');
-        codeBlock.className = 'case-study-block case-study-code-block';
-        const codeTitle = document.createElement('h3');
-        codeTitle.className = 'case-study-block-title';
-        codeTitle.textContent = '구현 코드';
-        const codeScroll = document.createElement('div');
-        codeScroll.className = 'case-study-code-scroll';
+        const codeParts = implementSlides.map((slide) => {
+          const title = slide.getAttribute('data-title') || '';
+          const body = slide.querySelector('.slide-body');
+          const nodes = [];
+          while (body && body.firstChild) {
+            nodes.push(body.removeChild(body.firstChild));
+          }
+          return { title, nodes };
+        });
 
-        groupSlides.slice(1).forEach((slide) => {
+        const promptBody = applyCaseStudyShell(
+          promptSlide,
+          group.promptTitle,
+          'case-study-prompt-card'
+        );
+        const codeBody = applyCaseStudyShell(
+          codeSlide,
+          group.codeTitle,
+          'case-study-code-card'
+        );
+        if (!promptBody || !codeBody) return;
+
+        const prompt = buildCaseStudyBlock('prompt', '프롬프트');
+        promptNodes.forEach((node) => prompt.scroll.appendChild(node));
+        promptBody.replaceChildren(prompt.block);
+
+        const code = buildCaseStudyBlock('code', '구현 코드');
+        codeParts.forEach(({ title, nodes }) => {
           const partTitle = document.createElement('h4');
           partTitle.className = 'case-study-code-part-title';
-          partTitle.textContent = slide.getAttribute('data-title');
-          codeScroll.appendChild(partTitle);
-
-          const body = slide.querySelector('.slide-body');
-          while (body && body.firstChild) codeScroll.appendChild(body.firstChild);
+          partTitle.textContent = title;
+          code.scroll.appendChild(partTitle);
+          nodes.forEach((node) => code.scroll.appendChild(node));
         });
-        codeBlock.append(codeTitle, codeScroll);
+        codeBody.replaceChildren(code.block);
 
-        primarySlide.classList.add('case-study-card');
-        primarySlide.setAttribute('data-title', group.title);
-        const primaryTitle = primarySlide.querySelector('.slide-title-main');
-        if (primaryTitle) primaryTitle.textContent = group.title;
-        primaryBody.classList.add('case-study-content');
-        primaryBody.replaceChildren(promptBlock, codeBlock);
-        groupSlides.slice(1).forEach((slide) => slide.remove());
+        // Keep prompt + code pages; remove leftover implementation slides.
+        groupSlides.slice(2).forEach((slide) => slide.remove());
       });
 
       // 2. DOM Elements Caching
@@ -2556,6 +2605,8 @@ if st.button("계산하기"):
         const itemEl = document.createElement('div');
         itemEl.className = `agenda-item ${idx === 0 ? 'active' : ''}`;
         itemEl.setAttribute('data-index', idx);
+        itemEl.setAttribute('role', 'button');
+        itemEl.setAttribute('tabindex', idx === 0 ? '0' : '-1');
         itemEl.innerHTML = `
           <span class="item-num">${String(idx + 1).padStart(2, '0')}</span>
           <span class="item-text">${title}</span>
@@ -2564,26 +2615,49 @@ if st.button("계산하기"):
           e.stopPropagation();
           goToSlide(idx);
         });
+        itemEl.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            goToSlide(idx);
+          }
+        });
         agendaNavList.appendChild(itemEl);
       });
 
       const agendaItems = Array.from(document.querySelectorAll('.agenda-item'));
 
       // 4. Slide Navigation Function
-      function goToSlide(index) {
+      function goToSlide(index, options = {}) {
         if (index < 0 || index >= totalSlides) return;
 
-        // Deactivate current
+        // Deactivate current — blur so previous focus ring does not linger
         slides[currentIndex].classList.remove('active');
-        if (agendaItems[currentIndex]) agendaItems[currentIndex].classList.remove('active');
+        if (agendaItems[currentIndex]) {
+          const prevItem = agendaItems[currentIndex];
+          prevItem.classList.remove('active');
+          prevItem.setAttribute('tabindex', '-1');
+          if (document.activeElement === prevItem) prevItem.blur();
+        }
 
         // Activate target
         currentIndex = index;
         slides[currentIndex].classList.add('active');
         if (agendaItems[currentIndex]) {
-          agendaItems[currentIndex].classList.add('active');
-          agendaItems[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          const nextItem = agendaItems[currentIndex];
+          nextItem.classList.add('active');
+          nextItem.setAttribute('tabindex', '0');
+          nextItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (options.focusAgenda) {
+            nextItem.focus({ preventScroll: true });
+          } else if (document.activeElement?.classList?.contains('agenda-item')) {
+            document.activeElement.blur();
+          }
         }
+
+        // Clear any leftover focus on non-active agenda rows
+        agendaItems.forEach((item, i) => {
+          if (i !== currentIndex && document.activeElement === item) item.blur();
+        });
 
         // Update Progress
         const pageNum = currentIndex + 1;
@@ -2596,14 +2670,13 @@ if st.button("계산하기"):
         stageArea.scrollTop = 0;
       }
 
-      // Stage Click (Ignore if user is selecting/dragging text)
+      // Stage Click (텍스트 선택 중이면 이동하지 않음)
       stageArea.addEventListener('click', (e) => {
         const selection = window.getSelection();
         if (selection && selection.toString().length > 0) {
-          return; // text selected
+          return;
         }
-        // Don't trigger if clicked on interactive elements
-        if (e.target.closest('button, a, input, select, textarea, pre')) {
+        if (e.target.closest('button, a, input, select, textarea')) {
           return;
         }
         if (currentIndex < totalSlides - 1) {
@@ -2611,24 +2684,38 @@ if st.button("계산하기"):
         }
       });
 
-      // Keyboard Navigation
+      // Keyboard Navigation (슬라이드 + 사이드바 커서 이동)
       window.addEventListener('keydown', (e) => {
-        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) {
+        if (e.target.closest('input, textarea, select')) return;
+
+        const inAgenda = !!e.target.closest('.agenda-item, .agenda-nav');
+
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key) && !inAgenda) {
           if (currentIndex < totalSlides - 1) {
             e.preventDefault();
             goToSlide(currentIndex + 1);
           }
-        } else if (['ArrowLeft', 'PageUp'].includes(e.key)) {
+        } else if (['ArrowLeft', 'PageUp'].includes(e.key) && !inAgenda) {
           if (currentIndex > 0) {
             e.preventDefault();
             goToSlide(currentIndex - 1);
           }
+        } else if (e.key === 'ArrowDown') {
+          if (currentIndex < totalSlides - 1) {
+            e.preventDefault();
+            goToSlide(currentIndex + 1, { focusAgenda: inAgenda });
+          }
+        } else if (e.key === 'ArrowUp') {
+          if (currentIndex > 0) {
+            e.preventDefault();
+            goToSlide(currentIndex - 1, { focusAgenda: inAgenda });
+          }
         } else if (e.key === 'Home') {
           e.preventDefault();
-          goToSlide(0);
+          goToSlide(0, { focusAgenda: inAgenda });
         } else if (e.key === 'End') {
           e.preventDefault();
-          goToSlide(totalSlides - 1);
+          goToSlide(totalSlides - 1, { focusAgenda: inAgenda });
         }
       });
 

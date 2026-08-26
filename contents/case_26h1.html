@@ -214,9 +214,11 @@
 
     table {
       width: 100%;
+      min-width: 1236px;
       border-collapse: collapse;
       text-align: left;
       font-size: 12.5px;
+      table-layout: fixed;
     }
 
     thead th {
@@ -226,8 +228,12 @@
       padding: 8px 10px;
       border-bottom: 1px solid #cbd5e1;
       white-space: nowrap;
-      position: relative;
+      position: sticky;
+      top: 0;
+      z-index: 2;
       overflow: hidden;
+      text-overflow: ellipsis;
+      user-select: none;
     }
 
     tbody tr {
@@ -245,57 +251,93 @@
       color: #334155;
     }
 
+    /* 기본 컬럼 너비: 현재 데이터 길이(헤더·p90) 기준 최적값 */
     .col-no {
-      width: 42px;
+      width: 48px;
       text-align: center;
       color: var(--text-muted);
       font-size: 11.5px;
     }
 
-    .col-l1, .col-l2, .col-l3 {
+    .col-l1 {
+      width: 88px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    .col-l2 {
+      width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    .col-l3 {
+      width: 130px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       font-weight: 500;
     }
 
     .col-l4 {
+      width: 260px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       font-weight: 700;
       color: #0f172a;
       background: #f0f9ff;
     }
 
     .col-desc {
-      min-width: 260px;
+      width: 380px;
       line-height: 1.45;
       color: #475569;
     }
 
-    .col-purpose {
+    .col-type {
+      width: 110px;
       white-space: nowrap;
     }
 
-    /* Column resize */
-    thead th {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      user-select: none;
+    .col-purpose {
+      width: 160px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
+    /* Column resize — hit area sits on the right edge of sticky headers */
     .th-resizer {
       position: absolute;
       right: 0;
       top: 0;
       bottom: 0;
-      width: 5px;
+      width: 8px;
       cursor: col-resize;
       background: transparent;
+      z-index: 3;
+      touch-action: none;
     }
 
     .th-resizer:hover,
     .th-resizer.active {
       background: var(--primary);
       opacity: 0.4;
+    }
+
+    body.col-resizing {
+      cursor: col-resize !important;
+      user-select: none !important;
+    }
+
+    body.col-resizing iframe,
+    body.col-resizing * {
+      cursor: col-resize !important;
     }
 
     /* Type Badge Tags (과제 유형 전용) */
@@ -377,7 +419,7 @@
         <div class="stats-badge">
           조회 결과: <span id="filtered-count">0</span> / <span id="total-count">0</span> 건
         </div>
-        <a href="/" class="stats-badge" style="text-decoration:none; cursor:pointer;">홈화면으로</a>
+        <a href="/" target="_top" class="stats-badge" style="text-decoration:none; cursor:pointer;">홈화면으로</a>
       </div>
     </header>
 
@@ -387,25 +429,25 @@
       <div class="filter-grid">
         <div class="filter-group">
           <label for="filter-l1">L1 조직 기능</label>
-          <select id="filter-l1" onchange="applyFilters()">
+          <select id="filter-l1" onchange="onHierarchyChange('l1')">
             <option value="">전체</option>
           </select>
         </div>
         <div class="filter-group">
           <label for="filter-l2">L2 업무 도메인</label>
-          <select id="filter-l2" onchange="applyFilters()">
+          <select id="filter-l2" onchange="onHierarchyChange('l2')">
             <option value="">전체</option>
           </select>
         </div>
         <div class="filter-group">
           <label for="filter-l3">L3 핵심 기능</label>
-          <select id="filter-l3" onchange="applyFilters()">
+          <select id="filter-l3" onchange="onHierarchyChange('l3')">
             <option value="">전체</option>
           </select>
         </div>
         <div class="filter-group">
           <label for="filter-l4">L4 과제명</label>
-          <select id="filter-l4" onchange="applyFilters()">
+          <select id="filter-l4" onchange="onHierarchyChange('l4')">
             <option value="">전체</option>
           </select>
         </div>
@@ -447,13 +489,13 @@
           <thead>
             <tr>
               <th class="col-no">No</th>
-              <th>L1 조직 기능</th>
-              <th>L2 업무 도메인</th>
-              <th>L3 핵심 기능</th>
-              <th style="background:#e0f2fe; color:#0c4a6e; font-weight:800;">L4 과제명</th>
-              <th>과제 주요내용</th>
-              <th>과제 유형</th>
-              <th>과제 목적</th>
+              <th class="col-l1">L1 조직 기능</th>
+              <th class="col-l2">L2 업무 도메인</th>
+              <th class="col-l3">L3 핵심 기능</th>
+              <th class="col-l4" style="background:#e0f2fe; color:#0c4a6e; font-weight:800;">L4 과제명</th>
+              <th class="col-desc">과제 주요내용</th>
+              <th class="col-type">과제 유형</th>
+              <th class="col-purpose">과제 목적</th>
             </tr>
           </thead>
           <tbody id="task-tbody">
@@ -694,34 +736,89 @@
       return 'type-default';
     }
 
-    // 드롭다운 옵션 자동 채우기
+    // 유니크 정렬 값 추출
+    function uniqueSorted(rows, key) {
+      var set = {};
+      rows.forEach(function(row) {
+        var val = row[key];
+        if (val) set[val] = true;
+      });
+      return Object.keys(set).sort();
+    }
+
+    // select 옵션 재구성 (prev가 유효하면 유지, clear면 전체로)
+    function fillSelect(selectId, values, clear) {
+      var select = document.getElementById(selectId);
+      if (!select) return;
+      var prev = clear ? '' : select.value;
+      select.innerHTML = '';
+      var allOpt = document.createElement('option');
+      allOpt.value = '';
+      allOpt.textContent = '전체';
+      select.appendChild(allOpt);
+      values.forEach(function(val) {
+        var opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        select.appendChild(opt);
+      });
+      if (prev && values.indexOf(prev) !== -1) {
+        select.value = prev;
+      } else {
+        select.value = '';
+      }
+    }
+
+    // 상위 선택값 기준으로 행 필터
+    function rowsForLevel(level) {
+      var l1 = document.getElementById('filter-l1').value;
+      var l2 = document.getElementById('filter-l2').value;
+      var l3 = document.getElementById('filter-l3').value;
+      return rawData.filter(function(item) {
+        if (level === 'l2' || level === 'l3' || level === 'l4') {
+          if (l1 && item.l1 !== l1) return false;
+        }
+        if (level === 'l3' || level === 'l4') {
+          if (l2 && item.l2 !== l2) return false;
+        }
+        if (level === 'l4') {
+          if (l3 && item.l3 !== l3) return false;
+        }
+        return true;
+      });
+    }
+
+    // L2/L3/L4 옵션을 상위 선택에 맞게 갱신
+    function refreshHierarchyOptions(changedLevel) {
+      if (!changedLevel || changedLevel === 'l1') {
+        fillSelect('filter-l2', uniqueSorted(rowsForLevel('l2'), 'l2'), changedLevel === 'l1');
+      }
+      if (!changedLevel || changedLevel === 'l1' || changedLevel === 'l2') {
+        fillSelect('filter-l3', uniqueSorted(rowsForLevel('l3'), 'l3'),
+          changedLevel === 'l1' || changedLevel === 'l2');
+      }
+      if (!changedLevel || changedLevel === 'l1' || changedLevel === 'l2' || changedLevel === 'l3') {
+        fillSelect('filter-l4', uniqueSorted(rowsForLevel('l4'), 'l4'),
+          changedLevel === 'l1' || changedLevel === 'l2' || changedLevel === 'l3');
+      }
+    }
+
+    // L1~L4 계단식 변경 핸들러
+    function onHierarchyChange(level) {
+      if (level === 'l1' || level === 'l2' || level === 'l3') {
+        refreshHierarchyOptions(level);
+      }
+      applyFilters();
+    }
+
+    // 드롭다운 옵션 자동 채우기 (L1~L4는 계단식)
     function populateDropdowns() {
-      var keys = [
-        { id: 'filter-l1', key: 'l1' },
-        { id: 'filter-l2', key: 'l2' },
-        { id: 'filter-l3', key: 'l3' },
-        { id: 'filter-l4', key: 'l4' },
-        { id: 'filter-type', key: 'type' },
-        { id: 'filter-purpose', key: 'purpose' }
-      ];
+      fillSelect('filter-l1', uniqueSorted(rawData, 'l1'), true);
+      refreshHierarchyOptions(null);
 
-      keys.forEach(function(item) {
-        var select = document.getElementById(item.id);
-        if (!select) return;
-
-        var set = {};
-        rawData.forEach(function(row) {
-          var val = row[item.key];
-          if (val) set[val] = true;
-        });
-
-        var sortedVals = Object.keys(set).sort();
-        sortedVals.forEach(function(val) {
-          var opt = document.createElement('option');
-          opt.value = val;
-          opt.textContent = val;
-          select.appendChild(opt);
-        });
+      ['filter-type', 'filter-purpose'].forEach(function(id) {
+        var key = id === 'filter-type' ? 'type' : 'purpose';
+        fillSelect(id, uniqueSorted(rawData, key), true);
       });
 
       var totalEl = document.getElementById('total-count');
@@ -768,7 +865,7 @@
           '<td class="col-l3">' + escapeHtml(item.l3 || '-') + '</td>' +
           '<td class="col-l4">' + escapeHtml(item.l4 || '-') + '</td>' +
           '<td class="col-desc">' + formatDesc(item.desc) + '</td>' +
-          '<td><span class="tag-type ' + typeClass + '">' + escapeHtml(item.type) + '</span></td>' +
+          '<td class="col-type"><span class="tag-type ' + typeClass + '">' + escapeHtml(item.type) + '</span></td>' +
           '<td class="col-purpose">' + escapeHtml(item.purpose || '-') + '</td>';
 
         fragment.appendChild(tr);
@@ -816,13 +913,11 @@
     // 필터 초기화
     function resetFilters() {
       document.getElementById('filter-l1').value = '';
-      document.getElementById('filter-l2').value = '';
-      document.getElementById('filter-l3').value = '';
-      document.getElementById('filter-l4').value = '';
       document.getElementById('filter-type').value = '';
       document.getElementById('filter-purpose').value = '';
       document.getElementById('search-title').value = '';
       document.getElementById('search-desc').value = '';
+      refreshHierarchyOptions('l1');
       renderTable(rawData);
     }
 
@@ -837,30 +932,68 @@
       return safe;
     }
 
-    // 컬럼 너비 드래그 리사이즈
+    // 기본 컬럼 너비(px): 현재 데이터 헤더·내용 길이 기준 최적값
+    // No / L1 / L2 / L3 / L4 / 주요내용 / 유형 / 목적
+    var DEFAULT_COL_WIDTHS = [48, 88, 120, 130, 260, 380, 110, 160];
+
+    // 컬럼 너비 드래그 리사이즈 (table-layout: fixed 필수)
     function initColumnResize() {
+      var table = document.querySelector('table');
       var ths = document.querySelectorAll('thead th');
-      ths.forEach(function(th) {
+      if (!table || !ths.length) return;
+
+      ths.forEach(function(th, colIndex) {
+        var px = DEFAULT_COL_WIDTHS[colIndex];
+        if (px && !th.style.width) {
+          var w = px + 'px';
+          th.style.width = w;
+          th.style.minWidth = w;
+          th.style.maxWidth = w;
+        }
+      });
+
+      ths.forEach(function(th, colIndex) {
+        if (th.querySelector('.th-resizer')) return;
         var resizer = document.createElement('div');
         resizer.className = 'th-resizer';
         th.appendChild(resizer);
-        var startX, startW;
+
         resizer.addEventListener('mousedown', function(e) {
-          startX = e.pageX;
-          startW = th.offsetWidth;
+          e.preventDefault();
+          e.stopPropagation();
+          var startX = e.clientX;
+          var startW = th.getBoundingClientRect().width;
           resizer.classList.add('active');
-          function onMove(ev) {
-            th.style.width = (startW + ev.pageX - startX) + 'px';
-            th.style.minWidth = th.style.width;
+          document.body.classList.add('col-resizing');
+
+          function applyWidth(px) {
+            var w = Math.max(48, Math.round(px)) + 'px';
+            th.style.width = w;
+            th.style.minWidth = w;
+            th.style.maxWidth = w;
+            var rows = table.tBodies[0] ? table.tBodies[0].rows : [];
+            for (var i = 0; i < rows.length; i++) {
+              var cell = rows[i].cells[colIndex];
+              if (!cell) continue;
+              cell.style.width = w;
+              cell.style.minWidth = w;
+              cell.style.maxWidth = w;
+            }
           }
+
+          function onMove(ev) {
+            applyWidth(startW + (ev.clientX - startX));
+          }
+
           function onUp() {
             resizer.classList.remove('active');
+            document.body.classList.remove('col-resizing');
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onUp);
           }
+
           document.addEventListener('mousemove', onMove);
           document.addEventListener('mouseup', onUp);
-          e.preventDefault();
         });
       });
     }

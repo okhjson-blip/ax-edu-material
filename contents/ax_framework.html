@@ -111,13 +111,31 @@
     const main=document.getElementById('main');
     cards.forEach((x,i)=>{const p=document.createElement('section');p.className='page';p.id=`card-${i+1}`;p.dataset.section=x.s;p.innerHTML=`<article class="card" tabindex="0" role="button" aria-label="${x.t}. 클릭하면 다음 카드로 이동합니다"><header class="head"><div class="num">${x.n}</div><div><div class="kicker">${x.k}</div><h2>${x.t}</h2></div><div class="count">${String(i+1).padStart(2,'0')} / ${cards.length}</div></header><div class="body">${x.c}</div><footer class="foot"><span>카드를 클릭하면 다음 내용으로 이동합니다</span><span class="down">↓</span></footer></article>`;main.appendChild(p)});
     const pages=[...document.querySelectorAll('.page')],toc=document.getElementById('toc');
-    sectionTitles.forEach((t,i)=>{const first=pages.find(p=>Number(p.dataset.section)===i+1);const a=document.createElement('a');a.href=`#${first.id}`;a.dataset.section=i+1;a.innerHTML=`<span class="toc-no">${String(i+1).padStart(2,'0')}</span><span>${t}</span>`;toc.appendChild(a)});
+    sectionTitles.forEach((t,i)=>{
+      const first=pages.find(p=>Number(p.dataset.section)===i+1);
+      if(!first)return;
+      const a=document.createElement('a');
+      a.href=`#${first.id}`;
+      a.dataset.section=i+1;
+      a.dataset.pageIndex=String(pages.indexOf(first));
+      a.innerHTML=`<span class="toc-no">${String(i+1).padStart(2,'0')}</span><span>${t}</span>`;
+      toc.appendChild(a);
+    });
     const links=[...toc.querySelectorAll('a')],bar=document.getElementById('bar'),progressText=document.getElementById('progressText'),topBtn=document.getElementById('top');
     let currentIndex=0;
-    links[0].classList.add('active');
+    if(links[0])links[0].classList.add('active');
     function go(i){if(pages[i])pages[i].scrollIntoView({behavior:'smooth',block:'start'})}
+    // <base href="/contents/"> 때문에 #card 해시 링크가 깨지므로 JS로 이동
+    links.forEach(a=>{
+      a.addEventListener('click',e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        const idx=Number(a.dataset.pageIndex);
+        if(Number.isFinite(idx)&&idx>=0)go(idx);
+      });
+    });
     pages.forEach((p,i)=>{const card=p.querySelector('.card');card.addEventListener('click',e=>{if(e.target.closest('a,button')||window.getSelection().toString().trim())return;go(i+1)});card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go(i+1)}})});
-    const updateNavigation=i=>{if(i<0||i>=pages.length)return;currentIndex=i;const s=Number(pages[i].dataset.section);links.forEach(a=>a.classList.toggle('active',Number(a.dataset.section)===s));links[s-1].scrollIntoView({block:'nearest',inline:'nearest'});progressText.textContent=`${String(i+1).padStart(2,'0')} / ${cards.length}`;bar.style.width=`${(i+1)/cards.length*100}%`;topBtn.classList.toggle('show',i>1);document.title=`${cards[i].n} · ${cards[i].t} | AX Framework`};
+    const updateNavigation=i=>{if(i<0||i>=pages.length)return;currentIndex=i;const s=Number(pages[i].dataset.section);links.forEach(a=>a.classList.toggle('active',Number(a.dataset.section)===s));const activeLink=links.find(a=>Number(a.dataset.section)===s);if(activeLink)activeLink.scrollIntoView({block:'nearest',inline:'nearest'});progressText.textContent=`${String(i+1).padStart(2,'0')} / ${cards.length}`;bar.style.width=`${(i+1)/cards.length*100}%`;topBtn.classList.toggle('show',i>1);document.title=`${cards[i].n} · ${cards[i].t} | AX Framework`};
     if('IntersectionObserver' in window){const obs=new IntersectionObserver(es=>{const v=es.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(v)updateNavigation(pages.indexOf(v.target))},{threshold:[.35,.55,.75]});pages.forEach(p=>obs.observe(p))}else{window.addEventListener('scroll',()=>{let nearest=0,best=Infinity;pages.forEach((p,i)=>{const distance=Math.abs(p.getBoundingClientRect().top);if(distance<best){best=distance;nearest=i}});updateNavigation(nearest)},{passive:true})}
     document.addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select'))return;if((e.key==='ArrowDown'||e.key==='PageDown')&&currentIndex<pages.length-1){e.preventDefault();go(currentIndex+1)}if((e.key==='ArrowUp'||e.key==='PageUp')&&currentIndex>0){e.preventDefault();go(currentIndex-1)}});topBtn.addEventListener('click',()=>go(0));
   </script>

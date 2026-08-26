@@ -91,11 +91,17 @@
       font-weight: 500;
       border-radius: 8px;
       transition: all 0.2s ease;
+      cursor: pointer;
     }
 
     .nav-link:hover, .nav-link.active {
       color: #ffffff;
       background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link:focus,
+    .nav-link:focus-visible {
+      outline: none;
     }
 
     .nav-link .badge {
@@ -571,6 +577,7 @@
 
     .card-agenda {
       width: 100%;
+      min-height: 2.75rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -578,6 +585,25 @@
       padding-bottom: clamp(0.75rem, 1.5vh, 1rem);
       border-bottom: 1px solid var(--border-color);
       text-align: left;
+      box-sizing: content-box;
+    }
+
+    /* Agenda 없는 페이지는 상단 맞춤이므로 placeholder 숨김 */
+    .card-agenda.is-placeholder {
+      display: none;
+    }
+
+    .presentation-card.content-sparse,
+    .presentation-card.content-sparse p,
+    .presentation-card.content-sparse li,
+    .presentation-card.content-sparse td,
+    .presentation-card.content-sparse .card-text,
+    .presentation-card.content-sparse .step-desc,
+    .presentation-card.content-sparse .step-title,
+    .presentation-card.content-sparse .card-title,
+    .presentation-card.content-sparse h3,
+    .presentation-card.content-sparse h4 {
+      line-height: 1.95;
     }
 
     .card-agenda .section-num {
@@ -607,6 +633,20 @@
 
     .presentation-card {
       position: relative;
+    }
+
+    /* Agenda 제목이 없는 페이지는 상단 맞춤 */
+    .section > .card.no-agenda,
+    .section > .grid > .card.no-agenda,
+    .section > .box-dark.no-agenda,
+    .section > .outro-card.no-agenda {
+      justify-content: flex-start;
+    }
+
+    .section > .box-dark.no-agenda,
+    .section > .outro-card.no-agenda {
+      display: flex;
+      flex-direction: column;
     }
 
     .card-next-hint {
@@ -1147,13 +1187,13 @@
                 <td><strong>초거대형 모델 (Trillions)</strong></td>
                 <td>OpenAI GPT-4</td>
                 <td>약 1.8T</td>
-                <td>최고 수준의 추론·문제 해결 능력, 기업용 최상위 플래그십</td>
+                <td>최고 수준의 추론·문제 해결 능력, <br>기업용 최상위 플래그십</td>
               </tr>
               <tr>
                 <td><strong>중·대형 오픈소스 (100B+)</strong></td>
-                <td>Llama 3.1 405B / DeepSeek V3</td>
+                <td>Llama 3.1 405B / <br>DeepSeek V3</td>
                 <td>405B / 671B</td>
-                <td>연구 및 자체 서버 구축용 상위 모델 (상용 AI에 필적)</td>
+                <td>연구 및 자체 서버 구축용 상위 모델 <br>(상용 AI에 필적)</td>
               </tr>
               <tr>
                 <td><strong>경량화 모델 SLM (Billions)</strong></td>
@@ -1165,7 +1205,7 @@
                 <td><strong>초소형/온디바이스 (Mobile)</strong></td>
                 <td>Google Gemini Nano</td>
                 <td>1.8B ~ 3.2B</td>
-                <td>인터넷 연결 없이 기기 내부에서 즉시 처리 (번역/요약 등)</td>
+                <td>인터넷 연결 없이 기기 내부에서 즉시 처리 <br>(번역/요약 등)</td>
               </tr>
             </tbody>
           </table>
@@ -1178,9 +1218,9 @@
           <span class="card-tag">02 · OUTPUT FORMATS</span>
           <h3 class="card-title">AI로 즉시 생성 가능한 실무 결과물 포맷</h3>
           <ul style="padding-left:1.2rem; font-size:0.9rem; color:#334155; margin-bottom:1rem;">
-            <li><strong>1. 문서/텍스트:</strong> 기획서, Markdown(.md), JSON(.json)</li>
-            <li><strong>2. 코드/데이터:</strong> Python 자동화, C/C++ 최적화 코드</li>
-            <li><strong>3. 멀티미디어:</strong> 일러스트·로고, 영상 클립, TTS 인간 음성</li>
+            <li><strong>문서/텍스트:</strong> 기획서, Markdown(.md), JSON(.json)</li>
+            <li><strong>코드/데이터:</strong> Python 자동화, C/C++ 최적화 코드</li>
+            <li><strong>멀티미디어:</strong> 일러스트·로고, 영상 클립, TTS 인간 음성</li>
           </ul>
           <div class="box-highlight" style="margin-bottom:0;">
             <h4>💡 AI는 왜 PPTX보다 HTML을 잘 만들까?</h4>
@@ -1770,7 +1810,7 @@
       <!-- Outro Banner -->
       <div class="outro-card">
         <p class="quote">
-          "올바른 기대, 전략적 활용, 그리고 지속적인 검증이 AI 활용 성공의 핵심입니다."
+          "올바른 기대, 전략적 활용, 그리고 지속적인 검증이 <br>AI 활용 성공의 핵심입니다."
         </p>
         <div class="thanks">Thank You</div>
         <div class="credit">AX: AI와 협업하는 미래 | Samsung Electronics AX Consulting</div>
@@ -1786,52 +1826,201 @@
 
   <script>
     (function () {
+      var SLIDE_SEL =
+        ".hero, .section > .card, .section > .grid > .card, .section > .box-dark, .section > .outro-card";
+      var CARD_SEL =
+        ":scope > .card, :scope > .grid > .card, :scope > .box-dark, :scope > .outro-card";
+
+      var navLinks = Array.from(document.querySelectorAll(".nav-link"));
+      var activeNavIndex = -1;
+
+      function scrollToTarget(el) {
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      function clearNavFocus() {
+        navLinks.forEach(function (item) {
+          if (document.activeElement === item) item.blur();
+        });
+      }
+
+      function setActiveNav(link, options) {
+        if (!link) return;
+        var opts = options || {};
+        var nextIndex = navLinks.indexOf(link);
+        if (nextIndex === activeNavIndex && link.classList.contains("active") && !opts.force) {
+          clearNavFocus();
+          return;
+        }
+        activeNavIndex = nextIndex;
+        navLinks.forEach(function (item) {
+          item.classList.toggle("active", item === link);
+        });
+        clearNavFocus();
+        link.scrollIntoView({
+          behavior: opts.instant ? "auto" : "smooth",
+          block: "nearest"
+        });
+      }
+
+      function syncNavFromSlide(slide) {
+        if (!slide) return;
+        var section = slide.closest(".section");
+        if (!section || !section.id) return;
+        var href = "#" + section.id;
+        var link = navLinks.find(function (item) {
+          return item.getAttribute("href") === href;
+        });
+        if (link) setActiveNav(link);
+      }
+
+      /** 아젠다 항목 → 해당 PART 첫 카드로 이동 */
+      function goToSection(navIndex, options) {
+        var link = navLinks[navIndex];
+        if (!link) return;
+        var href = link.getAttribute("href") || "";
+        var id = href.charAt(0) === "#" ? href.slice(1) : "";
+        if (!id) return;
+        var section = document.getElementById(id);
+        var target = (section && section.querySelector(CARD_SEL)) || section;
+        if (!target) return;
+        scrollToTarget(target);
+        setActiveNav(link, options);
+      }
+
+      // <base href="/contents/"> 때문에 #part 해시 링크가 깨지므로 JS로 이동
+      navLinks.forEach(function (link, index) {
+        link.setAttribute("data-nav-index", String(index));
+        link.setAttribute("tabindex", "-1");
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          goToSection(index, { force: true });
+        });
+      });
+
+      if (navLinks[0]) setActiveNav(navLinks[0], { instant: true, force: true });
+
       document.querySelectorAll(".section").forEach(function (section) {
-        const agenda = section.querySelector(":scope > .section-header");
+        var agenda = section.querySelector(":scope > .section-header");
         if (!agenda) return;
 
-        const cards = section.querySelectorAll(
-          ":scope > .card, :scope > .grid > .card, :scope > .box-dark, :scope > .outro-card"
-        );
-
-        const firstCard = cards[0];
+        var cards = section.querySelectorAll(CARD_SEL);
+        var firstCard = cards[0];
         if (firstCard) {
-          const cardAgenda = document.createElement("div");
+          var cardAgenda = document.createElement("div");
           cardAgenda.className = "card-agenda";
-          cardAgenda.appendChild(agenda.querySelector(".section-num").cloneNode(true));
-          cardAgenda.appendChild(agenda.querySelector(".section-title").cloneNode(true));
+          var num = agenda.querySelector(".section-num");
+          var title = agenda.querySelector(".section-title");
+          if (num) cardAgenda.appendChild(num.cloneNode(true));
+          if (title) cardAgenda.appendChild(title.cloneNode(true));
           firstCard.prepend(cardAgenda);
         }
 
         agenda.classList.add("agenda-source");
       });
 
-      const slides = Array.from(document.querySelectorAll(
-        ".hero, .section > .card, .section > .grid > .card, .section > .box-dark, .section > .outro-card"
-      ));
-
-      const bodySlides = slides.filter(function (slide) {
+      var slides = Array.from(document.querySelectorAll(SLIDE_SEL));
+      var bodySlides = slides.filter(function (slide) {
         return !slide.classList.contains("hero");
       });
 
       bodySlides.forEach(function (slide, index) {
         slide.classList.add("presentation-card");
+
+        if (!slide.querySelector(":scope > .card-agenda:not(.is-placeholder)")) {
+          slide.classList.add("no-agenda");
+        }
+
         if (index === bodySlides.length - 1) return;
 
-        const hint = document.createElement("div");
+        var hint = document.createElement("div");
         hint.className = "card-next-hint";
         hint.setAttribute("aria-hidden", "true");
-        hint.innerHTML = '<span>카드를 클릭하면 다음 내용으로 이동합니다</span><span class="down-arrow">↓</span>';
+        hint.innerHTML =
+          '<span>카드를 클릭하면 다음 내용으로 이동합니다</span><span class="down-arrow">↓</span>';
         slide.appendChild(hint);
       });
 
+      function estimateBodyLines(slide) {
+        var nodes = slide.querySelectorAll(
+          "p, li, td, .card-text, .step-desc, .step-title, .card-title, h3, h4"
+        );
+        var lines = 0;
+        nodes.forEach(function (node) {
+          if (node.closest(".card-agenda, .card-next-hint")) return;
+          var style = window.getComputedStyle(node);
+          var lh = parseFloat(style.lineHeight);
+          if (!lh || Number.isNaN(lh)) {
+            lines += 1;
+            return;
+          }
+          lines += Math.max(1, Math.round(node.scrollHeight / lh));
+        });
+        return lines;
+      }
+
+      requestAnimationFrame(function () {
+        bodySlides.forEach(function (slide) {
+          if (estimateBodyLines(slide) <= 6) {
+            slide.classList.add("content-sparse");
+          }
+        });
+      });
+
+      // 카드 클릭 = 다음 슬라이드 (키보드와 분리)
       slides.forEach(function (slide, index) {
         slide.addEventListener("click", function (event) {
           if (event.target.closest("a, button, input, textarea, select")) return;
-          const next = slides[index + 1];
+          var next = slides[index + 1];
           if (!next) return;
-          next.scrollIntoView({ behavior: "smooth", block: "center" });
+          scrollToTarget(next);
+          syncNavFromSlide(next);
         });
+      });
+
+      // 스크롤/카드 이동 시 사이드바 active만 동기화 (포커스 없음)
+      if ("IntersectionObserver" in window) {
+        var navObserver = new IntersectionObserver(
+          function (entries) {
+            var visible = entries
+              .filter(function (entry) {
+                return entry.isIntersecting;
+              })
+              .sort(function (a, b) {
+                return b.intersectionRatio - a.intersectionRatio;
+              })[0];
+            if (!visible) return;
+            syncNavFromSlide(visible.target);
+          },
+          { threshold: [0.35, 0.55, 0.75] }
+        );
+        bodySlides.forEach(function (slide) {
+          navObserver.observe(slide);
+        });
+      }
+
+      // 키보드 커서 = 아젠다 사이드바만 (해당 PART 첫 페이지로 이동)
+      document.addEventListener("keydown", function (event) {
+        if (event.target.closest("input, textarea, select")) return;
+
+        var idx = activeNavIndex >= 0 ? activeNavIndex : 0;
+        var key = event.key;
+
+        if (key === "ArrowDown") {
+          event.preventDefault();
+          goToSection(Math.min(navLinks.length - 1, idx + 1), { force: true });
+        } else if (key === "ArrowUp") {
+          event.preventDefault();
+          goToSection(Math.max(0, idx - 1), { force: true });
+        } else if (key === "Home") {
+          event.preventDefault();
+          goToSection(0, { force: true });
+        } else if (key === "End") {
+          event.preventDefault();
+          goToSection(navLinks.length - 1, { force: true });
+        }
       });
     })();
   </script>

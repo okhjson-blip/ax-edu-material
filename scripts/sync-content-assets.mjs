@@ -1,4 +1,11 @@
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  rmSync,
+  statSync,
+} from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -6,25 +13,30 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourceRoot = path.join(root, "contents");
 const destRoot = path.join(root, "public", "contents");
 
-const IMAGE_DIRS = [
-  "G_A_C_image",
-  "ChatGPT_Work_Codex_image",
-  "Claude_image",
-];
-
 mkdirSync(destRoot, { recursive: true });
 
-for (const dir of IMAGE_DIRS) {
+if (!existsSync(sourceRoot)) {
+  console.warn("skip: contents/ missing");
+  process.exit(0);
+}
+
+/** Auto-discover image asset folders under contents/ (e.g. G_A_C_image). */
+const imageDirs = readdirSync(sourceRoot, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && /_image$/i.test(entry.name))
+  .map((entry) => entry.name)
+  .sort();
+
+if (imageDirs.length === 0) {
+  console.warn("no *_image directories under contents/");
+  process.exit(0);
+}
+
+for (const dir of imageDirs) {
   const from = path.join(sourceRoot, dir);
   const to = path.join(destRoot, dir);
-  if (!existsSync(from)) {
-    console.warn(`skip missing: contents/${dir}`);
-    continue;
-  }
   rmSync(to, { recursive: true, force: true });
   cpSync(from, to, { recursive: true });
-  const files = countFiles(to);
-  console.log(`synced contents/${dir} → public/contents/${dir} (${files} files)`);
+  console.log(`synced contents/${dir} → public/contents/${dir} (${countFiles(to)} files)`);
 }
 
 function countFiles(dir) {

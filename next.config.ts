@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
     "/c/[slug]/raw": [
       "./content/registry.json",
       "./contents/*.html",
-      "./content/categories/**/*.html",
     ],
     "/c/[slug]/cover": ["./content/registry.json"],
   },
