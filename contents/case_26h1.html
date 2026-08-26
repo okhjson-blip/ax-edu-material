@@ -297,6 +297,9 @@
       width: 380px;
       line-height: 1.45;
       color: #475569;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: keep-all;
     }
 
     .col-type {
@@ -921,15 +924,9 @@
       renderTable(rawData);
     }
 
-    // 과제 주요내용을 한국어 의미 단위로 줄바꿈
+    // 과제 주요내용: 강제 줄바꿈 없이 컬럼 너비에 맞춰 자연 줄바꿈
     function formatDesc(str) {
-      if (!str) return '';
-      var safe = escapeHtml(str);
-      // 의미 구분자: ~하고, ~하여, ~하며, ~통해, ~위해, ~및, ~등을, ~으로, 쉼표 뒤
-      safe = safe.replace(/(,\s*|하고\s|하여\s|으로써\s|통해\s|위해\s|으로\s전환|으로\s개선|시스템으로\s|자동으로\s|형태로\s)/g, '$1<br>');
-      // 길면 주요 접속사/조사 뒤에서도 분리
-      safe = safe.replace(/(\s및\s)/g, '$1<br>');
-      return safe;
+      return escapeHtml(str);
     }
 
     // 기본 컬럼 너비(px): 현재 데이터 헤더·내용 길이 기준 최적값
