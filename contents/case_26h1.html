@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026년 상반기 AX 컨설팅 과제 관리 대시보드</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+
+      /* 과제 유형별 차별화 컬러 팔레트 */
+      --type-macro-bg: #fef3c7;
+      --type-macro-txt: #92400e;
+      --type-macro-bd: #fde68a;
+
+      --type-rpa-bg: #e0e7ff;
+      --type-rpa-txt: #3730a3;
+      --type-rpa-bd: #c7d2fe;
+
+      --type-chatbot-bg: #dcfce7;
+      --type-chatbot-txt: #166534;
+      --type-chatbot-bd: #bbf7d0;
+
+      --type-app-bg: #e0f2fe;
+      --type-app-txt: #0369a1;
+      --type-app-bd: #bae6fd;
+
+      --type-vision-bg: #fae8ff;
+      --type-vision-txt: #86198f;
+      --type-vision-bd: #f5d0fe;
+
+      --type-agent-bg: #fee2e2;
+      --type-agent-txt: #991b1b;
+      --type-agent-bd: #fecaca;
+
+      --type-default-bg: #f1f5f9;
+      --type-default-txt: #475569;
+      --type-default-bd: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 14px 18px;
+      line-height: 1.4;
+      font-size: 13px;
+    }
+
+    /* 15인치 노트북(1366px~1536px) 해상도 최적화 컨테이너 */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .title-area h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .title-area p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .stats-badge {
+      background: var(--card-bg);
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .stats-badge span {
+      color: var(--primary);
+    }
+
+    /* Filter Card */
+    .filter-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .filter-group label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    select, input[type="text"] {
+      padding: 5px 8px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background-color: #fff;
+      color: var(--text);
+      outline: none;
+      transition: all 0.15s ease;
+      width: 100%;
+      height: 30px;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      align-items: flex-end;
+    }
+
+    .search-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .btn {
+      height: 30px;
+      padding: 0 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    /* Table Container */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      max-height: calc(100vh - 250px);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12.5px;
+    }
+
+    thead th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 600;
+      padding: 8px 10px;
+      border-bottom: 1px solid #cbd5e1;
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s ease;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    td {
+      padding: 7px 10px;
+      vertical-align: middle;
+      color: #334155;
+    }
+
+    .col-no {
+      width: 42px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 11.5px;
+    }
+
+    .col-l1, .col-l2, .col-l3 {
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .col-l4 {
+      white-space: nowrap;
+      font-weight: 700;
+      color: #0f172a;
+      background: #f0f9ff;
+    }
+
+    .col-desc {
+      min-width: 260px;
+      line-height: 1.45;
+      color: #475569;
+    }
+
+    .col-purpose {
+      white-space: nowrap;
+    }
+
+    /* Column resize */
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      user-select: none;
+    }
+
+    .th-resizer {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      cursor: col-resize;
+      background: transparent;
+    }
+
+    .th-resizer:hover,
+    .th-resizer.active {
+      background: var(--primary);
+      opacity: 0.4;
+    }
+
+    /* Type Badge Tags (과제 유형 전용) */
+    .tag-type {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .type-macro {
+      background: var(--type-macro-bg);
+      color: var(--type-macro-txt);
+      border: 1px solid var(--type-macro-bd);
+    }
+
+    .type-rpa {
+      background: var(--type-rpa-bg);
+      color: var(--type-rpa-txt);
+      border: 1px solid var(--type-rpa-bd);
+    }
+
+    .type-chatbot {
+      background: var(--type-chatbot-bg);
+      color: var(--type-chatbot-txt);
+      border: 1px solid var(--type-chatbot-bd);
+    }
+
+    .type-app {
+      background: var(--type-app-bg);
+      color: var(--type-app-txt);
+      border: 1px solid var(--type-app-bd);
+    }
+
+    .type-vision {
+      background: var(--type-vision-bg);
+      color: var(--type-vision-txt);
+      border: 1px solid var(--type-vision-bd);
+    }
+
+    .type-agent {
+      background: var(--type-agent-bg);
+      color: var(--type-agent-txt);
+      border: 1px solid var(--type-agent-bd);
+    }
+
+    .type-default {
+      background: var(--type-default-bg);
+      color: var(--type-default-txt);
+      border: 1px solid var(--type-default-bd);
+    }
+
+    /* Empty State */
+    .empty-state {
+      padding: 36px 16px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1100px) {
+      .filter-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="title-area">
+        <h1>2026년 상반기 AX 컨설팅 과제 현황판</h1>
+        <p>L1~L4 분류 체계 및 과제 속성별 다차원 필터링 대시보드</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div class="stats-badge">
+          조회 결과: <span id="filtered-count">0</span> / <span id="total-count">0</span> 건
+        </div>
+        <a href="/" class="stats-badge" style="text-decoration:none; cursor:pointer;">홈화면으로</a>
+      </div>
+    </header>
+
+    <!-- Filter Card -->
+    <div class="filter-card">
+      <!-- Dropdown Filters (L1~L4, 과제 유형, 과제 목적) -->
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label for="filter-l1">L1 조직 기능</label>
+          <select id="filter-l1" onchange="applyFilters()">
+            <option value="">전체</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-l2">L2 업무 도메인</label>
+          <select id="filter-l2" onchange="applyFilters()">
+            <option value="">전체</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-l3">L3 핵심 기능</label>
+          <select id="filter-l3" onchange="applyFilters()">
+            <option value="">전체</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-l4">L4 과제명</label>
+          <select id="filter-l4" onchange="applyFilters()">
+            <option value="">전체</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-type">과제 유형</label>
+          <select id="filter-type" onchange="applyFilters()">
+            <option value="">전체</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-purpose">과제 목적</label>
+          <select id="filter-purpose" onchange="applyFilters()">
+            <option value="">전체</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Keyword Search Filters -->
+      <div class="search-row">
+        <div class="search-group">
+          <label for="search-title">과제명 검색</label>
+          <input type="text" id="search-title" placeholder="과제명 키워드 입력 (Enter 지원)" onkeydown="handleKeyDown(event)">
+        </div>
+        <div class="search-group">
+          <label for="search-desc">과제 주요내용 검색</label>
+          <input type="text" id="search-desc" placeholder="주요내용 키워드 입력 (Enter 지원)" onkeydown="handleKeyDown(event)">
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-primary" onclick="applyFilters()">검색</button>
+          <button class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th>L1 조직 기능</th>
+              <th>L2 업무 도메인</th>
+              <th>L3 핵심 기능</th>
+              <th style="background:#e0f2fe; color:#0c4a6e; font-weight:800;">L4 과제명</th>
+              <th>과제 주요내용</th>
+              <th>과제 유형</th>
+              <th>과제 목적</th>
+            </tr>
+          </thead>
+          <tbody id="task-tbody">
+            <!-- Dynamic Rows -->
+          </tbody>
+        </table>
+      </div>
+      <div id="empty-state" class="empty-state" style="display: none;">
+        조건에 일치하는 과제가 없습니다.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Embedded 210 Projects Raw Data
+    var rawData = [
+      {no: 1, title: "PCB Stack-Up Generator", desc: "현업의 수기 중심 업무를 자동 생성 시스템 체계로 전환", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "연구개발", l2: "H/W 개발", l3: "회로·PCB 설계", l4: "PCB Stack-Up Generator"},
+      {no: 2, title: "이물 성분분석 검증 시스템", desc: "이물 분석 결과 검증을 데이터 기반 표준 프로세스로 전환", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "품질관리", l3: "품질정보관리", l4: "이물 성분분석 검증 시스템"},
+      {no: 3, title: "전표 작성·규정 안내 AI 챗봇", desc: "반복 문의를 줄이고 회계 규정·전표 지원을 AI 챗봇으로 표준화", type: "3) AI챗봇", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "회계관리", l4: "전표 작성·규정 안내 AI 챗봇"},
+      {no: 4, title: "재공 파악 및 출하 시뮬레이터", desc: "공정 내 재공품 현황 데이터를 연동하여 출하 일정을 시뮬레이션하고 최적화", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "공정관리", l3: "공정분석·최적화", l4: "재공 파악 및 출하 시뮬레이터"},
+      {no: 5, title: "PCB 검사공정 분석 모니터링", desc: "PCB 검사 공정의 데이터를 수집/분석하여 실시간 대시보드 형태로 모니터링", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "품질관리", l3: "품질지표 모니터링", l4: "PCB 검사공정 분석 모니터링"},
+      {no: 6, title: "FTA 원산지 등록 시스템", desc: "시스템 간 데이터 연동을 통해 FTA 원산지 증명 데이터를 수집하고 자동 등록", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "무역관리", l3: "FTA 원산지 관리", l4: "FTA 원산지 등록 시스템"},
+      {no: 7, title: "인사정보 관리 대시보드", desc: "사내 인사 데이터를 시각화하여 한눈에 관리할 수 있는 통합 대시보드 구축", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "인사관리", l3: "인사정보관리", l4: "인사정보 관리 대시보드"},
+      {no: 8, title: "원자재 시황분석 현황판", desc: "외부 원자재 가격 변동 추이 등을 크롤링하여 실시간 시황 대시보드 제공", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "구매·SCM", l2: "구매관리", l3: "원자재 시황·조달 분석", l4: "원자재 시황분석 현황판"},
+      {no: 9, title: "포털 사이트", desc: "시스템 링크, 회사소식 등 SharePoint 페이지로 제공", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "업무지원", l3: "협업·정보공유 플랫폼", l4: "포털 사이트"},
+      {no: 10, title: "종합 월말보고 시스템", desc: "월간경영실적 보고를 위한 웹 기반의 발표 플랫폼", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "경영관리", l3: "경영실적 보고", l4: "종합 월말보고 시스템"},
+      {no: 11, title: "납품 배차 자동화", desc: "제품 배송을 위한 배차 로직 자동 실행 시스템", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "물류관리", l3: "운송·배차 관리", l4: "납품 배차 자동화"},
+      {no: 12, title: "PDA Program", desc: "단종 예정 외부 솔루션 대체 위한 PDA 전용 Android앱 전환", type: "4) 앱/시스템", purpose: "자체 AI 시스템 구축", l1: "제조·품질", l2: "생산관리", l3: "생산실적 관리", l4: "PDA Program"},
+      {no: 13, title: "주요기업 경영실적", desc: "경쟁사 공시정보 자동 수집 및 비교·분석 대시보드 플랫폼", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "영업·마케팅", l2: "시장조사", l3: "경쟁정보 분석", l4: "주요기업 경영실적"},
+      {no: 14, title: "유/무선 네트워크 설정 자동화", desc: "외부/내부 PC 네트워크 설정 자동화", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "IT운영", l3: "IT 서비스 관리", l4: "유/무선 네트워크 설정 자동화"},
+      {no: 15, title: "보안 모니터링 시스템", desc: "다양한 보안 솔루션에서 제공되는 보안 지표 통합 관리", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "정보보안", l3: "보안 모니터링·통제", l4: "보안 모니터링 시스템"},
+      {no: 16, title: "MIS 데이터웨어하우스", desc: "편리한 MIS 정보 활용과 통제 기능을 제공하는 데이터 플랫폼", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "IT·데이터관리", l3: "데이터 플랫폼 운영", l4: "MIS 데이터웨어하우스"},
+      {no: 17, title: "프로세스 디자이너", desc: "업무 시각화·문서화를 위한 프로세스 분석·현황화 플랫폼", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "업무혁신", l3: "업무프로세스 설계", l4: "프로세스 디자이너"},
+      {no: 18, title: "실패사례 관리 시스템", desc: "제품 형별, 공정별 실패 사례 관리 및 분석 시스템", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "제조·품질", l2: "품질관리", l3: "불량·개선관리", l4: "실패사례 관리 시스템"},
+      {no: 19, title: "AI Crew Manager 프로그램 생성", desc: "크루원 인터뷰, 주차별 엑셀 보고서 등 수작업을 시스템화하여 실시간 현황 조회 및 크루원 직접 입력 체계 구축", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "업무혁신", l3: "혁신과제·크루 운영", l4: "AI Crew Manager 프로그램 생성"},
+      {no: 20, title: "근태기록 관리 프로그램", desc: "출퇴근 기록 수기 확인 및 근태시간 계산을 자동화하고, ERP 연동을 통해 데이터 정확도 향상", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "근태관리", l4: "근태기록 관리 프로그램"},
+      {no: 21, title: "용역관리 프로그램", desc: "용역비 수기 계산 및 엑셀 기반 관리를 근태 데이터 자동 연동 및 용역비 자동 계산 시스템으로 전환", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "총무·업무지원", l3: "용역·계약 관리", l4: "용역관리 프로그램"},
+      {no: 22, title: "Gemini Gems 제품사진 스튜디오", desc: "휴대폰으로 촬영한 제품 이미지를 AI 기반으로 자동 보정하여 홈페이지용 이미지 등을 자동 제작", type: "5) Vision AI", purpose: "운영 및 프로세스 자동화", l1: "영업·마케팅", l2: "마케팅", l3: "디지털 콘텐츠 제작", l4: "Gemini Gems 제품사진 스튜디오"},
+      {no: 23, title: "해킹메일 탐지 프로그램", desc: "사용자의 경험에 의존한 해킹메일 판단을 OCR 자동 분석 및 위험 메일 탐지/알림 시스템으로 개선", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "정보보안", l3: "보안 모니터링·통제", l4: "해킹메일 탐지 프로그램"},
+      {no: 24, title: "ERP BOM 자동 검토 프로그램", desc: "BOM 수작업 비교 및 엑셀 활용을 다중 BOM 자동 비교 및 변경점 자동 검출 시스템으로 전환", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "연구개발", l2: "개발관리", l3: "BOM·개발정보 관리", l4: "ERP BOM 자동 검토 프로그램"},
+      {no: 25, title: "단가 변동 이력관리 매크로", desc: "계약서 수기 정리 및 이력 파일 수기 작성을 VBA 자동 분류 및 업데이트 처리로 개선", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "구매관리", l3: "구매가격·협력사 관리", l4: "단가 변동 이력관리 매크로"},
+      {no: 26, title: "협력사 단가 변동 OCR 자동화", desc: "협력사 견적서 확인 및 ERP 수기 입력을 OCR 자동 인식 및 견적 양식 자동 작성으로 개선", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "구매관리", l3: "구매가격·협력사 관리", l4: "협력사 단가 변동 OCR 자동화"},
+      {no: 27, title: "AI 활용 생산계획 관리 및 배포", desc: "자료 다운로드, 엑셀 작성, 메일 발송 등 수작업을 생산계획 자동 생성 및 자동 메일 발송 시스템으로 전환", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "생산관리", l3: "생산계획 수립", l4: "AI 활용 생산계획 관리 및 배포"},
+      {no: 28, title: "ERP/MES 입출고 등록 자동화", desc: "전표를 확인하여 ERP/MES에 수기로 등록하던 작업을, 업로드된 전표를 자동 변환하고 ERP에 자동 등록하도록 개선", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "생산관리", l3: "생산실적·입출고 등록", l4: "ERP/MES 입출고 등록 자동화"},
+      {no: 29, title: "AI 기반 품질 이력관리 및 사전예방", desc: "PPT/엑셀 기반의 과거 사례 검색을 품질 이력 통합 검색 및 유사 불량 사전 예방 시스템으로 전환", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "품질관리", l3: "불량·개선관리", l4: "AI 기반 품질 이력관리 및 사전예방"},
+      {no: 30, title: "개선대책서 초안 자동 생성기", desc: "개선대책서 수작업 작성 및 담당자 별도 문자 발송을, 핵심 입력 시 초안 자동 생성 및 문서 양식 자동 표준화로 개선", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "불량·개선관리", l4: "개선대책서 초안 자동 생성기"},
+      {no: 31, title: "AI 품질 챗봇", desc: "담당자 경험에 의존한 정보 조회 및 정보 검색 시간 소요를, 다차원 품질 정보 조회 및 이력 즉시 검색이 가능한 챗봇으로 개선", type: "3) AI챗봇", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질정보관리", l4: "AI 품질 챗봇"},
+      {no: 32, title: "AI 기반 변경점 장기 미결 감지", desc: "변경점 현황 수동 관리 및 장기 미결 건 누락 위험을, 자동 감지 및 알림, 리스크 사전 관리 시스템으로 개선", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "변경점·미결 리스크 관리", l4: "AI 기반 변경점 장기 미결 감지"},
+      {no: 33, title: "원가검토서 견적작성", desc: "단가 및 BOM 데이터를 매핑하여 엑셀 형태의 원가검토서 및 견적서 자동 산출", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "원가관리", l4: "원가검토서 견적작성"},
+      {no: 34, title: "재료비 산출", desc: "소요량 및 단가 데이터를 바탕으로 제품별 재료비를 자동 계산하는 매크로/로직 구현", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "원가관리", l4: "재료비 산출"},
+      {no: 35, title: "생산 CAPA 분석", desc: "설비/인력 가동 데이터를 연동하여 생산 가능 CAPA를 산출하고 대시보드에 시각화", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "생산관리", l3: "생산능력 분석", l4: "생산 CAPA 분석"},
+      {no: 36, title: "발주수량 산출", desc: "현재 재고와 생산 계획 데이터를 비교 연산하여 적정 발주 수량을 자동 산출", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "자재관리", l3: "자재소요·발주 관리", l4: "발주수량 산출"},
+      {no: 37, title: "협력사 FCST 배포", desc: "ERP의 수요예측 데이터를 협력사별로 분리 추출하여 메일 등으로 자동 전송", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "공급망관리", l3: "수요정보·협력사 협업", l4: "협력사 FCST 배포"},
+      {no: 38, title: "멕시코 생산관리 웹", desc: "멕시코 법인의 생산 실적 및 현황 데이터를 통합 관리하고 조회할 수 있는 웹 시스템", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "생산관리", l3: "생산실적 관리", l4: "멕시코 생산관리 웹"},
+      {no: 39, title: "주간 WORST 불량현황", desc: "주간 불량 데이터를 수집/분석하여 주요 불량 유형 TOP 현황을 대시보드로 제공", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "품질관리", l3: "불량·개선관리", l4: "주간 WORST 불량현황"},
+      {no: 40, title: "급여 이상탐지 AI", desc: "급여 대장 데이터를 AI가 분석하여 중복/누락/이상 금액 등의 지급 오류를 자동 탐지", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "급여관리", l4: "급여 이상탐지 AI"},
+      {no: 41, title: "HR 챗봇", desc: "복리후생, 휴가 규정 등 반복적인 인사 관련 질의에 답변하는 사내 AI 챗봇", type: "3) AI챗봇", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "복리후생 운영", l4: "HR 챗봇"},
+      {no: 42, title: "업무량 데이터 수집", desc: "부서/개인별 시스템 사용 로그 등을 수집하여 업무 부하량을 자동으로 측정 및 시각화", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "인사관리", l3: "인력운영", l4: "업무량 데이터 수집"},
+      {no: 43, title: "선적 일정 관리", desc: "포워딩 업체 및 선사 데이터를 연동하여 컨테이너 선적 스케줄을 실시간 트래킹", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "물류관리", l3: "운송·배차 관리", l4: "선적 일정 관리"},
+      {no: 44, title: "웹앱 통합관리시스템", desc: "사내 개발된 여러 자동화 웹앱의 접근 권한, 로그, 배포 현황을 일괄 관리", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "IT운영", l3: "IT 서비스 관리", l4: "웹앱 통합관리시스템"},
+      {no: 45, title: "자체 AX Hub 구축 및 코드리뷰 자동화", desc: "생성형 AI를 활용하여 사내 개발 코드의 버그 탐지, 최적화 및 리뷰 프로세스 자동화", type: "6) Agent", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "AX·AI 플랫폼", l3: "AI 개발·활용 플랫폼", l4: "자체 AX Hub 구축 및 코드리뷰 자동화"},
+      {no: 46, title: "인원현황 메일보고", desc: "근태/인사 시스템에서 일일 인원 현황을 자동 취합하여 경영진 메일로 자동 발송", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "근태관리", l4: "인원현황 메일보고"},
+      {no: 47, title: "입사자 처리현황 관리", desc: "신규 입사자의 계정 생성, 비품 지급 등 온보딩 프로세스 상태를 웹 대시보드로 관리", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "채용·온보딩", l4: "입사자 처리현황 관리"},
+      {no: 48, title: "품의서 자동 작성", desc: "정형화된 기초 데이터를 입력하면 전자결재 시스템에 맞춘 품의서 양식을 자동 생성", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "총무·업무지원", l3: "업무·시설 관리", l4: "품의서 자동 작성"},
+      {no: 49, title: "채용공고 자동 작성", desc: "필요 직무 키워드를 입력하면 AI가 채용 포털 양식에 맞춘 공고문 초안을 자동 생성", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "채용·온보딩", l4: "채용공고 자동 작성"},
+      {no: 50, title: "내부 시스템 DLP 기능 구현", desc: "사내 PC의 파일 반출 로그 등을 모니터링하여 정보 유출 방지(Data Loss Prevention)", type: "6) Agent", purpose: "자체 AI 시스템 구축", l1: "경영지원", l2: "정보보안", l3: "보안 모니터링·통제", l4: "내부 시스템 DLP 기능 구현"},
+      {no: 51, title: "부가세 신고 검증 웹앱", desc: "국세청 전자세금계산서 내역과 사내 ERP 전표를 대사하여 신고 누락/오류 검증", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "세무관리", l4: "부가세 신고 검증 웹앱"},
+      {no: 52, title: "법인카드 비교검증 웹앱", desc: "카드사 청구 내역과 사내 ERP 회계 전표를 대사하여 불일치 항목을 자동 추출", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "회계관리", l4: "법인카드 비교검증 웹앱"},
+      {no: 53, title: "주52시간 모니터링", desc: "출퇴근 기록 데이터를 바탕으로 주 52시간 초과 예상자를 파악하고 대시보드 경고", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "인사관리", l3: "근태관리", l4: "주52시간 모니터링"},
+      {no: 54, title: "고객사 RTP 자동전송", desc: "고객사가 요구하는 리포트(RTP) 데이터를 양식에 맞춰 자동 추출 및 메일 전송", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질정보관리", l4: "고객사 RTP 자동전송"},
+      {no: 55, title: "대리운전 현황 대시보드", desc: "사내 대리운전 호출 내역 및 정산 데이터를 시각화하여 비용 통제 대시보드로 활용", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "총무·업무지원", l3: "차량·비용 운영", l4: "대리운전 현황 대시보드"},
+      {no: 56, title: "신규입사자 전산 체크", desc: "신규 입사자의 필수 그룹웨어/ERP 계정 생성 및 권한 부여 상태를 RPA가 자동 점검", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "채용·온보딩", l4: "신규입사자 전산 체크"},
+      {no: 57, title: "승인원 작성 자동화", desc: "제품 스펙 데이터를 기반으로 고객사 제출용 승인원 문서를 자동 맵핑 및 포맷팅", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "승인원 작성 자동화"},
+      {no: 58, title: "개발 일정 통합관리", desc: "개발 일정을 통합하여 관리", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "연구개발", l2: "개발관리", l3: "개발 프로젝트 관리", l4: "개발 일정 통합관리"},
+      {no: 59, title: "PADS 자연어 처리", desc: "PADS 회로설계 툴에서 자연어 처리 기능을 활용", type: "4) 앱/시스템", purpose: "자체 AI 시스템 구축", l1: "연구개발", l2: "H/W 개발", l3: "회로·PCB 설계", l4: "PADS 자연어 처리"},
+      {no: 60, title: "금형마감 자동화", desc: "금형 마감일을 자동으로 관리", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "금형·사출관리", l3: "금형·사출 검증", l4: "금형마감 자동화"},
+      {no: 61, title: "법인 결산데이터 분석 웹 개발", desc: "해외법인 결산 데이터를 취합하여 재무 트렌드를 분석하고 시각화하는 웹 페이지", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "회계관리", l4: "법인 결산데이터 분석 웹 개발"},
+      {no: 62, title: "법인 인건비 분석", desc: "법인별 인건비 지출 데이터를 집계/분석하여 효율성을 점검하는 관리 대시보드 구축", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "인사관리", l3: "인건비 분석", l4: "법인 인건비 분석"},
+      {no: 63, title: "금형 관리 시스템 개발", desc: "자사 및 협력사가 보유한 금형의 이력, 타발 수명, 위치 등을 통합 관리하는 웹 플랫폼", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "제조·품질", l2: "금형·사출관리", l3: "금형·사출 검증", l4: "금형 관리 시스템 개발"},
+      {no: 64, title: "AI Crew 게시판 운영", desc: "사내 AI 활용 사례, 과제 진행 현황 및 노하우를 공유하는 인트라넷 커뮤니티 구축", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "업무지원", l3: "협업·정보공유 플랫폼", l4: "AI Crew 게시판 운영"},
+      {no: 65, title: "삼진 LLM 시스템 구축", desc: "사내 문서 및 규정 데이터를 학습하여 내부 임직원이 질의응답할 수 있는 프라이빗 AI", type: "3) AI챗봇", purpose: "자체 AI 시스템 구축", l1: "경영지원", l2: "AX·AI 플랫폼", l3: "AI 개발·활용 플랫폼", l4: "삼진 LLM 시스템 구축"},
+      {no: 66, title: "CMI Report", desc: "주요 원자재 시황 및 가격 데이터를 크롤링하여 정기 리포트로 자동 생성 및 배포", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "구매관리", l3: "원자재 시황·조달 분석", l4: "CMI Report"},
+      {no: 67, title: "개인 비용 정산 자동화", desc: "OCR 기술을 활용해 영수증 이미지에서 사업자번호, 금액 등 정보를 자동 추출하고 전표 형식으로 생성", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "비용정산", l4: "개인 비용 정산 자동화"},
+      {no: 68, title: "법인별 물량 배분 시뮬레이션", desc: "법인별 생산능력을 고려한 최적의 물량 배분 시뮬레이션", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "생산관리", l3: "생산 물량 배분", l4: "법인별 물량 배분 시뮬레이션"},
+      {no: 69, title: "삼진 SAP 운영 매뉴얼 & FAQ List", desc: "ERP 데이터를 연동하여 전사 손익, 재무 현황 등 핵심 재무 지표를 분석하고 시각화하는 대시보드", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "재무·회계", l3: "재무성과분석", l4: "삼진 SAP 운영 매뉴얼 & FAQ List"},
+      {no: 70, title: "전사 재무분석(전사손익·재무현황·EBITDA·ROE·잉여현금흐름)", desc: "ERP 회계 데이터를 실시간 연동하여 핵심 재무 지표를 자동 산출하는 분석 대시보드", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "회계관리", l4: "전사 재무분석(전사손익·재무현황·EBITDA·ROE·잉여현금흐름)"},
+      {no: 71, title: "제품군 원가계산(SAP CO 자료 업로드·제품군별 원가 분석)", desc: "SAP CO(원가) 데이터를 업로드하여 제품군별 상세 원가 및 마진을 자동으로 분석하는 앱", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "원가관리", l4: "제품군 원가계산(SAP CO 자료 업로드·제품군별 원가 분석)"},
+      {no: 72, title: "장기 미수채권 현황 공유 및 조기 회수", desc: "ERP에서 장기 미수채권 리스트를 자동 추출하여 관련 영업 담당자에게 공유함으로써 조기 회수를 지원", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "채권·채무관리", l4: "장기 미수채권 현황 공유 및 조기 회수"},
+      {no: 73, title: "회로 승인원 PDF 변환·병합 (원본+CPK+ROHS 합본)", desc: "Word, 정음글로벌(.gul) 문서를 PDF로 일괄 자동 변환하고, 원본+CPK+ROHS 자료를 순서대로 병합", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "회로 승인원 PDF 변환·병합 (원본+CPK+ROHS 합본)"},
+      {no: 74, title: "승인원 오타 검출 자동화 앱개발", desc: "승인원 텍스트를 AI로 분석하여 SPEC, BT FW 버전 등의 오타 및 불일치 항목을 자동으로 검출", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "승인원 오타 검출 자동화 앱개발"},
+      {no: 75, title: "AI를 활용한 유해물질 성적서 검증 자동화", desc: "AI 엔진(OCR)을 통해 PDF 형태의 유해물질 성적서를 자동 분석하고 오류를 검증", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "AI를 활용한 유해물질 성적서 검증 자동화"},
+      {no: 76, title: "AI를 활용한 유해물질 관련 정기 메일 자동 발송", desc: "유해물질 자료의 만료일을 관리하며, 만료 전 협력사 담당자에게 갱신 요청 메일을 자동으로 발송", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "AI를 활용한 유해물질 관련 정기 메일 자동 발송"},
+      {no: 77, title: "구매팀 자재 운영 효율화 Tool, 장납기 자재 체크 자동화", desc: "장납기 자재의 결품을 예방하고, 재료비 산출, 물량 관리 등을 자동화하는 구매팀 전용 웹사이트 구축", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "구매·SCM", l2: "자재관리", l3: "장납기 자재 운영", l4: "구매팀 자재 운영 효율화 Tool, 장납기 자재 체크 자동화"},
+      {no: 78, title: "직원 근태현황 52시간 초과 여부 파악 파일 작성", desc: "일별 근태 CSV 파일을 자동으로 취합하여, 주 52시간 초과 근무 위험이 있는 인원을 모니터링하는 대시보드 구현", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "인사관리", l3: "근태관리", l4: "직원 근태현황 52시간 초과 여부 파악 파일 작성"},
+      {no: 79, title: "기구 승인원 PDF 변환·병합", desc: "여러 개의 기구 승인원 관련 문서(Word, 훈민정음)를 드래그앤드롭 방식으로 한번에 PDF로 변환 및 병합", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "기구 승인원 PDF 변환·병합"},
+      {no: 80, title: "스피커 제품 홀 비전 검사기 개발", desc: "자체 AI 기반 딥러닝 비전 알고리즘 적용하여 불량 홀 실시간 정밀 판독", type: "5) Vision AI", purpose: "자체 AI 시스템 구축", l1: "제조·품질", l2: "품질관리", l3: "자동검사·판정", l4: "스피커 제품 홀 비전 검사기 개발"},
+      {no: 81, title: "규정 검토 시스템", desc: "AI를 활용해 3개국(한국,중국,베트남)의 규정 및 법령을 자동으로 분석·관리하고, 신구대비표 생성, 개정 이력 관리, 법령 모니터링, 챗봇을 통한 학습까지 지원하는 서버리스 웹 애플리케이션", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "법무·준법", l3: "법규·규정 모니터링", l4: "규정 검토 시스템"},
+      {no: 82, title: "4분할 폴더 탐색기 App", desc: "다중 폴더 작업을 위한 분할 화면(1~4분할) 레이아웃, 드래그앤드롭, 빠른 웹사이트 접속(Quick Link) 등을 지원하여 파일 관리 편의성을 높인 데스크톱 애플리케이션", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "업무지원", l3: "협업·정보공유 플랫폼", l4: "4분할 폴더 탐색기 App"},
+      {no: 83, title: "PC-OFF (퇴근시간 연계)", desc: "유연근무제 환경에서, IP 기반으로 개인별 퇴근 시간을 관리하고 정시에 팝업 알림과 PC 자동 종료를 실행하여 정시 퇴근 문화를 유도하는 시스템", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "근태관리", l4: "PC-OFF (퇴근시간 연계)"},
+      {no: 84, title: "판매량 예측기", desc: "고객사 FCST 및 과거 3개년 출하 실적을 복합적으로 분석하여, 데이터 기반의 선제적 물량 확보 및 재고 최적화를 지원하는 수요 예측 시스템", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "영업·마케팅", l2: "판매계획", l3: "수요예측", l4: "판매량 예측기"},
+      {no: 85, title: "재고의 정도(적정 재고) 파일 자동 생성기", desc: "ERP의 매입 이력, 재고 수량 등 데이터를 기반으로 품목별 재고 수준을 A, B, C 등급으로 자동 분류하고, 담당자별 재고 현황을 대시보드로 시각화하여 적정 재고 관리를 지원", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "구매·SCM", l2: "자재관리", l3: "재고·입출고 관리", l4: "재고의 정도(적정 재고) 파일 자동 생성기"},
+      {no: 86, title: "제조지 손익 분석 BI 시스템", desc: "해외 제조법인의 생산·출하·손익 데이터를 통합하여, 손익 현황, 계획 대비 변동 원인, 미래 손익 및 환율 시뮬레이션까지 하나의 웹 대시보드에서 분석하는 BI 시스템", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "재무성과분석", l4: "제조지 손익 분석 BI 시스템"},
+      {no: 87, title: "AOI 검사 자동화 시스템", desc: "PCB 기판 위 부품의 결함(미삽, 색상 불일치, 극성 오류 등)을 AI 비전 기술(ROI 기반)로 실시간 자동 판정하고, 검사 이력 및 불량 이미지를 DB에 자동 저장하는 시스템", type: "5) Vision AI", purpose: "자체 AI 시스템 구축", l1: "제조·품질", l2: "품질관리", l3: "자동검사·판정", l4: "AOI 검사 자동화 시스템"},
+      {no: 88, title: "BOM <> PCB 좌표 매칭 & 이력 비교", desc: "BOM과 PCB 좌표 파일의 부품 참조번호(RefDes) 및 세부 규격을 자동으로 비교·매칭하여 불일치를 검출하고, BOM 버전 간의 변경 이력을 시각적으로 비교하는 시스템", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "연구개발", l2: "개발관리", l3: "BOM·개발정보 관리", l4: "BOM <> PCB 좌표 매칭 & 이력 비교"},
+      {no: 89, title: "SMPS 시험성적서 자동작성 프로그램", desc: "오실로스코프의 파형 이미지를 OCR 기술로 자동 인식하여 측정값(MIN/MAX/RMS)을 추출하고, 27개의 엑셀 시트별 규칙에 따라 파형 사진과 측정값을 자동으로 기입", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "SMPS 시험성적서 자동작성 프로그램"},
+      {no: 90, title: "LinguaMeet 실시간 AI 통역 웹앱", desc: "설치 없이 모바일과 PC에서 음성 및 텍스트를 실시간으로 인식하고 다국어로 통·번역하여, 해외 파트너와의 회의 및 소통을 지원하는 웹 플랫폼", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "업무지원", l3: "다국어 커뮤니케이션", l4: "LinguaMeet 실시간 AI 통역 웹앱"},
+      {no: 91, title: "DIMA – 3D 사출 검증 Tool", desc: "3D 모델(STP)을 업로드하면 파팅라인, 언더컷, 수축, 웰드라인 등 사출 성형 및 금형 구조의 문제점을 사전에 자동으로 예측하고 DFM 리포트를 생성하는 검증 솔루션", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "금형·사출관리", l3: "금형·사출 검증", l4: "DIMA – 3D 사출 검증 Tool"},
+      {no: 92, title: "DLP 정보유출방지", desc: "중요 자료의 외부 유출(USB, 메일 등) 경로를 모니터링하고 자동으로 차단 및 기록하는 보안 시스템", type: "6) Agent", purpose: "자체 AI 시스템 구축", l1: "경영지원", l2: "정보보안", l3: "보안 모니터링·통제", l4: "DLP 정보유출방지"},
+      {no: 93, title: "개선제안 AI 평가", desc: "직원들이 제출한 비정형 텍스트의 개선 제안 내용을 AI가 이해하여 독창성 및 실현 가능성을 자동 평가", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "업무혁신", l3: "혁신과제 관리", l4: "개선제안 AI 평가"},
+      {no: 94, title: "장납기자재 발주 자동화", desc: "리드타임이 긴 자재의 재고와 미래 소요량을 분석하여 결품을 예방하고 자동으로 발주 처리", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "자재관리", l3: "자재소요·발주 관리", l4: "장납기자재 발주 자동화"},
+      {no: 95, title: "AI 설계 기술가이드", desc: "AI를 활용하여 사내 설계 표준 및 기술 가이드를 손쉽게 제공받고 검색할 수 있는 시스템", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "연구개발", l2: "기술개발", l3: "설계지식 관리", l4: "AI 설계 기술가이드"},
+      {no: 96, title: "ERP 실적관리 (PDA)", desc: "PDA 단말기를 통해 생산 현장에서 실시간으로 ERP 실적 데이터를 즉시 등록하고 조회하는 앱", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "생산관리", l3: "생산실적 관리", l4: "ERP 실적관리 (PDA)"},
+      {no: 97, title: "신뢰성 검증 관리 모듈", desc: "제품의 신뢰성 검증 및 테스트 이력 데이터를 체계적으로 통합하여 관리하고 분석하는 시스템 모듈", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "제조·품질", l2: "품질관리", l3: "시험·신뢰성 관리", l4: "신뢰성 검증 관리 모듈"},
+      {no: 98, title: "삼광 ChatGPT 서비스", desc: "LibreChat 기반으로 사내 서비스 계정을 통합하고, 문서/FAQ 지식 검색과 자동 응대를 지원하는 프라이빗 AI 챗봇", type: "3) AI챗봇", purpose: "자체 AI 시스템 구축", l1: "경영지원", l2: "AX·AI 플랫폼", l3: "AI 개발·활용 플랫폼", l4: "삼광 ChatGPT 서비스"},
+      {no: 99, title: "총무 업무 관리시스템", desc: "총무 부서의 정형/비정형 현업 업무를 시스템화하여 데이터를 통합하고 효율적으로 관리하는 웹 플랫폼", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "총무·업무지원", l3: "업무·시설 관리", l4: "총무 업무 관리시스템"},
+      {no: 100, title: "AI 머신러닝 펜 수량 카운팅 솔루션", desc: "카메라로 촬영된 이미지 속 다수의 펜(제품) 객체를 AI 비전 기술로 자동 인식하고 판별하여 수량을 정확히 카운팅", type: "5) Vision AI", purpose: "자체 AI 시스템 구축", l1: "제조·품질", l2: "품질관리", l3: "자동검사·판정", l4: "AI 머신러닝 펜 수량 카운팅 솔루션"},
+      {no: 101, title: "사출·금형 업무 포털", desc: "흩어져 있던 조건표, 엑셀 대장, 설비, 점검 업무를 하나의 통합 플랫폼으로 디지털화", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "제조·품질", l2: "금형·사출관리", l3: "금형·사출 검증", l4: "사출·금형 업무 포털"},
+      {no: 102, title: "성우전자 FAI (초도품 검사) 관리 시스템 개발", desc: "Excel로 수기 관리하던 초도품 측정 데이터를 웹 시스템에 업로드하여 Cpk 산출, Spec 판정을 자동화하고, 고객사별 승인 이력 관리 및 마감일 알림 기능을 제공", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질통계·역량평가", l4: "성우전자 FAI (초도품 검사) 관리 시스템 개발"},
+      {no: 103, title: "AMR(Autonomous Mobile Robot) 자동화 설비 작동 시뮬레이션 코딩 개발", desc: "AMR 물류 자동화 설비의 운영 로직(운행 Cycle Time, 가동률, 병목 공정 등)을 디지털 환경에서 사전 시뮬레이션하여 설비 투자 전 운영 효율성을 검증", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "설비관리", l3: "설비 운영·예지보전", l4: "AMR(Autonomous Mobile Robot) 자동화 설비 작동 시뮬레이션 코딩 개발"},
+      {no: 104, title: "신규 개발 품목 Database 통합 리스트 관리", desc: "담당자별로 개별 관리하던 신규 모델의 파트 리스트(BOM)를 통합 DB로 구축하여, 모델, 품목, 소재, 담당자 등 다양한 조건으로 검색하고 관리", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "연구개발", l2: "개발관리", l3: "BOM·개발정보 관리", l4: "신규 개발 품목 Database 통합 리스트 관리"},
+      {no: 105, title: "SCM 원자재 시황분석 및 전략적 조달 플랫폼", desc: "주요 원자재(구리, 아연, 니켈 등)의 실시간 시세와 매입 단가를 모니터링하고, AI 교차 분석을 통해 최적의 매입 전략 및 리스크 분석을 지원하는 플랫폼", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "구매·SCM", l2: "구매관리", l3: "원자재 시황·조달 분석", l4: "SCM 원자재 시황분석 및 전략적 조달 플랫폼"},
+      {no: 106, title: "생성형 AI 활용 법인 생산 실적 분석 및 Capa 검토 Dashboard 구현", desc: "해외 법인의 ERP 생산 실적을 AI가 자동으로 분류/분석하고, 공정별/시리즈별 실적 및 Capa 가동률을 시각화하여 경영 현황을 즉시 파악할 수 있는 대시보드", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "생산관리", l3: "생산실적·생산능력 분석", l4: "생성형 AI 활용 법인 생산 실적 분석 및 Capa 검토 Dashboard 구현"},
+      {no: 107, title: "품질 검사자 역량 평가 시스템 구축", desc: "동일 샘플에 대한 검사자별 측정 데이터의 편차(R&R)를 통계적으로 분석하여, 검사자의 역량을 정량적으로 평가하고 MSA 심사에 대응", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "품질관리", l3: "품질통계·역량평가", l4: "품질 검사자 역량 평가 시스템 구축"},
+      {no: 108, title: "신규 영업 수주 현황 Dashboard", desc: "견적 접수부터 수주까지 영업 활동 전체 파이프라인을 시각화하여 진행 현황을 종합적으로 관리하고, 미수주 원인 분석을 통해 영업 전략 수립을 지원", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "영업·마케팅", l2: "영업관리", l3: "영업실적관리", l4: "신규 영업 수주 현황 Dashboard"},
+      {no: 109, title: "회사 경영 활동에 필요한 법규 준수 및 사내 규정 업데이트 알림 Dashboard", desc: "국가법령정보센터 API와 연동하여 법규 개정 사항을 실시간으로 추적하고, 사내 규정과 연관된 변경 내용을 담당자에게 자동으로 알리는 시스템", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "법무·준법", l3: "법규·규정 모니터링", l4: "회사 경영 활동에 필요한 법규 준수 및 사내 규정 업데이트 알림 Dashboard"},
+      {no: 110, title: "AI 이용한 사내 IT 전산 문의 통합 시스템 (Helpdesk) 구축", desc: "전화, 메신저 등 파편화된 IT 문의 채널을 챗봇 기반의 웹 플랫폼으로 통합하여, 단순/반복 문의는 자동 응대하고 처리 이력을 체계적으로 관리", type: "3) AI챗봇", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "IT운영", l3: "IT 서비스 관리", l4: "AI 이용한 사내 IT 전산 문의 통합 시스템 (Helpdesk) 구축"},
+      {no: 111, title: "연결 손익 현황판 (데이터 기반 경영 의사결정 시스템 구축)", desc: "본사와 해외 법인의 손익 데이터를 통합하여 KPI 달성 현황, 손익 요인(매출/원가/고정비), 환율 영향 등을 다각도로 자동 분석하고 시각화하는 BI 대시보드", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "재무성과분석", l4: "연결 손익 현황판 (데이터 기반 경영 의사결정 시스템 구축)"},
+      {no: 112, title: "“똑똑한 정보 소싱“을 위한 통합 Dashboard 도우미", desc: "개인 PC에 흩어져 있던 시장, 고객사, 경쟁사 관련 정보 및 아이디어를 중앙 플랫폼에 수집/공유하고, 카테고리, 보안 등급별로 분류하여 검색/활용", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "영업·마케팅", l2: "시장조사", l3: "경쟁정보 분석", l4: "“똑똑한 정보 소싱“을 위한 통합 Dashboard 도우미"},
+      {no: 113, title: "부서 업무 Scheduler 및 유관부서 담당자 알림 톡 발송 Dashboard", desc: "부서의 주요 업무 및 회의 일정을 시스템에 등록하면, 중요도에 따라 D-7, D-Day 등에 맞춰 유관부서 담당자에게 자동으로 이메일 알림을 발송", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "총무·업무지원", l3: "업무·시설 관리", l4: "부서 업무 Scheduler 및 유관부서 담당자 알림 톡 발송 Dashboard"},
+      {no: 114, title: "베트남 법인 ERP 매출/손익 및 주요 계정 변동 현황 분석 보고서 생성", desc: "베트남 법인의 ERP 원본 데이터를 분석하여, 품목별/계정별 매출, 손익, 주요 계정의 변동 추이를 시각화하고 분석 리포트를 자동으로 생성", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "재무성과분석", l4: "베트남 법인 ERP 매출/손익 및 주요 계정 변동 현황 분석 보고서 생성"},
+      {no: 115, title: "ESG micro website 제작", desc: "ESG 가이드라인 분석부터 콘텐츠 생성, 다국어 번역까지 지원하여 웹사이트를 자동 제작", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "ESG·지속가능경영", l3: "ESG 정보관리", l4: "ESG micro website 제작"},
+      {no: 116, title: "경쟁사실적비교 보고", desc: "DART 공시 자료를 자동 수집하여 경쟁사와 자사의 실적을 비교 분석", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "영업·마케팅", l2: "시장조사", l3: "경쟁정보 분석", l4: "경쟁사실적비교 보고"},
+      {no: 117, title: "공정능력분석(CPK) 툴", desc: "측정값을 입력하면 CPK를 자동 산출하고 판정해주는 분석 프로그램", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질통계·역량평가", l4: "공정능력분석(CPK) 툴"},
+      {no: 118, title: "CR관리 프로그램", desc: "제품별 원가절감(CR) 이력과 금액을 관리하고 과도한 CR 리스크를 사전에 인지", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "원가절감 관리", l4: "CR관리 프로그램"},
+      {no: 119, title: "달러 취득 및 환전 내역 관리", desc: "달러 취득 및 환전 내역을 자동으로 기록하고 관리하는 자금 관리 프로그램", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "자금관리", l4: "달러 취득 및 환전 내역 관리"},
+      {no: 120, title: "PLM 시스템 활용현황 집계", desc: "PLM의 기능별 데이터를 자동 통합하여 부서별 활용 현황을 시각화하는 대시보드", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "연구개발", l2: "개발관리", l3: "개발 프로젝트 관리", l4: "PLM 시스템 활용현황 집계"},
+      {no: 121, title: "고객관계관리(CRM)", desc: "회의록, 고객 정보를 등록/관리하고 관련 일정을 추적하는 영업 관리 시스템", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "영업·마케팅", l2: "영업관리", l3: "고객·수주관리", l4: "고객관계관리(CRM)"},
+      {no: 122, title: "불량개선 AI 솔루션", desc: "과거 불량 개선 사례를 AI(RAG)가 분석하여 최적의 불량 대책을 자동 추천", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "품질관리", l3: "불량·개선관리", l4: "불량개선 AI 솔루션"},
+      {no: 123, title: "지능형 특허 서치 및 회피 전략 자동화", desc: "연관 특허를 자동 검색 기반 회피/적용 전략 도출 자동화", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "연구개발", l2: "지식재산관리", l3: "특허 리스크 분석", l4: "지능형 특허 서치 및 회피 전략 자동화"},
+      {no: 124, title: "GRecipe 소재 Formulation 및 데이터 분석 자동화", desc: "실험 데이터 기반 다차원 물성 예측 및 알고리즘 기반 최적 레시피 자동 도출", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "연구개발", l2: "소재개발", l3: "소재 배합·물성 예측", l4: "GRecipe 소재 Formulation 및 데이터 분석 자동화"},
+      {no: 125, title: "ISO9001/14001 챗봇 개발", desc: "ISO9001/14001 및 사내 표준문서 관련 내용을 학습하여, 실무자가 업무 지침을 쉽게 조회하고 확인하는 챗봇 개발", type: "3) AI챗봇", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "ISO9001/14001 챗봇 개발"},
+      {no: 126, title: "SQCI 심사 대비 챗봇", desc: "SQCI 심사 대비, 품질 관리 규정 및 심사 요건을 빠르게 조회할 수 있도록 지원하는 챗봇", type: "3) AI챗봇", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질정보관리", l4: "SQCI 심사 대비 챗봇"},
+      {no: 127, title: "품질 KPI 통합 대시보드", desc: "IQC, OQC, PQC, CS 등 품질 전 파트의 핵심 지표(주/월 단위)를 통합 모니터링하는 대시보드 구축", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "품질관리", l3: "품질지표 모니터링", l4: "품질 KPI 통합 대시보드"},
+      {no: 128, title: "PQC 공정 점검 대시보드", desc: "PQC 공정 점검 결과를 데이터화하고 실시간으로 취합 및 모니터링하는 전용 대시보드 시스템 구축", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "품질관리", l3: "공정품질 모니터링", l4: "PQC 공정 점검 대시보드"},
+      {no: 129, title: "검교정 관리 자동화 웹앱", desc: "분기별 검교정 대상 장비를 자동 선정하고, 검교정 결과를 입력/관리하는 웹앱 개발", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "시험·신뢰성 관리", l4: "검교정 관리 자동화 웹앱"},
+      {no: 130, title: "다국어 품질 교육 동영상", desc: "외국인 작업자를 위해 정전기 방지, 제품 취급 방법 등 현장 품질 기본 준수 사항을 다국어로 교육하는 영상 교재 제작", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "현장 품질교육", l4: "다국어 품질 교육 동영상"},
+      {no: 131, title: "소모품 재고관리 시스템", desc: "QR 코드 기반의 소모품 입출고 관리 앱 및 발주/입출고 현황 대시보드 운영", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "자재관리", l3: "재고·입출고 관리", l4: "소모품 재고관리 시스템"},
+      {no: 132, title: "생산 필요량 산출 자동화 웹앱", desc: "고객사 SOP(Excel) 데이터를 웹앱에 연동하여 PBA 생산 필요량을 자동 산출", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "생산관리", l3: "생산계획 수립", l4: "생산 필요량 산출 자동화 웹앱"},
+      {no: 133, title: "웹앱 기반 생산계획 수립", desc: "기준 정보(모델별 생산라인, 표준시간 등) 및 SOP, 고객사 D/O를 기반으로 간트차트를 활용한 생산계획 수립", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "생산관리", l3: "생산계획 수립", l4: "웹앱 기반 생산계획 수립"},
+      {no: 134, title: "경영실적(KPI) 대시보드", desc: "주요 경영실적 KPI 현황을 웹앱 형태의 대시보드로 구성하여 정기 보고를 자동화하고, 챗봇을 통한 예측 기능 제공", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "경영관리", l3: "경영실적 보고", l4: "경영실적(KPI) 대시보드"},
+      {no: 135, title: "MODAPTS 기반 ST 측정 AI", desc: "수삽 라인의 작업자 동작을 영상으로 분석하여 MODAPTS 기법 기반의 표준시간(ST)을 실시간으로 측정하는 AI 프로그램 개발", type: "5) Vision AI", purpose: "자체 AI 시스템 구축", l1: "제조·품질", l2: "공정관리", l3: "공정분석·최적화", l4: "MODAPTS 기반 ST 측정 AI"},
+      {no: 136, title: "선입선출(FIFO) 관리 시스템", desc: "반제품 창고의 매거진 입출고 시, 바코드 스캔을 통해 선입선출을 관리하고 실시간 데이터를 저장하는 웹앱 개발", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "자재관리", l3: "재고·입출고 관리", l4: "선입선출(FIFO) 관리 시스템"},
+      {no: 137, title: "매출채권 연체관리", desc: "ERP 데이터 기반 장기 미수채권을 추출 및 자동 현황 메일 발송현황표 정기발송", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "채권·채무관리", l4: "매출채권 연체관리"},
+      {no: 138, title: "월 실적 총괄표 관리", desc: "월 실적 데이터를 취합하고 총괄표를 만드는 과정의 데이터 가공 시간 단축", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "경영관리", l3: "업무 운영관리", l4: "월 실적 총괄표 관리"},
+      {no: 139, title: "경쟁기업 경영정보 비교 분석", desc: "전자공시 데이터를 자동으로 수집하고, 경쟁사와 경영 정보를 비교 분석하는 프로세스 자동화", type: "2) RPA", purpose: "의사결정 고도화", l1: "영업·마케팅", l2: "시장조사", l3: "경쟁정보 분석", l4: "경쟁기업 경영정보 비교 분석"},
+      {no: 140, title: "P/F Cutting 작업일보 대시보드화", desc: "P/F Cutting 공정의 작업일보를 대시보드로 구현하여 생산성 비교 분석을 자동화", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "공정관리", l3: "공정분석·최적화", l4: "P/F Cutting 작업일보 대시보드화"},
+      {no: 141, title: "AI 기반 데이터 설비 예지보전", desc: "IBA(이상 진동 분석) 시스템의 데이터를 연계하여 설비 상태를 대시보드에서 모니터링하고 예지보전 수행", type: "4) 앱/시스템", purpose: "자체 AI 시스템 구축", l1: "제조·품질", l2: "설비관리", l3: "설비 운영·예지보전", l4: "AI 기반 데이터 설비 예지보전"},
+      {no: 142, title: "법 개정 자동 모니터링 및 적용 지원", desc: "주요 법령의 개정 사항을 AI를 통해 자동으로 모니터링", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "법무·준법", l3: "법규·규정 모니터링", l4: "법 개정 자동 모니터링 및 적용 지원"},
+      {no: 143, title: "부동산 임대료 수금 관리", desc: "AI활용 대시보드 → 계약정보 자동입력, 내용 부서간 공유", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "자산관리", l4: "부동산 임대료 수금 관리"},
+      {no: 144, title: "회의실 예약 Dash Board 및 예약 시스템 구축", desc: "회의실 실시간 가용 상태 공유 및 스마트 예약 시스템", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "총무·업무지원", l3: "업무·시설 관리", l4: "회의실 예약 Dash Board 및 예약 시스템 구축"},
+      {no: 145, title: "과제 및 일정관리 Dash Board 제작", desc: "AI 과제 및 컨설팅 진행 현황, 일정을 자동으로 관리하는 대시보드 제작", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "총무·업무지원", l3: "업무·시설 관리", l4: "과제 및 일정관리 Dash Board 제작"},
+      {no: 146, title: "AI 기반 FCST(수요예측) 보정 및 판매계획 반영", desc: "AI를 활용해 수요 패턴을 분석하고, 이를 통해 수요예측(FCST) 정확도를 높여 판매계획에 반영", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "영업·마케팅", l2: "판매계획", l3: "수요예측", l4: "AI 기반 FCST(수요예측) 보정 및 판매계획 반영"},
+      {no: 147, title: "원자재별 과부족 산출 업무 간소화", desc: "원자재 사용량을 기반으로 과부족 현황을 자동으로 산출하여 업무를 간소화", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "자재관리", l3: "자재소요·발주 관리", l4: "원자재별 과부족 산출 업무 간소화"},
+      {no: 148, title: "방습제 도포 경로 최적화 및 작성시간 단축", desc: "방습제 도포 작업의 최적 경로를 계산하여 작업 시간을 단축", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "제조·품질", l2: "공정관리", l3: "공정분석·최적화", l4: "방습제 도포 경로 최적화 및 작성시간 단축"},
+      {no: 149, title: "사업장별 자재 과부족 점검 프로그램", desc: "각 사업장의 생산계획 대비 자재 과부족 현황을 점검하는 프로그램", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "자재관리", l3: "자재소요·발주 관리", l4: "사업장별 자재 과부족 점검 프로그램"},
+      {no: 150, title: "4점 정합(데이터 비교) 업무 효율화", desc: "4개의 다른 데이터를 비교/검증(정합)하는 수작업을 자동화하여 휴먼 에러 방지", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "IT·데이터관리", l3: "데이터 정합성 검증", l4: "4점 정합(데이터 비교) 업무 효율화"},
+      {no: 151, title: "과도 스트레스 파형/값 자동삽입 및 스코프 제어", desc: "제품 테스트 시 측정되는 스트레스 파형 데이터를 자동으로 분석하고, 스코프 장비를 제어", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "측정데이터 분석", l4: "과도 스트레스 파형/값 자동삽입 및 스코프 제어"},
+      {no: 152, title: "사내 복리후생 Q&A 챗봇 구축", desc: "RAG(검색 증강 생성) 기술을 기반으로 사내 복리후생 정책 및 지원 프로그램을 안내하는 챗봇", type: "3) AI챗봇", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "복리후생 운영", l4: "사내 복리후생 Q&A 챗봇 구축"},
+      {no: 153, title: "매출/매입 부가세 누락 현황 비교 프로그램", desc: "전표 데이터를 기반으로 매출 및 매입 부가세 누락 현황을 자동으로 비교/검증", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "세무관리", l4: "매출/매입 부가세 누락 현황 비교 프로그램"},
+      {no: 154, title: "제품승인원 PDF 통합 변환 Tool", desc: "여러 개의 제품 승인원 문서를 하나의 PDF 파일로 변환 및 병합하는 도구", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "제품승인원 PDF 통합 변환 Tool"},
+      {no: 155, title: "스코프 측정파형 정리 간소화", desc: "오실로스코프로 측정한 파형 데이터를 자동으로 정리하고 분석", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "측정데이터 분석", l4: "스코프 측정파형 정리 간소화"},
+      {no: 156, title: "부품 동질성 데이터 분석", desc: "여러 제품에 사용되는 부품의 주요 데이터를 비교하여 동질성을 분석", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "측정데이터 분석", l4: "부품 동질성 데이터 분석"},
+      {no: 157, title: "VD Partlist 비교 분석 프로그램", desc: "제품 개발 시 생성되는 여러 버전의 부품표(Partlist)를 자동으로 비교하여 변경사항을 확인", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "연구개발", l2: "개발관리", l3: "BOM·개발정보 관리", l4: "VD Partlist 비교 분석 프로그램"},
+      {no: 158, title: "PCB Check List 보조 Tool", desc: "PCB 설계 및 검증 단계에서 사용하는 체크리스트 업무를 자동화하는 보조 도구", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "연구개발", l2: "H/W 개발", l3: "회로·PCB 설계", l4: "PCB Check List 보조 Tool"},
+      {no: 159, title: "자성류 규격승인원 비교 검토 Tool", desc: "자성류 부품의 규격과 승인원 내용을 자동으로 비교하고 검토", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "자성류 규격승인원 비교 검토 Tool"},
+      {no: 160, title: "SMPS 포장 설계 보조", desc: "SMPS(전원공급장치)의 포장 사양을 결정하는 설계를 보조하는 시스템", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "연구개발", l2: "제품설계", l3: "설계 시뮬레이션", l4: "SMPS 포장 설계 보조"},
+      {no: 161, title: "특허 사전검토 AI 분석 지원", desc: "신규 기술 개발 시 관련 특허를 AI로 분석하여 분쟁 리스크를 사전에 검토 (부가가치 창출 과제)", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "연구개발", l2: "지식재산관리", l3: "특허 리스크 분석", l4: "특허 사전검토 AI 분석 지원"},
+      {no: 162, title: "출퇴근 미인식 자동메일 전송", desc: "출퇴근 데이터를 자동으로 분석하여, 인식이 누락된 경우 대상자에게 자동으로 메일을 발송.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "근태관리", l4: "출퇴근 미인식 자동메일 전송"},
+      {no: 163, title: "연차현황 자동메일 전송", desc: "개인별 연차 사용 현황을 자동으로 취합하여 분석하고, 관련 내용을 메일로 발송.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "근태관리", l4: "연차현황 자동메일 전송"},
+      {no: 164, title: "총 자산현황 자동화", desc: "전사의 총자산 현황 데이터를 자동으로 취합하고 가공하여 보고.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "자산관리", l4: "총 자산현황 자동화"},
+      {no: 165, title: "문서중앙화 보안 위반 메일 발송", desc: "문서 중앙화 시스템의 보안 정책 위반 사례를 자동으로 감지하여 위반자에게 경고 메일을 발송.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "정보보안", l3: "보안 모니터링·통제", l4: "문서중앙화 보안 위반 메일 발송"},
+      {no: 166, title: "전사 MRO 구매 성과 및 네고 현황 자동 분석 시스템", desc: "MRO(소모성 자재) 구매 데이터를 자동으로 분석하고, 성과 및 네고 현황을 시각화하는 시스템 구축.", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "구매·SCM", l2: "구매관리", l3: "구매가격·협력사 관리", l4: "전사 MRO 구매 성과 및 네고 현황 자동 분석 시스템"},
+      {no: 167, title: "원자재/광물 시장 가격 변동 및 트렌드 분석 자동화", desc: "외부 정보 소스에서 원자재 및 광물 가격 데이터를 자동으로 수집하여 시장 트렌드를 분석.", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "구매·SCM", l2: "구매관리", l3: "원자재 시황·조달 분석", l4: "원자재/광물 시장 가격 변동 및 트렌드 분석 자동화"},
+      {no: 168, title: "매월 재고조사 자동화", desc: "매월 실시하는 재고조사 데이터를 자동으로 취합하고, 실시간으로 현황을 모니터링.", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "자재관리", l3: "재고·입출고 관리", l4: "매월 재고조사 자동화"},
+      {no: 169, title: "Battery Pack, Cell 측정 Data 분석 자동화", desc: "배터리 팩과 셀의 테스트 측정 데이터를 자동으로 분석하고, 분석 공수를 단축.", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "측정데이터 분석", l4: "Battery Pack, Cell 측정 Data 분석 자동화"},
+      {no: 170, title: "전자담배 과습궐련 인식 측정 Data 분석 자동화", desc: "전자담배의 과습 궐련 테스트 데이터를 자동으로 수집, 분석하여 불량 판정 정확도를 향상.", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "불량·개선관리", l4: "전자담배 과습궐련 인식 측정 Data 분석 자동화"},
+      {no: 171, title: "SW License 분석 자동화", desc: "사내에서 사용하는 소프트웨어 라이선스 현황 데이터를 자동으로 가공하고 분석.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "IT운영", l3: "IT 서비스 관리", l4: "SW License 분석 자동화"},
+      {no: 172, title: "KT&G 매출 대시보드 구축 및 매출 분석 효율화", desc: "KT&G 관련 매출 실적을 대시보드로 시각화하여 분석 시간을 단축.", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "영업·마케팅", l2: "영업관리", l3: "영업실적관리", l4: "KT&G 매출 대시보드 구축 및 매출 분석 효율화"},
+      {no: 173, title: "직수출 / 3자거래 분류 자동화", desc: "수출 데이터를 기준으로 직수출과 제3자 거래를 자동으로 분류하여 데이터 가공 시간을 단축.", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "영업·마케팅", l2: "영업관리", l3: "수출거래 관리", l4: "직수출 / 3자거래 분류 자동화"},
+      {no: 174, title: "전사 내부거래 매출/매입 집계 자동화", desc: "전사 내부거래 데이터를 자동으로 취합하여 매출 및 매입 실적을 집계.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "재무관리", l4: "전사 내부거래 매출/매입 집계 자동화"},
+      {no: 175, title: "매출 집계 자동화", desc: "흩어져 있는 매출 데이터를 자동으로 취합하여 집계하는 프로세스.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "영업·마케팅", l2: "영업관리", l3: "영업실적관리", l4: "매출 집계 자동화"},
+      {no: 176, title: "매입채무 리스트 작성 자동화", desc: "여러 시스템의 데이터를 취합하여 매입채무 리스트를 자동으로 작성.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "채권·채무관리", l4: "매입채무 리스트 작성 자동화"},
+      {no: 177, title: "유휴설비 취합 자동화", desc: "각 라인에 산재된 유휴설비 현황 데이터를 자동으로 취합하고 분석.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "설비관리", l3: "설비 운영·예지보전", l4: "유휴설비 취합 자동화"},
+      {no: 178, title: "제조팀 부가가치 자동화", desc: "제조팀의 부가가치 산출에 필요한 각종 데이터를 자동으로 분석하여 집계.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "재무성과분석", l4: "제조팀 부가가치 자동화"},
+      {no: 179, title: "스페어 관리 자동화", desc: "스페어 부품의 입출고 및 재고를 관리하고, 부족 시 자동으로 알림을 보내 결품 리스크를 예방.", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "구매·SCM", l2: "자재관리", l3: "재고·입출고 관리", l4: "스페어 관리 자동화"},
+      {no: 180, title: "시험 로그 데이터 조건부 자동 추출 및 연산", desc: "방대한 시험 로그 데이터에서 특정 조건의 값을 자동으로 추출하고 필요한 연산을 수행.", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "시험·신뢰성 관리", l4: "시험 로그 데이터 조건부 자동 추출 및 연산"},
+      {no: 181, title: "AI 기반 XRF 스펙트럼 간섭피크 자동 판별 시스템", desc: "XRF(X선 형광분석) 측정 시 나타나는 스펙트럼의 간섭 피크를 AI가 자동으로 판별.", type: "5) Vision AI", purpose: "자체 AI 시스템 구축", l1: "제조·품질", l2: "품질관리", l3: "자동검사·판정", l4: "AI 기반 XRF 스펙트럼 간섭피크 자동 판별 시스템"},
+      {no: 182, title: "CMM 측정 로그 데이터 자동 매핑 및 저장 효율화", desc: "CMM(3차원 측정기) 측정 데이터를 자동으로 도면과 매핑하고 결과를 저장하여 분석 시간을 단축.", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "측정데이터 분석", l4: "CMM 측정 로그 데이터 자동 매핑 및 저장 효율화"},
+      {no: 183, title: "급여명세서 이메일 자동발송 매크로", desc: "250여 명의 직원에게 급여명세서를 이메일로 자동 발송", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "급여관리", l4: "급여명세서 이메일 자동발송 매크로"},
+      {no: 184, title: "특근비 자동계산", desc: "EKP의 Raw Data를 자동으로 취합하여 특근비를 계산하는 프로그램", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "인사관리", l3: "급여관리", l4: "특근비 자동계산"},
+      {no: 185, title: "고객 PO 자동 정리 프로그램", desc: "고객사별로 다른 양식의 PO(발주서)를 자동으로 정리하고 시스템에 입력", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "영업·마케팅", l2: "영업관리", l3: "고객·수주관리", l4: "고객 PO 자동 정리 프로그램"},
+      {no: 186, title: "출장비 관리 시스템", desc: "EKP, 항공 리포트 등 분산된 출장 데이터를 자동으로 취합하고 정산하는 시스템", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "비용정산", l4: "출장비 관리 시스템"},
+      {no: 187, title: "ERP데이터 집계 자동화 시스템", desc: "ERP 데이터를 자동으로 집계하여 보고서, 시스템 입력 등에 활용", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "IT·데이터관리", l3: "ERP 데이터 통합", l4: "ERP데이터 집계 자동화 시스템"},
+      {no: 188, title: "매출실적 취합", desc: "일본 영업의 매출 및 장부 데이터를 통합 관리하고 취합을 자동화하는 시스템", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "영업·마케팅", l2: "영업관리", l3: "영업실적관리", l4: "매출실적 취합"},
+      {no: 189, title: "작업지도서 자동 번역", desc: "서식 유지하며 작업지도서를 베트남어, 일본어 등으로 자동 번역", type: "2) RPA", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "생산관리", l3: "생산운영 관리", l4: "작업지도서 자동 번역"},
+      {no: 190, title: "CPK 분석 자동화 프로그램", desc: "MIC/음향 제품의 CPK(공정 능력 지수) 분석 및 보고 프로세스 자동화", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질통계·역량평가", l4: "CPK 분석 자동화 프로그램"},
+      {no: 191, title: "측정데이터 분석 프로그램", desc: "수작업으로 진행하던 측정 데이터 분석 및 시각화 자동화", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "측정데이터 분석", l4: "측정데이터 분석 프로그램"},
+      {no: 192, title: "기술팀 Work Space", desc: "기술팀의 업무 현황, 신모델 일정, 실패사례 등을 통합 관리하는 웹 기반 시스템", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "연구개발", l2: "개발관리", l3: "기술개발 업무 통합관리", l4: "기술팀 Work Space"},
+      {no: 193, title: "영업부문 Work Space", desc: "ERP, 메일 등에 흩어진 영업 데이터를 통합 관리하고, 실시간 현황을 공유하는 시스템", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "영업·마케팅", l2: "영업관리", l3: "영업실적관리", l4: "영업부문 Work Space"},
+      {no: 194, title: "인사총무 Work Space", desc: "Notion 등 유료 서비스를 대체하고, 개인별 산재된 업무 데이터를 중앙에서 관리하는 시스템", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "경영지원", l2: "인사관리", l3: "인사정보관리", l4: "인사총무 Work Space"},
+      {no: 195, title: "온실가스 관리 포털", desc: "전사 에너지 사용량을 집계하여 온실가스 배출량을 자동 산출하고 관리하는 시스템", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "ESG·지속가능경영", l3: "ESG 정보관리", l4: "온실가스 관리 포털"},
+      {no: 196, title: "산업안전보건 관리 시스템", desc: "엑셀과 종이 기반으로 분산 관리되던 안전보건 문서를 디지털 통합 DB로 전환하고 법적 리스크 사전 차단", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "안전보건관리", l3: "안전보건 리스크 관리", l4: "산업안전보건 관리 시스템"},
+      {no: 197, title: "손익 분석 시스템", desc: "다양한 조건별 손익 분석을 자동화하고 시각화하는 시스템", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "재무성과분석", l4: "손익 분석 시스템"},
+      {no: 198, title: "개발원가견적표 작성 프로그램", desc: "엑셀 기반의 개발원가 견적 업무를 시스템화하여 정확성과 효율을 높인 프로그램", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "경영지원", l2: "재무·회계", l3: "원가관리", l4: "개발원가견적표 작성 프로그램"},
+      {no: 199, title: "고객회의일지 시스템", desc: "팀원별로 관리하던 고객 회의록을 실시간으로 공유하고 이력을 관리하는 시스템", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "영업·마케팅", l2: "영업관리", l3: "고객·수주관리", l4: "고객회의일지 시스템"},
+      {no: 200, title: "프로젝트 관리 시스템(PLM)", desc: "분산된 개발 프로젝트 정보를 중앙에서 관리하여 이력 추적 및 협업을 지원하는 시스템", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "연구개발", l2: "개발관리", l3: "개발 프로젝트 관리", l4: "프로젝트 관리 시스템(PLM)"},
+      {no: 201, title: "품질관리 시스템", desc: "신뢰성 시험, SQA, 실패사례 등 품질보증 업무와 데이터를 단일 플랫폼에서 통합 관리", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "제조·품질", l2: "품질관리", l3: "품질보증 통합관리", l4: "품질관리 시스템"},
+      {no: 202, title: "현지법인 사전 원가 시뮬레이션 시스템", desc: "ERP 실적과 매출 자료를 기반으로 연간 사전 원가를 시뮬레이션하는 시스템", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "원가관리", l4: "현지법인 사전 원가 시뮬레이션 시스템"},
+      {no: 203, title: "크레신 톡 개발(카카오워크 대체)", desc: "사내 업무 시스템과 연동되고 정보 유출 리스크가 없는 자체 메신저 개발", type: "4) 앱/시스템", purpose: "자체 AI 시스템 구축", l1: "경영지원", l2: "업무지원", l3: "협업·정보공유 플랫폼", l4: "크레신 톡 개발(카카오워크 대체)"},
+      {no: 204, title: "AI 통역 프로그램", desc: "본사-해외법인, 고객과의 회의 시 실시간 통역 지원", type: "4) 앱/시스템", purpose: "자체 AI 시스템 구축", l1: "경영지원", l2: "업무지원", l3: "다국어 커뮤니케이션", l4: "AI 통역 프로그램"},
+      {no: 205, title: "UNIT 설계 고도화를 위한 음향 예측 시뮬레이터", desc: "AI 모델로 음향 특성을 예측하여 유닛 설계 사양을 결정하는 시뮬레이터", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "연구개발", l2: "제품설계", l3: "설계 시뮬레이션", l4: "UNIT 설계 고도화를 위한 음향 예측 시뮬레이터"},
+      {no: 206, title: "웹 기반 실시간 비전 검사 시스템", desc: "기존의 육안 수작업 검사를 바코드와 연동된 웹 기반 AI 비전 검사(YOLO, OpenCV 활용)로 전환하고, 검사 이력을 자동으로 기록/관리", type: "5) Vision AI", purpose: "자체 AI 시스템 구축", l1: "제조·품질", l2: "품질관리", l3: "자동검사·판정", l4: "웹 기반 실시간 비전 검사 시스템"},
+      {no: 207, title: "AI 기반 비용분석 통합 대시보드", desc: "엑셀 기반의 수작업 비용 분석을 HTML 기반의 통합 대시보드로 전환하여, 매출 대비 비용 부담, 부서별 증감, 세부 비용 구조 등을 한 화면에서 분석", type: "4) 앱/시스템", purpose: "의사결정 고도화", l1: "경영지원", l2: "재무·회계", l3: "재무성과분석", l4: "AI 기반 비용분석 통합 대시보드"},
+      {no: 208, title: "정밀분석 성적서 자동 검출 프로그램", desc: "담당자가 수동으로 검증하던 정밀분석 성적서를 GPT를 활용한 프로그램을 통해 자동으로 검증하고 결과를 추출", type: "4) 앱/시스템", purpose: "운영 및 프로세스 자동화", l1: "제조·품질", l2: "품질관리", l3: "품질문서 검증", l4: "정밀분석 성적서 자동 검출 프로그램"},
+      {no: 209, title: "신규 모델 BOM 자동 통합", desc: "여러 형식의 BOM(자재명세서) 파일을 수작업으로 통합하던 프로세스를 VBA 매크로를 통해 자동화", type: "1) 매크로", purpose: "운영 및 프로세스 자동화", l1: "연구개발", l2: "개발관리", l3: "BOM·개발정보 관리", l4: "신규 모델 BOM 자동 통합"},
+      {no: 210, title: "SW 통합 현황 시스템 「SW Town」", desc: "Jira, Redmine, 캘린더, 메신저 등에 흩어져 있던 SW개발실의 7가지 현황(프로젝트, 개인업무, 근무상태, 이슈, 세미나, 공지, 식단)을 단일 플랫폼으로 통합하여 가시화, AI 챗봇(NC Talk) 도입", type: "4) 앱/시스템", purpose: "플랫폼 및 자산화", l1: "연구개발", l2: "S/W 개발", l3: "SW 개발현황 관리", l4: "SW 통합 현황 시스템 「SW Town」"}
+    ];
+
+    // 과제 유형별 CSS 태그 클래스 매핑
+    function getTypeClass(typeStr) {
+      if (!typeStr) return 'type-default';
+      if (typeStr.indexOf('매크로') !== -1) return 'type-macro';
+      if (typeStr.indexOf('RPA') !== -1) return 'type-rpa';
+      if (typeStr.indexOf('챗봇') !== -1) return 'type-chatbot';
+      if (typeStr.indexOf('Vision') !== -1) return 'type-vision';
+      if (typeStr.indexOf('Agent') !== -1) return 'type-agent';
+      if (typeStr.indexOf('앱/시스템') !== -1) return 'type-app';
+      return 'type-default';
+    }
+
+    // 드롭다운 옵션 자동 채우기
+    function populateDropdowns() {
+      var keys = [
+        { id: 'filter-l1', key: 'l1' },
+        { id: 'filter-l2', key: 'l2' },
+        { id: 'filter-l3', key: 'l3' },
+        { id: 'filter-l4', key: 'l4' },
+        { id: 'filter-type', key: 'type' },
+        { id: 'filter-purpose', key: 'purpose' }
+      ];
+
+      keys.forEach(function(item) {
+        var select = document.getElementById(item.id);
+        if (!select) return;
+
+        var set = {};
+        rawData.forEach(function(row) {
+          var val = row[item.key];
+          if (val) set[val] = true;
+        });
+
+        var sortedVals = Object.keys(set).sort();
+        sortedVals.forEach(function(val) {
+          var opt = document.createElement('option');
+          opt.value = val;
+          opt.textContent = val;
+          select.appendChild(opt);
+        });
+      });
+
+      var totalEl = document.getElementById('total-count');
+      if (totalEl) totalEl.textContent = rawData.length;
+    }
+
+    // HTML 특수문자 이스케이프 (안전한 테이블 렌더링)
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 테이블 렌더링
+    function renderTable(data) {
+      var tbody = document.getElementById('task-tbody');
+      var emptyState = document.getElementById('empty-state');
+      var filteredCountEl = document.getElementById('filtered-count');
+
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (filteredCountEl) filteredCountEl.textContent = data.length;
+
+      if (data.length === 0) {
+        if (emptyState) emptyState.style.display = 'block';
+        return;
+      }
+      if (emptyState) emptyState.style.display = 'none';
+
+      var fragment = document.createDocumentFragment();
+      data.forEach(function(item) {
+        var tr = document.createElement('tr');
+        var typeClass = getTypeClass(item.type);
+
+        tr.innerHTML = 
+          '<td class="col-no">' + item.no + '</td>' +
+          '<td class="col-l1">' + escapeHtml(item.l1 || '-') + '</td>' +
+          '<td class="col-l2">' + escapeHtml(item.l2 || '-') + '</td>' +
+          '<td class="col-l3">' + escapeHtml(item.l3 || '-') + '</td>' +
+          '<td class="col-l4">' + escapeHtml(item.l4 || '-') + '</td>' +
+          '<td class="col-desc">' + formatDesc(item.desc) + '</td>' +
+          '<td><span class="tag-type ' + typeClass + '">' + escapeHtml(item.type) + '</span></td>' +
+          '<td class="col-purpose">' + escapeHtml(item.purpose || '-') + '</td>';
+
+        fragment.appendChild(tr);
+      });
+
+      tbody.appendChild(fragment);
+    }
+
+    // 필터링 실행
+    function applyFilters() {
+      var l1 = document.getElementById('filter-l1').value;
+      var l2 = document.getElementById('filter-l2').value;
+      var l3 = document.getElementById('filter-l3').value;
+      var l4 = document.getElementById('filter-l4').value;
+      var type = document.getElementById('filter-type').value;
+      var purpose = document.getElementById('filter-purpose').value;
+
+      var titleSearch = document.getElementById('search-title').value.trim().toLowerCase();
+      var descSearch = document.getElementById('search-desc').value.trim().toLowerCase();
+
+      var filtered = rawData.filter(function(item) {
+        if (l1 && item.l1 !== l1) return false;
+        if (l2 && item.l2 !== l2) return false;
+        if (l3 && item.l3 !== l3) return false;
+        if (l4 && item.l4 !== l4) return false;
+        if (type && item.type !== type) return false;
+        if (purpose && item.purpose !== purpose) return false;
+
+        if (titleSearch && item.title.toLowerCase().indexOf(titleSearch) === -1) return false;
+        if (descSearch && item.desc.toLowerCase().indexOf(descSearch) === -1) return false;
+
+        return true;
+      });
+
+      renderTable(filtered);
+    }
+
+    // 엔터키 입력 처리
+    function handleKeyDown(e) {
+      if (e.key === 'Enter') {
+        applyFilters();
+      }
+    }
+
+    // 필터 초기화
+    function resetFilters() {
+      document.getElementById('filter-l1').value = '';
+      document.getElementById('filter-l2').value = '';
+      document.getElementById('filter-l3').value = '';
+      document.getElementById('filter-l4').value = '';
+      document.getElementById('filter-type').value = '';
+      document.getElementById('filter-purpose').value = '';
+      document.getElementById('search-title').value = '';
+      document.getElementById('search-desc').value = '';
+      renderTable(rawData);
+    }
+
+    // 과제 주요내용을 한국어 의미 단위로 줄바꿈
+    function formatDesc(str) {
+      if (!str) return '';
+      var safe = escapeHtml(str);
+      // 의미 구분자: ~하고, ~하여, ~하며, ~통해, ~위해, ~및, ~등을, ~으로, 쉼표 뒤
+      safe = safe.replace(/(,\s*|하고\s|하여\s|으로써\s|통해\s|위해\s|으로\s전환|으로\s개선|시스템으로\s|자동으로\s|형태로\s)/g, '$1<br>');
+      // 길면 주요 접속사/조사 뒤에서도 분리
+      safe = safe.replace(/(\s및\s)/g, '$1<br>');
+      return safe;
+    }
+
+    // 컬럼 너비 드래그 리사이즈
+    function initColumnResize() {
+      var ths = document.querySelectorAll('thead th');
+      ths.forEach(function(th) {
+        var resizer = document.createElement('div');
+        resizer.className = 'th-resizer';
+        th.appendChild(resizer);
+        var startX, startW;
+        resizer.addEventListener('mousedown', function(e) {
+          startX = e.pageX;
+          startW = th.offsetWidth;
+          resizer.classList.add('active');
+          function onMove(ev) {
+            th.style.width = (startW + ev.pageX - startX) + 'px';
+            th.style.minWidth = th.style.width;
+          }
+          function onUp() {
+            resizer.classList.remove('active');
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+          }
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup', onUp);
+          e.preventDefault();
+        });
+      });
+    }
+
+    // 초기 실행
+    function init() {
+      populateDropdowns();
+      renderTable(rawData);
+      initColumnResize();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>

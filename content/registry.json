@@ -1,0 +1,60 @@
+{
+  "categories": [
+    {
+      "slug": "ax-paradigm",
+      "title": "AX : AI와 협업하는 미래",
+      "description": "AX Consulting Basic Guide",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/ax_paradigm.html",
+      "showCaption": true
+    },
+    {
+      "slug": "ax-framework",
+      "title": "AX Framework",
+      "description": "AX를 수행하는 데 필요한 5단계 실행 여정",
+      "cover": "cover.png",
+      "htmlFile": "contents/ax_framework.html",
+      "showCaption": true
+    },
+    {
+      "slug": "vibe-coding",
+      "title": "Vibe Coding",
+      "description": "말로 만들고, 검증으로 완성하다",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/vibe_coding.html",
+      "showCaption": true
+    },
+    {
+      "slug": "gemini-cursor",
+      "title": "Gemini · Antigravity · Cursor",
+      "description": "",
+      "cover": "cover.png",
+      "htmlFile": "contents/Gemini_Antigravity_Cursor.html",
+      "showCaption": true
+    },
+    {
+      "slug": "chatgpt-codex",
+      "title": "ChatGPT · Work · Codex",
+      "description": "",
+      "cover": "cover.png",
+      "htmlFile": "contents/ChatGPT_Work_Codex.html",
+      "showCaption": true
+    },
+    {
+      "slug": "claude",
+      "title": "Claude Code",
+      "description": "",
+      "cover": "cover.png",
+      "htmlFile": "contents/Claude_Code.html",
+      "showCaption": true
+    },
+    {
+      "slug": "case-study-2026h1",
+      "title": "Case Study - 2026H1",
+      "description": "",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/case_26h1.html",
+      "showCaption": true
+    }
+  ]
+}

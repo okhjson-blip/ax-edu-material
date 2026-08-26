@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AX 실무 교육 - Vibe Coding</title>
+  <style>
+    :root {
+      /* Typography */
+      --font-hero: 34pt;
+      --font-title: 26pt;
+      --font-subtitle: 18pt;
+      --font-body: 14pt;
+      --font-sub: 12pt;
+      --font-caption: 10pt;
+
+      /* Color Palette */
+      --color-primary: #1428A0;       /* AX Main Blue */
+      --color-primary-dark: #071A52;  /* AX Navy */
+      --color-primary-light: #F6F9FF; /* AX Pale Blue */
+      --color-accent: #00A9E0;        /* AX Sky Blue */
+      --color-accent-light: #EAF7FF;  /* AX Sky Blue BG */
+      --color-accent-text: #071A52;
+      --color-text-dark: #17233E;
+      --color-text-muted: #63718B;
+      --color-bg-white: #FFFFFF;
+      --color-border: #DBE6F4;
+
+      /* Layout */
+      --sidebar-width: 300px;
+      --footer-height: 60px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      color: var(--color-text-dark);
+      background-color: #F8F9FA;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      color: #FFFFFF;
+      background-color: #0f172a;
+      border-right: 0;
+      box-shadow: 14px 0 38px rgba(6, 23, 64, 0.15);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      background-color: transparent;
+      color: #FFFFFF;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .sidebar-header .title-badge {
+      font-size: var(--font-caption);
+      font-weight: 700;
+      color: #43C9FF;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .sidebar-header .progress-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .progress-info .page-count {
+      font-size: var(--font-sub);
+      font-weight: 700;
+    }
+
+    .progress-info .percentage {
+      font-size: var(--font-caption);
+      opacity: 0.85;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #43C9FF, #FFFFFF);
+      border-radius: 4px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .agenda-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 8px;
+    }
+
+    .agenda-nav::-webkit-scrollbar {
+      width: 5px;
+    }
+    .agenda-nav::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.28);
+      border-radius: 3px;
+    }
+
+    .agenda-group-title {
+      font-size: 11pt;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.78);
+      padding: 14px 10px 6px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .agenda-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      margin: 2px 0;
+      border-radius: 6px;
+      font-size: var(--font-caption);
+      color: rgba(255, 255, 255, 0.72);
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+      line-height: 1.35;
+      text-align: left;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      text-wrap: pretty;
+    }
+
+    .agenda-item:hover {
+      color: #FFFFFF;
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .agenda-item.active {
+      background: linear-gradient(90deg, #0064D2, #0879DC);
+      color: #FFFFFF;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.17);
+    }
+
+    .agenda-item .item-num {
+      font-size: 9pt;
+      opacity: 0.7;
+      min-width: 18px;
+      padding-top: 1px;
+    }
+
+    /* Main Container */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #FFFFFF;
+    }
+
+    /* Main Stage */
+    .stage-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 40px;
+      overflow-y: auto;
+      cursor: pointer;
+      user-select: text;
+    }
+
+    .slide-card {
+      display: none;
+      width: 100%;
+      max-width: 1100px;
+      min-height: 620px;
+      background-color: var(--color-bg-white);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 44px 50px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .slide-card.active {
+      display: flex;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Slide Content Hierarchy */
+    .slide-header {
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--color-primary-light);
+      padding-bottom: 16px;
+    }
+
+    .slide-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: var(--font-sub);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .badge-primary {
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+
+    .badge-accent {
+      background-color: var(--color-accent);
+      color: #FFFFFF;
+    }
+
+    .badge-lime-bg {
+      background-color: var(--color-accent-light);
+      color: var(--color-accent-text);
+      border: 1px solid var(--color-accent);
+    }
+
+    .slide-category {
+      font-size: var(--font-caption);
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+
+    .slide-title-hero {
+      font-size: var(--font-hero);
+      font-weight: 900;
+      color: var(--color-primary-dark);
+      line-height: 1.25;
+      margin-top: 10px;
+    }
+
+    .slide-title-main {
+      font-size: var(--font-title);
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.3;
+    }
+
+    .slide-subtitle {
+      font-size: var(--font-subtitle);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .slide-body {
+      flex: 1;
+      font-size: var(--font-body);
+      line-height: 1.65;
+      color: var(--color-text-dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .slide-card,
+    .slide-header,
+    .slide-body,
+    .content-box {
+      min-width: 0;
+      text-align: left;
+    }
+
+    .slide-title-hero,
+    .slide-title-main,
+    .slide-subtitle,
+    .content-box-title {
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    .slide-title-hero,
+    .slide-title-main,
+    .content-box-title {
+      text-align: left;
+      text-wrap: balance;
+    }
+
+    .slide-subtitle,
+    .slide-body p,
+    .slide-body li,
+    .tip-box {
+      text-align: left;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      text-wrap: pretty;
+    }
+
+    .slide-body ul:not(.step-list),
+    .slide-body ol:not(.step-list) {
+      list-style-position: outside;
+    }
+
+    .slide-body li {
+      padding-left: 0.12em;
+    }
+
+    .slide-body li::marker {
+      font-size: 0.9em;
+    }
+
+    /* Korean semantic wrapping and readable hierarchy */
+    .slide-title-hero,
+    .slide-title-main,
+    .slide-subtitle,
+    .content-box-title,
+    .slide-body p,
+    .slide-body li,
+    .tip-box,
+    td,
+    th {
+      line-break: strict;
+      hyphens: none;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    .slide-title-hero,
+    .slide-title-main,
+    .content-box-title {
+      text-wrap: balance;
+    }
+
+    .slide-subtitle,
+    .slide-body p,
+    .slide-body li,
+    .tip-box,
+    td {
+      text-wrap: pretty;
+    }
+
+    .content-box > .content-box-title ~ *,
+    .slide-body > h3 ~ *,
+    .slide-body > h4 ~ *,
+    .case-study-block > .case-study-block-title + * {
+      margin-inline-start: 1em;
+      max-width: calc(100% - 1em);
+    }
+
+    .slide-body ul:not(.step-list),
+    .slide-body ol:not(.step-list) {
+      list-style-position: outside;
+      padding-inline-start: 1.4em;
+    }
+
+    .step-list li {
+      min-width: 0;
+      text-align: left;
+    }
+
+    .step-list li > .step-num {
+      flex: 0 0 auto;
+    }
+
+    .semantic-bullet {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding-inline-start: 0;
+      list-style: none;
+      text-align: left;
+    }
+
+    .semantic-bullet::before {
+      content: "•";
+      flex: 0 0 auto;
+      width: 0.65em;
+      color: currentColor;
+      font-weight: 800;
+    }
+
+    .semantic-bullet-text {
+      display: block;
+      flex: 1 1 auto;
+      min-width: 0;
+      text-align: left;
+    }
+
+    .keep-together {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 900px) {
+      .content-box > .content-box-title ~ *,
+      .slide-body > h3 ~ *,
+      .slide-body > h4 ~ *,
+      .case-study-block > .case-study-block-title + * {
+        margin-inline-start: 0.5em;
+        max-width: calc(100% - 0.5em);
+      }
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .content-box {
+      background-color: #FAFAFA;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+
+    .content-box.primary-light {
+      background-color: var(--color-primary-light);
+      border-color: #D3E0F5;
+    }
+
+    .content-box.accent-light {
+      background-color: #f7fee7;
+      border-color: #65a30d;
+    }
+
+    .content-box-title {
+      font-size: 16pt;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .step-num {
+      background-color: var(--color-primary);
+      color: #FFF;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10pt;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Code Block */
+    pre.code-block {
+      background-color: #1E1E1E;
+      color: #D4D4D4;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 11pt;
+      line-height: 1.5;
+      overflow-x: auto;
+      border: 1px solid #333;
+    }
+
+    .tip-box {
+      background-color: #f7fee7;
+      border-left: 4px solid #65a30d;
+      padding: 12px 16px;
+      border-radius: 4px;
+      font-size: var(--font-sub);
+      color: #1a2e05;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Slide Footer */
+    .slide-footer-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--color-border);
+      padding-top: 14px;
+      margin-top: 20px;
+      font-size: var(--font-caption);
+      color: var(--color-text-muted);
+    }
+
+    /* Bottom Control Bar */
+    .footer-controls {
+      height: var(--footer-height);
+      background-color: var(--color-bg-white);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: var(--font-sub);
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--color-primary);
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+    }
+
+    .nav-btn:disabled {
+      background-color: #E5E5EA;
+      border-color: #E5E5EA;
+      color: #AEAEB2;
+      cursor: not-allowed;
+    }
+
+    .shortcut-guide {
+      font-size: var(--font-caption);
+      color: var(--color-text-muted);
+      display: flex;
+      gap: 12px;
+    }
+
+    .key-badge {
+      background-color: #F0F4FC;
+      border: 1px solid var(--color-border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 240px;
+      }
+      .slide-card {
+        padding: 30px;
+      }
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .slide-footer-meta.card-next-hint {
+      min-height: 39px;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 10px;
+      color: var(--color-text-muted);
+      background: #FBFDFF;
+      font-size: var(--font-caption);
+      line-height: 1.4;
+    }
+
+    .card-next-hint .down-arrow {
+      color: #0064D2;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .intro-hero-card {
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+      border: 0;
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.22);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .intro-hero-card::after {
+      content: "VIBE";
+      position: absolute;
+      right: -20px;
+      bottom: -40px;
+      z-index: -1;
+      color: rgba(255, 255, 255, 0.045);
+      font-size: clamp(8rem, 15vw, 13rem);
+      font-weight: 900;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .intro-hero-card .slide-header {
+      margin: auto 0;
+      padding: 0 clamp(1rem, 4vw, 4rem);
+      border: 0;
+    }
+
+    .intro-kicker {
+      margin-bottom: 18px;
+      color: #00D4F0;
+      font-size: clamp(0.78rem, 1vw, 0.95rem);
+      font-weight: 800;
+      letter-spacing: 0.16em;
+    }
+
+    .intro-hero-title {
+      margin: 0 0 22px;
+      color: #FFFFFF;
+      font-size: clamp(3rem, 5.6vw, 5.4rem);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -0.055em;
+      text-align: left;
+      text-wrap: balance;
+    }
+
+    .intro-hero-desc {
+      max-width: 1050px;
+      margin-bottom: 24px;
+      color: #E2E8F0;
+      font-size: clamp(1.05rem, 1.45vw, 1.4rem);
+      line-height: 1.75;
+      text-align: left;
+      text-wrap: pretty;
+    }
+
+    .intro-hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .intro-hero-tags span {
+      padding: 7px 14px;
+      color: #F1F5F9;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
+    .case-study-card {
+      height: min(calc(100vh - 56px), 900px);
+      min-height: 0;
+      max-height: 900px;
+      padding: 28px 32px 20px;
+      overflow: hidden;
+    }
+
+    .case-study-card .slide-header {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+    }
+
+    .case-study-card .case-study-content {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 0.9fr) minmax(0, 1.35fr);
+      align-items: stretch;
+      justify-content: stretch;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .case-study-block {
+      min-width: 0;
+      min-height: 0;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      background: var(--color-primary-light);
+    }
+
+    .case-study-block-title {
+      flex: 0 0 auto;
+      color: var(--color-primary-dark);
+      font-size: 12pt;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: left;
+      text-wrap: balance;
+      word-break: keep-all;
+    }
+
+    .case-study-prompt-scroll,
+    .case-study-code-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: #94A3B8 #1E1E1E;
+    }
+
+    .case-study-prompt-scroll::-webkit-scrollbar,
+    .case-study-code-scroll::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    .case-study-prompt-scroll::-webkit-scrollbar-thumb,
+    .case-study-code-scroll::-webkit-scrollbar-thumb {
+      background: #94A3B8;
+      border-radius: 99px;
+    }
+
+    .case-study-prompt-scroll pre.code-block,
+    .case-study-code-scroll pre.code-block {
+      max-height: none;
+      margin: 0 !important;
+      overflow: visible;
+    }
+
+    .case-study-code-part-title {
+      margin: 10px 0 6px;
+      color: var(--color-primary-dark);
+      font-size: 10.5pt;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .case-study-code-part-title:first-child {
+      margin-top: 0;
+    }
+
+    @media (max-width: 1024px) {
+      .case-study-card {
+        height: calc(100vh - 32px);
+        overflow-y: auto;
+      }
+
+      .case-study-card .case-study-content {
+        grid-template-rows: auto auto;
+        overflow: visible;
+      }
+
+      .case-study-prompt-scroll,
+      .case-study-code-scroll {
+        max-height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left Sidebar (Agenda & Progress) -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="title-badge">Vibe Coding 교육</span>
+      <div class="progress-info">
+        <span class="page-count"><span id="curr-page-text">1</span> / <span id="total-page-text">51</span></span>
+        <span class="percentage" id="progress-percent">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+    <nav class="agenda-nav" id="agenda-nav-list">
+      <!-- Agenda Items populated by JS -->
+    </nav>
+    <a href="/" target="_top" style="display:inline-block;margin:auto 16px 18px;padding:6px 0;color:rgba(255,255,255,.82);font-size:13.5px;text-decoration:none;">← 목록으로</a>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <!-- Main Stage -->
+    <main class="stage-area" id="stage-area">
+
+      <!-- Slide 1: Cover -->
+      <section class="slide-card active intro-hero-card" data-group="Intro & Overview" data-title="Vibe Coding: 말로 만들고, 검증으로 완성하다">
+        <div class="slide-header">
+          <div class="intro-kicker">NON-DEVELOPER &amp; BEGINNER AX GUIDE</div>
+          <h1 class="intro-hero-title">Vibe Coding: 말로 만들고,<br>검증으로 완성하다</h1>
+          <p class="intro-hero-desc">오늘의 목표는 “만들기”보다 <strong>“안전하게 완성하기”</strong>입니다. 기초 개념과 안전 원칙을 배우고, 4가지 실무 사례(VBA · RPA · HTML 대시보드 · 웹앱)로 완성합니다.</p>
+          <div class="intro-hero-tags">
+            <span>개념 &amp; 원칙</span>
+            <span>Excel VBA</span>
+            <span>Python RPA</span>
+            <span>HTML 대시보드</span>
+            <span>Streamlit 웹앱</span>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>Vibe Coding & AI 실습 교육</span>
+          <span>Intro</span>
+        </div>
+      </section>
+
+      <!-- Slide 2: Agenda -->
+      <section class="slide-card" data-group="Intro & Overview" data-title="교육 아젠다">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">AGENDA</span></div>
+          <h2 class="slide-title-main">오늘의 목표: “만들기”보다 “안전하게 완성하기”</h2>
+          <p class="slide-subtitle">개념과 안전 원칙을 먼저 익히고, 4가지 실습 사례로 직접 만들어봅니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">1</span> 개념</div>
+              <p>Vibe Coding이란 무엇이고 기존 개발과 어떻게 다른가</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">2</span> 안전</div>
+              <p>비밀정보 · 권한 · 의존성 · 배포 전 필수 점검 원칙</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">3</span> VBA</div>
+              <p>엑셀 매크로로 매출 요약 자동화 실습</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">4</span> RPA</div>
+              <p>파이썬을 활용한 청구서 파일 자동 정리 실습</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">5</span> HTML 대시보드</div>
+              <p>한 파일로 열리는 매출 대시보드 직접 제작</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">6</span> 웹앱</div>
+              <p>Streamlit으로 계산기 및 업무용 웹앱 제작</p>
+            </div>
+          </div>
+          <div class="tip-box">💡 각 실습 세션에는 코딩 경험이 없는 초보자용 미니 실습이 포함되어 있습니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>인트로 · 02</span>
+          <span>페이지 02</span>
+        </div>
+      </section>
+
+      <!-- Slide 3: Part 01 Overview -->
+      <section class="slide-card" data-group="PART 01 · 개념" data-title="PART 01 개념 이해하기">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">PART 01</span></div>
+          <h2 class="slide-title-main">Vibe Coding 개념 이해하기</h2>
+          <p class="slide-subtitle">자연어로 개발하는 시대의 기본 메커니즘과 접근법</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box primary-light">
+              <div class="content-box-title">1. 정의와 구분</div>
+              <p>자연어 중심 개발 방식과 성숙한 엔지니어링의 차이점</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">2. 반복 루프</div>
+              <p>의도 → 생성 → 실행 → 관찰 → 수정의 5단계 대화형 루프</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">3. 첫 과제 선택</div>
+              <p>성공 확률을 높이는 적합한 첫 프로젝트 선정 기준</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>PART 1 · 03</span>
+          <span>페이지 03</span>
+        </div>
+      </section>
+
+      <!-- Slide 4: Definition -->
+      <section class="slide-card" data-group="PART 01 · 개념" data-title="Vibe Coding의 정의">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">DEFINITION</span></div>
+          <h2 class="slide-title-main">Vibe Coding: 자연어로 의도를 말하고 결과로 방향을 잡는 방식</h2>
+          <p class="slide-subtitle">2025년 등장한 표현으로, 코드 문법보다 '원하는 느낌과 결과'에 집중하는 개발 방식</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box">
+              <div class="content-box-title">🌟 초보자에게 주는 기회</div>
+              <ul class="step-list" style="margin-top: 10px;">
+                <li>• 복잡한 문법을 외우기 전 아이디어를 작동하는 프로토타입으로 제작</li>
+                <li>• 비개발자도 데이터 분석 및 업무 자동화 도구를 즉시 구현</li>
+                <li>• 빠른 시도와 즉각적인 피드백 확인 가능</li>
+              </ul>
+            </div>
+            <div class="content-box accent-light">
+              <div class="content-box-title">⚠️ 놓쳐서는 안 될 핵심 책임</div>
+              <p><strong>이해 · 검토 · 테스트의 최종 책임까지 AI에 넘길 수는<br>없습니다.</strong></p>
+              <p style="margin-top: 8px;">속도는 AI가 획기적으로 높이지만, 방향 설정과 결과에 대한 판단, 비즈니스 책임은 사람이 담당합니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>개념 · 04</span>
+          <span>페이지 04</span>
+        </div>
+      </section>
+
+      <!-- Slide 5: Compare -->
+      <section class="slide-card" data-group="PART 01 · 개념" data-title="순수 Vibe Coding vs AI 엔지니어링">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">COMPARE</span></div>
+          <h2 class="slide-title-main">“그냥 실행”에서 “설명 · 검토 · 검증”으로 성숙하기</h2>
+          <p class="slide-subtitle">업무용 · 고객용 결과물을 만들기 위해서는 성숙한 엔지니어링 방식으로 전환해야 합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box">
+              <div class="content-box-title">🌱 순수 Vibe Coding (초기 실험용)</div>
+              <ul class="step-list">
+                <li>• 원하는 느낌/결과만 말함</li>
+                <li>• 생성된 코드를 거의 읽지 않음</li>
+                <li>• 오류 발생 시 무작정 재요청</li>
+                <li>• <em>빠른 개인 아이디어 프로토타입에 유리</em></li>
+              </ul>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">🛡️ AI 보조 엔지니어링 (업무/상용 수준)</div>
+              <ul class="step-list">
+                <li>• 명확한 요구사항과 완료 조건을 명시</li>
+                <li>• 코드 변경점(Diff)과 외부 의존성을 직접 확인</li>
+                <li>• 단위 테스트 및 보안 검사 수행</li>
+                <li>• <em>배포 후 실제 운영 및 예외 처리까지 고려</em></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>개념 · 05</span>
+          <span>페이지 05</span>
+        </div>
+      </section>
+
+      <!-- Slide 6: Loop -->
+      <section class="slide-card" data-group="PART 01 · 개념" data-title="대화형 개발 반복 루프">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">LOOP</span></div>
+          <h2 class="slide-title-main">대화형 개발의 5단계 반복 루프</h2>
+          <p class="slide-subtitle">좋은 결과물은 단 한 번의 '마법 프롬프트'가 아니라 짧고 명확한 반복에서 탄생합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4" style="grid-template-columns: repeat(5, 1fr);">
+            <div class="content-box" style="text-align: center;">
+              <div class="step-num" style="margin: 0 auto 8px;">1</div>
+              <b>의도 정의</b>
+              <p style="font-size: 11pt; margin-top: 6px;">사용자와 해결할 문제 및 제약 명시</p>
+            </div>
+            <div class="content-box" style="text-align: center;">
+              <div class="step-num" style="margin: 0 auto 8px;">2</div>
+              <b>코드 생성</b>
+              <p style="font-size: 11pt; margin-top: 6px;">AI가 요구조건에 맞춘 코드 작성</p>
+            </div>
+            <div class="content-box" style="text-align: center;">
+              <div class="step-num" style="margin: 0 auto 8px;">3</div>
+              <b>직접 실행</b>
+              <p style="font-size: 11pt; margin-top: 6px;">브라우저, 엑셀, 터미널 등에서 실행</p>
+            </div>
+            <div class="content-box" style="text-align: center;">
+              <div class="step-num" style="margin: 0 auto 8px;">4</div>
+              <b>관찰/대조</b>
+              <p style="font-size: 11pt; margin-top: 6px;">화면, 로그, 콘솔 오류 메시지 점검</p>
+            </div>
+            <div class="content-box primary-light" style="text-align: center;">
+              <div class="step-num" style="margin: 0 auto 8px;">5</div>
+              <b>수정/피드백</b>
+              <p style="font-size: 11pt; margin-top: 6px;">차이점을 구체적으로 설명하며 재작업</p>
+            </div>
+          </div>
+          <div class="tip-box">↻ 기대와 다른 결과가 나오면 포기하지 않고 '수정' 단계에서 '의도'를 더 구체화해 다시 전달합니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>작동 방식 · 06</span>
+          <span>페이지 06</span>
+        </div>
+      </section>
+
+      <!-- Slide 7: Fit -->
+      <section class="slide-card" data-group="PART 01 · 개념" data-title="적합한 첫 과제 선택 기준">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">FIT</span></div>
+          <h2 class="slide-title-main">작고 되돌릴 수 있는 문제부터 시작하세요</h2>
+          <p class="slide-subtitle">첫 프로젝트 기준: <strong>작다 · 복구 가능하다 · 민감정보가 없다</strong></p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box accent-light">
+              <div class="content-box-title" style="color: var(--color-accent-text);">✅ 잘 맞는 첫 과제</div>
+              <ul class="step-list">
+                <li>• 개인 업무용 계산기 및 체크리스트</li>
+                <li>• CSV / 엑셀 데이터 정리 및 간단한 대시보드</li>
+                <li>• 반복 양식 문서 자동 생성 및 내부 프로토타입</li>
+                <li>• 공개 데이터 기반의 가벼운 조회 도구</li>
+              </ul>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title" style="color: #D32F2F;">❌ 전문가 검토가 필수인 과제</div>
+              <ul class="step-list">
+                <li>• 결제, 금융, 인사, 의료 등 고위험 판단 영역</li>
+                <li>• 개인정보 처리 및 핵심 사용자 인증 시스템</li>
+                <li>• 안전 제어 시스템 및 대규모 대고객 라이브 서비스</li>
+                <li>• 법적 책임이나 금전적 리스크가 큰 자동화 파이프라인</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>선택 · 07</span>
+          <span>페이지 07</span>
+        </div>
+      </section>
+
+      <!-- Slide 8: Basics -->
+      <section class="slide-card" data-group="PART 01 · 개념" data-title="7가지 기본 개념의 역할">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">BASICS</span></div>
+          <h2 class="slide-title-main">코드를 외우기보다 7가지 기본 개념의 역할을 이해하세요</h2>
+          <p class="slide-subtitle">AI와 원활하게 대화하기 위해 필요한 기본 IT 지형도</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box"><b>1. 파일 · 폴더</b><p style="font-size:11pt; margin-top:4px;">결과물과 데이터가 저장되는 실제 위치</p></div>
+            <div class="content-box"><b>2. HTML/CSS/JS</b><p style="font-size:11pt; margin-top:4px;">웹 화면의 구조(H), 디자인(C), 동작(J)</p></div>
+            <div class="content-box"><b>3. 서버</b><p style="font-size:11pt; margin-top:4px;">브라우저에 앱과 기능을 제공하는 주체</p></div>
+            <div class="content-box"><b>4. 터미널</b><p style="font-size:11pt; margin-top:4px;">컴퓨터에 텍스트 명령을 직접 내리는 창</p></div>
+          </div>
+          <div class="grid-3" style="margin-top: 10px;">
+            <div class="content-box primary-light"><b>5. 패키지</b><p style="font-size:11pt; margin-top:4px;">다른 개발자가 만들어 둔 검증된 기능 묶음</p></div>
+            <div class="content-box primary-light"><b>6. Git</b><p style="font-size:11pt; margin-top:4px;">코드 변경 기록을 관리하고 언제든 복구</p></div>
+            <div class="content-box primary-light"><b>7. 환경변수</b><p style="font-size:11pt; margin-top:4px;">보안 키 · 시스템 설정을 코드와 분리 저장</p></div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>기초 · 08</span>
+          <span>페이지 08</span>
+        </div>
+      </section>
+
+      <!-- Slide 9: Tools -->
+      <section class="slide-card" data-group="PART 01 · 개념" data-title="AI 도구 유형별 특징과 선택">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">TOOLS</span></div>
+          <h2 class="slide-title-main">도구는 화면보다 “어디까지 실행할 수 있는가”로 선택</h2>
+          <p class="slide-subtitle">초보자는 복사본 폴더 + 기본 권한 + 작은 작업으로 시작합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">1</span> 대화형 AI</div>
+              <p><b>예시:</b> ChatGPT, Claude 웹 등</p>
+              <ul class="step-list" style="margin-top:8px; font-size:11pt;">
+                <li>• 코드 예시와 개념 설명 질의응답</li>
+                <li>• 직접 파일 실행이나 수정은 제한적</li>
+                <li>• 학습과 첫 기획 단계에 최적</li>
+              </ul>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title"><span class="step-num">2</span> 에디터형 AI</div>
+              <p><b>예시:</b> Cursor, VS Code AI 등</p>
+              <ul class="step-list" style="margin-top:8px; font-size:11pt;">
+                <li>• 코드 에디터 옆에서 직접 생성 및 수정</li>
+                <li>• 파일 단위 검토(Diff)가 매우 용이</li>
+                <li>• 개발 경험을 쌓기에 가장 적합</li>
+              </ul>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">3</span> 에이전트형 AI</div>
+              <p><b>예시:</b> Claude Code, Codex 등</p>
+              <ul class="step-list" style="margin-top:8px; font-size:11pt;">
+                <li>• 터미널 명령, 테스트 실행, 폴더 탐색 자율 수행</li>
+                <li>• 완료 조건까지 자체 반복 수행</li>
+                <li>• <em>권한 승인과 엄격한 검토 필수</em></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>도구 선택 · 09</span>
+          <span>페이지 09</span>
+        </div>
+      </section>
+
+      <!-- Slide 10: Mini Practice 1 -->
+      <section class="slide-card" data-group="PART 01 · 개념" data-title="미니 실습: AI에게 처음 요청해보기">
+        <div class="slide-header">
+          <div class="slide-meta">
+            <span class="badge badge-accent">실습</span>
+            <span class="slide-category">미니 실습 1</span>
+          </div>
+          <h2 class="slide-title-main">소프트웨어 없이 AI에게 처음 요청해보기</h2>
+          <p class="slide-subtitle">설치 없이 채팅창에서 좋은 요청의 4대 구조(목표·맥락·제약·완료조건) 연습</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> 아무 AI 챗봇(ChatGPT, Claude 등)을 엽니다.</li>
+              <li><span class="step-num">2</span> <strong>“엑셀에서 두 열의 숫자를 더하는 함수를 알려줘. 초보자도 이해할 수 있게 예시와 함께 설명해 줘”</strong>라고 요청합니다.</li>
+              <li><span class="step-num">3</span> 답변에서 ‘수식 예시’와 ‘설명’이 명확히 분리되어 있는지 확인합니다.</li>
+              <li><span class="step-num">4</span> <strong>“더 짧게, 함수 하나만”</strong>처럼 추가 제약조건을 입력하여 답변이 실시간으로 바뀌는지 관찰합니다.</li>
+            </ol>
+          </div>
+          <div class="tip-box">TIP: 이 미니 실습의 목적은 완성도가 아니라 <strong>‘요청 → 결과 → 조건 추가 → 재요청’</strong>의 기본 흐름에 익숙해지는 것입니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>미니실습 · 10</span>
+          <span>페이지 10</span>
+        </div>
+      </section>
+
+      <!-- Slide 11: Part 02 Overview -->
+      <section class="slide-card" data-group="PART 02 · 안전" data-title="PART 02 빠른 결과를 안전한 결과로">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">PART 02</span></div>
+          <h2 class="slide-title-main">빠른 결과를 안전한 결과로 바꾸기</h2>
+          <p class="slide-subtitle">편리함 뒤에 숨겨진 보안 리스크를 통제하고 안전하게 배포하는 3대 원칙</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box primary-light">
+              <div class="content-box-title">1. 비밀·개인정보</div>
+              <p>API 키, 고객 데이터 유출 방지 및 가명 데이터 활용법</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">2. 권한 & 의존성</div>
+              <p>에이전트 권한 최소화 및 외부 라이브러리 검증 원칙</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">3. 배포 전 점검</div>
+              <p>환경 분리, 로깅 보안, 복구 절차 문서화 체크리스트</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>PART 2 · 11</span>
+          <span>페이지 11</span>
+        </div>
+      </section>
+
+      <!-- Slide 12: Security -->
+      <section class="slide-card" data-group="PART 02 · 안전" data-title="비밀정보와 개인정보 보호">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">SECURITY</span></div>
+          <h2 class="slide-title-main">API 키 · 비밀번호 · 고객 데이터는 프롬프트에 넣지 않습니다</h2>
+          <p class="slide-subtitle">⚠️ 이미 노출했다면 텍스트 삭제에 그치지 말고 키를 즉시 폐기 및 재발급해야 합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box accent-light">
+              <div class="content-box-title" style="color: var(--color-accent-text);">✅ 이렇게 합니다 (권장)</div>
+              <ul class="step-list">
+                <li>• 환경변수(.env)와 시스템 비밀 저장소 사용</li>
+                <li>• 가명 또는 합성 샘플 데이터로 사전 테스트</li>
+                <li>• 필요한 최소 폴더만 도구에 공유</li>
+                <li>• 읽기/쓰기 권한을 분리하고 외부 전송 여부 확인</li>
+              </ul>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title" style="color: #D32F2F;">❌ 이렇게 하지 않습니다 (금지)</div>
+              <ul class="step-list">
+                <li>• API 키, 토큰, DB 접속 비밀번호를 프롬프트에 붙여넣기</li>
+                <li>• 주민번호, 건강, 금융정보 등 민감 개인정보 입력</li>
+                <li>• 고객 원본 데이터나 회사 비공개 소스코드 전체 투입</li>
+                <li>• 운영 서버 자격증명을 대화창에 노출</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>보안 · 12</span>
+          <span>페이지 12</span>
+        </div>
+      </section>
+
+      <!-- Slide 13: Permissions -->
+      <section class="slide-card" data-group="PART 02 · 안전" data-title="에이전트 권한 최소화">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">PERMISSIONS</span></div>
+          <h2 class="slide-title-main">에이전트 권한은 필요한 폴더 · 명령 · 시간에만 최소 부여</h2>
+          <p class="slide-subtitle">Full Access(전체 권한)는 편리함이 아니라 사용자의 책임 범위를 무한정 넓히는 설정입니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">1</span> 파일</div>
+              <p>작업 중인 프로젝트 폴더만 읽기 · 쓰기 허용</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">2</span> 명령</div>
+              <p>파일 삭제, 패키지 설치, 배포 명령 전 사람 승인</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">3</span> 네트워크</div>
+              <p>검증되고 꼭 필요한 외부 도메인만 통신 허용</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">4</span> 외부 행동</div>
+              <p>이메일 발송, 결제, SNS 게시 전 반드시 사람 확인</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>권한 · 13</span>
+          <span>페이지 13</span>
+        </div>
+      </section>
+
+      <!-- Slide 14: Supply Chain -->
+      <section class="slide-card" data-group="PART 02 · 안전" data-title="의존성 및 공급망 관리">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">SUPPLY CHAIN</span></div>
+          <h2 class="slide-title-main">패키지 하나를 추가할 때 코드 · 보안 · 라이선스 위험도 함께 유입</h2>
+          <p class="slide-subtitle">AI가 제안한 패키지명, 함수, 버전이 실제로 공식 저장소에 존재하는지 반드시 확인합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">1</span> 필요성 검토</div>
+              <p>표준 내장 라이브러리(Standard Library)로 가능한지, 패키지 도입이 필수적인지 확인</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">2</span> 신뢰성 확인</div>
+              <p>공식 저장소의 최근 업데이트 현황, 다운로드 수, 알려진 보안 취약점 점검</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">3</span> 라이선스 준수</div>
+              <p>상업적 사용 가능 여부, 코드 공개 의무(GPL 등)가 없는지 출처와 라이선스 점검</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>의존성 · 14</span>
+          <span>페이지 14</span>
+        </div>
+      </section>
+
+      <!-- Slide 15: Deploy -->
+      <section class="slide-card" data-group="PART 02 · 안전" data-title="배포 전 필수 점검 사항">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">DEPLOY</span></div>
+          <h2 class="slide-title-main">내 컴퓨터에서 실행되는 것과 고객에게 안전한 것은 다릅니다</h2>
+          <p class="slide-subtitle">실제 서비스 배포 전 체크리스트</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> 빌드 · 단위 테스트 · 보안 취약점 검사를 사전에 실행한다.</li>
+              <li><span class="step-num">2</span> 개발(Dev) · 테스트(Stage) · 운영(Prod) 환경과 데이터를 엄격히 분리한다.</li>
+              <li><span class="step-num">3</span> 시스템 오류 로그에 개인정보나 비밀값(API Key 등)이 남지 않게 마스킹 처리한다.</li>
+              <li><span class="step-num">4</span> 장애 발생 시 백업 데이터 복구 및 롤백 절차를 문서화한다.</li>
+              <li><span class="step-num">5</span> AI 토큰 사용량, API 호출 비용, 시스템 오류율을 지속적으로 모니터링한다.</li>
+            </ol>
+          </div>
+          <div class="tip-box">GO: 민감 데이터를 다루는 고위험 서비스는 반드시 사내 전문가 보안 리뷰 후 공개합니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>배포 · 15</span>
+          <span>페이지 15</span>
+        </div>
+      </section>
+
+      <!-- Slide 16: Session 01 VBA Intro -->
+      <section class="slide-card" data-group="SESSION 01 · VBA" data-title="SESSION 01 엑셀 매크로 자동화">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">SESSION 01 · VBA</span></div>
+          <h2 class="slide-title-main">엑셀 매크로로 매출 요약을 자동화하기</h2>
+          <p class="slide-subtitle">사무직의 필수 무기인 엑셀 VBA를 바이브 코딩으로 구현하고 안전하게 검증하기</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box primary-light">
+              <div class="content-box-title">1. 프롬프트 구조화</div>
+              <p>시트 구조, 집계 규칙, 예외 상황, 출력 포맷 명시</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">2. Dictionary 집계</div>
+              <p>고유 키 기반 매출 합산 및 자동 서식 적용</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">3. 버튼 연결 & 검증</div>
+              <p>도형 버튼 연결, 원본 보존, 재실행 안전성 검증</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>SESSION VBA · 16</span>
+          <span>페이지 16</span>
+        </div>
+      </section>
+
+      <!-- Slide 17: VBA Case -->
+      <section class="slide-card" data-group="SESSION 01 · VBA" data-title="VBA 실습 시나리오">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">CASE</span></div>
+          <h2 class="slide-title-main">엑셀 매출 원장을 버튼 한 번으로 요약하는 매크로</h2>
+          <p class="slide-subtitle">‘원본’ 시트의 일자·담당자·매출 데이터를 읽어 ‘요약’ 시트에 담당자별 합계와 서식을 자동 생성</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">1</span> 초기화</div>
+              <p>기존 ‘요약’ 시트 생성 또는 데이터 초기화</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">2</span> 집계</div>
+              <p>Dictionary로 담당자별 매출 자동 합산</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">3</span> 서식</div>
+              <p>헤더 굵게, 통화(#,##0), 열 너비 자동 맞춤</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">4</span> 완료</div>
+              <p>완료 안내창 표시 및 에러 핸들링</p>
+            </div>
+          </div>
+          <div class="tip-box">
+            📌 실습 파일은 반드시 <strong>.xlsm</strong>(매크로 사용 통합 문서)으로 저장하고, 처음에는 가상 샘플 데이터 20행으로 시작하세요.
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>VBA 1/5 · 17</span>
+          <span>페이지 17</span>
+        </div>
+      </section>
+
+      <!-- Slide 18: VBA Mini Practice -->
+      <section class="slide-card" data-group="SESSION 01 · VBA" data-title="VBA 미니 실습">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">실습</span><span class="slide-category">VBA 미니 실습</span></div>
+          <h2 class="slide-title-main">코드 없이 매크로 버튼만 눌러보기</h2>
+          <p class="slide-subtitle">VBA 모듈을 생성하고 3줄짜리 매크로를 실행하는 기본 구조 익히기</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> 엑셀을 열고 [개발 도구] 탭 확인 (없으면 [파일] > [옵션] > [리본 사용자 지정]에서 활성화)</li>
+              <li><span class="step-num">2</span> [개발 도구] > [Visual Basic]을 열어 코드 에디터 화면을 확인합니다.</li>
+              <li><span class="step-num">3</span> [삽입] > [모듈]을 클릭해 빈 모듈을 생성합니다.</li>
+              <li><span class="step-num">4</span> 아래 3줄을 입력하고 <span class="key-badge">F5</span> 키로 실행합니다:</li>
+            </ol>
+            <pre class="code-block" style="margin-top: 10px;">Sub 인사말()
+    MsgBox "안녕하세요"
+End Sub</pre>
+          </div>
+          <div class="tip-box">💡 메시지 창이 뜨면 성공입니다! 이것이 VBA 실습의 가장 작은 실행 단위입니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>미니실습 · 18</span>
+          <span>페이지 18</span>
+        </div>
+      </section>
+
+      <!-- Slide 19: VBA Prompt -->
+      <section class="slide-card" data-group="SESSION 01 · VBA" data-title="VBA 프롬프트 작성법">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">PROMPT</span></div>
+          <h2 class="slide-title-main">프롬프트에는 시트 구조 · 집계 규칙 · 예외 · 출력 형식을 명시</h2>
+          <p class="slide-subtitle">AI가 안정적인 코드를 작성하도록 입력과 완료 기준을 구체화합니다.</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 10pt;">Excel VBA 매크로를 작성해 줘.
+[입력]
+- 시트명: 원본 / 1행 제목, 2행부터 데이터
+- B열: 담당자, E열: 매출
+
+[요구사항]
+1. '요약' 시트가 없으면 생성, 있으면 초기화
+2. 담당자별 매출 합계를 Scripting.Dictionary로 계산
+3. A1:B1에 헤더 입력 및 굵게 표시
+4. 매출은 #,##0 서식 적용, 열 너비 자동 맞춤
+5. 빈 담당자 및 숫자가 아닌 매출 데이터는 건너뜀
+6. Option Explicit, On Error 오류 처리, 주석 포함
+7. 모듈 붙여넣기 위치 및 실행 방법 설명
+
+완료 기준: 원본 데이터 절대 미수정 · 요약 시트만 재생성 · 빈값 예외 처리</pre>
+        </div>
+        <div class="slide-footer-meta">
+          <span>VBA 2/5 · 19</span>
+          <span>페이지 19</span>
+        </div>
+      </section>
+
+      <!-- Slide 20: VBA Implement 1 -->
+      <section class="slide-card" data-group="SESSION 01 · VBA" data-title="VBA 구현: 모듈 및 집계 로직">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">IMPLEMENT</span></div>
+          <h2 class="slide-title-main">마지막 행을 찾고 Dictionary로 집계하기</h2>
+          <p class="slide-subtitle">Option Explicit으로 변수를 엄격히 선언하고 Scripting.Dictionary로 고유 합산</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 10.5pt;">Option Explicit
+
+Sub 담당자별매출요약()
+    Dim wsS As Worksheet, wsO As Worksheet
+    Dim lastRow As Long, r As Long, dict As Object
+    
+    Set wsS = ThisWorkbook.Worksheets("원본")
+    Set dict = CreateObject("Scripting.Dictionary")
+    
+    lastRow = wsS.Cells(wsS.Rows.Count, "B").End(xlUp).Row
+    
+    For r = 2 To lastRow
+        If Trim(wsS.Cells(r, "B").Value) <> "" And IsNumeric(wsS.Cells(r, "E").Value) Then
+            dict(wsS.Cells(r, "B").Value) = dict(wsS.Cells(r, "B").Value) + wsS.Cells(r, "E").Value
+        End If
+    Next r
+    ' 다음 단계: 요약 시트 출력 및 서식 지정</pre>
+          <div class="tip-box">💡 <code>End(xlUp)</code>은 데이터의 실제 마지막 행을 정확히 찾고, <code>IsNumeric</code>은 오입력된 문자 매출을 걸러냅니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>VBA 3/5 · 20</span>
+          <span>페이지 20</span>
+        </div>
+      </section>
+
+      <!-- Slide 21: VBA Implement 2 -->
+      <section class="slide-card" data-group="SESSION 01 · VBA" data-title="VBA 구현: 결과 출력 및 서식">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">IMPLEMENT</span></div>
+          <h2 class="slide-title-main">요약 시트 출력 · 서식 설정 · 오류 처리</h2>
+          <p class="slide-subtitle">기존 시트 청소 후 결과를 출력하고 천 단위 콤마 서식과 자동 너비를 적용합니다.</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 9.5pt;">    On Error Resume Next
+    Set wsO = ThisWorkbook.Worksheets("요약")
+    On Error GoTo EH
+    If wsO Is Nothing Then
+        Set wsO = Worksheets.Add: wsO.Name = "요약"
+    Else
+        wsO.Cells.Clear
+    End If
+    
+    wsO.Range("A1:B1").Value = Array("담당자", "매출합계")
+    Dim k, outRow As Long: outRow = 2
+    For Each k In dict.Keys
+        wsO.Cells(outRow, 1).Value = k
+        wsO.Cells(outRow, 2).Value = dict(k)
+        outRow = outRow + 1
+    Next k
+    
+    wsO.Rows(1).Font.Bold = True
+    wsO.Columns("B").NumberFormat = "#,##0"
+    wsO.Columns("A:B").AutoFit
+    MsgBox "매출 요약 완료!", vbInformation: Exit Sub
+EH:
+    MsgBox "오류 발생: " & Err.Description, vbExclamation
+End Sub</pre>
+        </div>
+        <div class="slide-footer-meta">
+          <span>VBA 4/5 · 21</span>
+          <span>페이지 21</span>
+        </div>
+      </section>
+
+      <!-- Slide 22: VBA Practice Check -->
+      <section class="slide-card" data-group="SESSION 01 · VBA" data-title="VBA 실습 검증 및 확장">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">실습</span><span class="slide-category">VBA 검증</span></div>
+          <h2 class="slide-title-main">버튼 연결 · 결과 대조 · 매크로 보안 확인</h2>
+          <p class="slide-subtitle">원본 필터 SUM 수식과 매크로 결과를 비교하고 예외 상황을 시험합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> 파일을 <strong>.xlsm</strong>으로 저장 → [개발 도구] > [삽입] > [단추(양식 컨트롤)] 생성 후 매크로 연결</li>
+              <li><span class="step-num">2</span> 원본 데이터를 수정한 뒤 버튼을 클릭해 '요약' 시트가 즉시 갱신되는지 확인</li>
+              <li><span class="step-num">3</span> <strong>확장 과제:</strong> 매출 기준 내림차순 정렬 → 담당자별 건수 열 추가 → 막대 차트 자동 생성</li>
+              <li><span class="step-num">4</span> 출처가 불분명한 외부 매크로 파일은 실행하지 않는 사내 신뢰 센터 보안 수칙 준수</li>
+            </ol>
+          </div>
+          <div class="tip-box">🏆 완료 기준: 결과 수치 100% 일치 · 원본 시트 불변 · 5회 연속 재실행 시에도 중복 오류 없음</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>VBA 5/5 · 22</span>
+          <span>페이지 22</span>
+        </div>
+      </section>
+
+      <!-- Slide 23: VBA Supplementary -->
+      <section class="slide-card" data-group="SESSION 01 · VBA" data-title="VBA 환경 설정 가이드">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">Supplementary</span></div>
+          <h2 class="slide-title-main">VBA 환경 설정 및 버튼 만들기 단계별 요약</h2>
+          <p class="slide-subtitle">엑셀 리본 메뉴 활성화부터 매크로 지정 및 파일 저장까지</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box">
+              <div class="content-box-title">1. 개발 도구 활성화</div>
+              <p>[파일] > [옵션] > [리본 사용자 지정] > 우측 <strong>[개발 도구] 체크박스 활성화</strong></p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title">2. 에디터 및 모듈</div>
+              <p>[개발 도구] > [Visual Basic] 클릭 > [삽입] > [모듈] 생성 후 코드 붙여넣기</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title">3. 버튼 연결 & 저장</div>
+              <p>시트에 도형/단추 삽입 > 마우스 우클릭 [매크로 지정] > 파일 형식 <strong>.xlsm</strong> 저장</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>보충자료 · 23</span>
+          <span>페이지 23</span>
+        </div>
+      </section>
+
+      <!-- Slide 24: Session 02 RPA Intro -->
+      <section class="slide-card" data-group="SESSION 02 · Python RPA" data-title="SESSION 02 파이썬 RPA">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">SESSION 02 · Python RPA</span></div>
+          <h2 class="slide-title-main">파이썬과 바이브 코딩으로 RPA 프로그램 만들기</h2>
+          <p class="slide-subtitle">반복되는 파일/폴더 정리 작업을 파이썬 표준 라이브러리만으로 자동화하기</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box primary-light">
+              <div class="content-box-title">1. 스크립트 설계</div>
+              <p>외부 패키지 설치 없는 표준 라이브러리 기반 프롬프트</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">2. 자동 분류 로직</div>
+              <p>pathlib & shutil을 활용한 날짜별 디렉토리 생성 및 복사</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">3. 검증 및 스케줄러</div>
+              <p>중복 파일 건너뛰기, 로그 출력, 작업 스케줄러 자동화</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>SESSION Python RPA · 24</span>
+          <span>페이지 24</span>
+        </div>
+      </section>
+
+      <!-- Slide 25: RPA Case -->
+      <section class="slide-card" data-group="SESSION 02 · Python RPA" data-title="RPA 실습 시나리오">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">CASE</span></div>
+          <h2 class="slide-title-main">다운로드 폴더의 청구서를 날짜별로 자동 정리</h2>
+          <p class="slide-subtitle">표준 라이브러리(os, shutil, pathlib, datetime)만으로 Input 폴더의 PDF를 오늘 날짜 폴더로 안전하게 복사</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4" style="grid-template-columns: repeat(5, 1fr);">
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">1</div><b>폴더 스캔</b><p style="font-size:10pt;">Input 내 *.pdf 탐색</p></div>
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">2</div><b>날짜 폴더</b><p style="font-size:10pt;">YYYY-MM-DD 생성</p></div>
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">3</div><b>중복 확인</b><p style="font-size:10pt;">이미 있으면 스킵</p></div>
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">4</div><b>파일 복사</b><p style="font-size:10pt;">shutil.copy2 보존</p></div>
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">5</div><b>결과 출력</b><p style="font-size:10pt;">복사/건너뜀 카운트</p></div>
+          </div>
+          <div class="tip-box">💡 원본 파일을 '삭제'하거나 '이동'하지 않고 '복사'함으로써 데이터 유실 위험을 원천 차단합니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>Python RPA 1/5 · 25</span>
+          <span>페이지 25</span>
+        </div>
+      </section>
+
+      <!-- Slide 26: RPA Mini Practice -->
+      <section class="slide-card" data-group="SESSION 02 · Python RPA" data-title="RPA 미니 실습">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">실습</span><span class="slide-category">RPA 미니 실습</span></div>
+          <h2 class="slide-title-main">5줄짜리 파이썬 스크립트 실행해보기</h2>
+          <p class="slide-subtitle">파이썬 파일을 생성하고 터미널에서 실행하는 기본 감각 익히기</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> 메모장이나 VS Code를 열고 <code>hello.py</code> 파일을 생성합니다.</li>
+              <li><span class="step-num">2</span> 아래 코드를 입력하고 저장합니다:</li>
+            </ol>
+            <pre class="code-block" style="margin-top: 10px;">from pathlib import Path
+
+print("안녕하세요! 파이썬 RPA 실습입니다.")
+files = list(Path(".").glob("*"))
+print(f"현재 폴더 파일 개수: {len(files)}개")</pre>
+            <ol class="step-list" style="margin-top: 10px;">
+              <li><span class="step-num">3</span> 터미널에서 <code>python hello.py</code> 명령을 실행하여 결과가 출력되는지 확인합니다.</li>
+            </ol>
+          </div>
+          <div class="tip-box">TIP: 이 '파일 저장 → 터미널 실행' 흐름이 모든 파이썬 자동화의 기본 동작입니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>미니실습 · 26</span>
+          <span>페이지 26</span>
+        </div>
+      </section>
+
+      <!-- Slide 27: RPA Prompt -->
+      <section class="slide-card" data-group="SESSION 02 · Python RPA" data-title="RPA 프롬프트 작성법">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">PROMPT</span></div>
+          <h2 class="slide-title-main">바이브 코딩 프롬프트: 목표 · 제약 · 예외 처리 명시</h2>
+          <p class="slide-subtitle">표준 라이브러리로 요청하면 별도의 pip 패키지 설치 없이 즉시 실행 가능합니다.</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 9.5pt;">파이썬으로 초보자용 파일 정리 스크립트를 만들어 줘.
+[목표]
+- RPA_Practice/Input 폴더의 *.pdf 파일을 오늘 날짜 폴더(RPA_Practice/Output/YYYY-MM-DD)로 복사한다.
+
+[조건 및 제약]
+- pip 설치 없이 표준 라이브러리만 사용 (os, shutil, pathlib, datetime)
+- 원본 파일은 절대 삭제하거나 이동하지 않는다 (복사 방식)
+- 대상 날짜 폴더가 없으면 자동 생성, 동일 파일명이 이미 존재하면 건너뜀
+- PDF가 0개일 경우 친절한 안내 메시지 출력
+- 실행 완료 시 '복사 X건 / 건너뜀 Y건' 결과 요약 출력
+
+[출력]
+1. 전체 실행 가능 코드 (organize_invoices.py)
+2. 함수별 핵심 설명 및 터미널 실행 명령어</pre>
+        </div>
+        <div class="slide-footer-meta">
+          <span>Python RPA 2/5 · 27</span>
+          <span>페이지 27</span>
+        </div>
+      </section>
+
+      <!-- Slide 28: RPA Implement 1 -->
+      <section class="slide-card" data-group="SESSION 02 · Python RPA" data-title="RPA 구현: 경로 및 폴더 생성">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">IMPLEMENT</span></div>
+          <h2 class="slide-title-main">경로 정의 · 오늘 날짜 폴더 생성 · PDF 탐색</h2>
+          <p class="slide-subtitle">pathlib.Path를 사용하여 OS(Windows/Mac) 간 호환성을 보장합니다.</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 10.5pt;">import shutil
+from pathlib import Path
+from datetime import date
+
+INPUT_DIR = Path("RPA_Practice/Input")
+OUTPUT_DIR = Path("RPA_Practice/Output")
+
+def get_today_folder() -> Path:
+    today_str = date.today().isoformat()  # 예: '2026-08-12'
+    target_folder = OUTPUT_DIR / today_str
+    target_folder.mkdir(parents=True, exist_ok=True)
+    return target_folder
+
+def find_pdf_files(folder: Path):
+    if not folder.exists():
+        return []
+    return sorted(folder.glob("*.pdf"))</pre>
+          <div class="tip-box">💡 <code>mkdir(parents=True, exist_ok=True)</code>는 폴더가 이미 있어도 에러 없이 안전하게 실행됩니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>Python RPA 3/5 · 28</span>
+          <span>페이지 28</span>
+        </div>
+      </section>
+
+      <!-- Slide 29: RPA Implement 2 -->
+      <section class="slide-card" data-group="SESSION 02 · Python RPA" data-title="RPA 구현: 복사 및 중복 방지">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">IMPLEMENT</span></div>
+          <h2 class="slide-title-main">중복을 건너뛰며 복사하고 결과 출력하기</h2>
+          <p class="slide-subtitle">shutil.copy2로 메타데이터를 보존하고 재실행 시 중복 복사를 방지합니다.</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 10pt;">def organize_invoices():
+    target = get_today_folder()
+    files = find_pdf_files(INPUT_DIR)
+    
+    if not files:
+        print("[안내] Input 폴더에 처리할 PDF 파일이 없습니다.")
+        return
+        
+    copied, skipped = 0, 0
+    for f in files:
+        dest = target / f.name
+        if dest.exists():
+            skipped += 1
+            continue
+        shutil.copy2(f, dest)
+        copied += 1
+        
+    print(f"✅ 처리 완료: 복사 {copied}건 / 건너뜀 {skipped}건 → {target}")
+
+if __name__ == "__main__":
+    organize_invoices()</pre>
+        </div>
+        <div class="slide-footer-meta">
+          <span>Python RPA 4/5 · 29</span>
+          <span>페이지 29</span>
+        </div>
+      </section>
+
+      <!-- Slide 30: RPA Practice Check -->
+      <section class="slide-card" data-group="SESSION 02 · Python RPA" data-title="RPA 실습 검증 및 확장">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">실습</span><span class="slide-category">RPA 검증</span></div>
+          <h2 class="slide-title-main">실행 · 재실행 검증과 자동화 확장</h2>
+          <p class="slide-subtitle">0건 처리, 중복 실행, 자동 스케줄러 등록까지 점검합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> <code>RPA_Practice/Input</code> 폴더에 연습용 더미 PDF 파일 2~3개 생성</li>
+              <li><span class="step-num">2</span> <code>python organize_invoices.py</code> 실행 후 Output 폴더에 날짜별 복사 확인</li>
+              <li><span class="step-num">3</span> <strong>재실행 시험:</strong> 같은 명령을 즉시 다시 실행해 '건너뜀' 카운트가 정상 작동하는지 확인</li>
+              <li><span class="step-num">4</span> <strong>확장 과제:</strong> 처리 결과를 <code>log.txt</code> 파일에 기록 / Windows 작업 스케줄러에 매일 아침 자동 실행 등록</li>
+            </ol>
+          </div>
+          <div class="tip-box">🏆 완료 기준: 원본 파일 100% 보존 · 중복 복사 방지 · 에러 없이 안전한 재실행 가능</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>Python RPA 5/5 · 30</span>
+          <span>페이지 30</span>
+        </div>
+      </section>
+
+      <!-- Slide 31: Session 03 HTML Intro -->
+      <section class="slide-card" data-group="SESSION 03 · HTML 대시보드" data-title="SESSION 03 HTML 대시보드">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">SESSION 03 · HTML 대시보드</span></div>
+          <h2 class="slide-title-main">한 파일로 열리는 웹 대시보드 만들기</h2>
+          <p class="slide-subtitle">별도 웹서버 설치 없이 index.html 파일 하나로 완성하는 사내 매출 시각화 대시보드</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box primary-light">
+              <div class="content-box-title">1. 구조 & 카드 CSS</div>
+              <p>시맨틱 HTML5 태그와 CSS Grid 반응형 레이아웃</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">2. 데이터 렌더링</div>
+              <p>Vanilla JS 기반 KPI 카드, 순수 CSS 막대 차트, 필터</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">3. 로컬 실행 & 검증</div>
+              <p>브라우저 개발자 도구 콘솔 오류 0건 점검 및 모바일 대응</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>SESSION HTML · 31</span>
+          <span>페이지 31</span>
+        </div>
+      </section>
+
+      <!-- Slide 32: HTML Case -->
+      <section class="slide-card" data-group="SESSION 03 · HTML 대시보드" data-title="HTML 대시보드 시나리오">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">CASE</span></div>
+          <h2 class="slide-title-main">한 파일로 더블클릭해 열리는 월간 매출 대시보드</h2>
+          <p class="slide-subtitle">외부 인터넷 연결(CDN) 없이 브라우저에서 바로 열리는 오프라인 완결형 대시보드</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4" style="grid-template-columns: repeat(5, 1fr);">
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">1</div><b>KPI 카드</b><p style="font-size:10pt;">총매출·평균·최고월</p></div>
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">2</div><b>막대 차트</b><p style="font-size:10pt;">순수 CSS div 구현</p></div>
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">3</div><b>월 필터</b><p style="font-size:10pt;">Select 드롭다운</p></div>
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">4</div><b>반응형 그리드</b><p style="font-size:10pt;">모바일 1열 전환</p></div>
+            <div class="content-box" style="text-align: center;"><div class="step-num" style="margin: 0 auto 6px;">5</div><b>데이터 수정</b><p style="font-size:10pt;">배열 교체 주석</p></div>
+          </div>
+          <div class="tip-box">💡 첫 웹 실습은 단일 HTML 파일로 구성해야 배포 복잡도와 의존성 문제를 최소화할 수 있습니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>HTML 1/5 · 32</span>
+          <span>페이지 32</span>
+        </div>
+      </section>
+
+      <!-- Slide 33: HTML Mini Practice -->
+      <section class="slide-card" data-group="SESSION 03 · HTML 대시보드" data-title="HTML 미니 실습">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">실습</span><span class="slide-category">HTML 미니 실습</span></div>
+          <h2 class="slide-title-main">3줄짜리 HTML 파일부터 열어보기</h2>
+          <p class="slide-subtitle">HTML 파일을 만들고 더블클릭하여 브라우저에서 확인하는 기본 단위</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> 메모장을 열고 <code>&lt;h1&gt;안녕하세요! 대시보드 실습입니다.&lt;/h1&gt;</code> 입력</li>
+              <li><span class="step-num">2</span> <code>test.html</code>로 저장 (파일 형식: '모든 파일' 선택)</li>
+              <li><span class="step-num">3</span> 저장한 파일을 더블클릭하여 브라우저(Chrome/Edge)에서 엽니다.</li>
+              <li><span class="step-num">4</span> 글자를 수정하고 저장한 뒤 브라우저에서 <span class="key-badge">F5</span> 새로고침을 눌러 변경 확인</li>
+            </ol>
+          </div>
+          <div class="tip-box">TIP: '코드 수정 → 저장 → 브라우저 새로고침' 반복이 모든 웹 개발의 핵심 루프입니다.</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>미니실습 · 33</span>
+          <span>페이지 33</span>
+        </div>
+      </section>
+
+      <!-- Slide 34: HTML Prompt -->
+      <section class="slide-card" data-group="SESSION 03 · HTML 대시보드" data-title="HTML 대시보드 프롬프트">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">PROMPT</span></div>
+          <h2 class="slide-title-main">프롬프트에 데이터 · 레이아웃 · 접근성을 구체적으로 명시</h2>
+          <p class="slide-subtitle">'예쁘게 만들어줘' 대신 카드 개수, 차트 형태, 필터 인터랙션을 숫자로 요청합니다.</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 9pt;">초보자용 단일 파일 매출 대시보드를 만들어 줘.
+[기술 제약]
+- index.html 단일 파일 구성 (외부 CDN 라이브러리 일체 금지)
+- Pure HTML5, CSS3, Vanilla JavaScript만 사용
+
+[기능 및 레이아웃]
+- 상단: 월간 매출 대시보드 제목 및 월 선택 select 필터
+- KPI 영역: 총매출, 월평균, 최고월 카드 3개 (CSS Grid)
+- 차트 영역: 외부 라이브러리 없이 CSS div 높이 비율로 구현한 막대 차트
+- 표 영역: 월별 매출 상세 표 (thead, tbody 구분)
+- 6개월 샘플 데이터는 JS 배열로 상단에 선언하여 수정하기 쉽게 주석 처리
+
+[품질 기준]
+- 브라우저 Console 에러 0개 / 모바일 700px 이하 1열 반응형 레이아웃</pre>
+        </div>
+        <div class="slide-footer-meta">
+          <span>HTML 2/5 · 34</span>
+          <span>페이지 34</span>
+        </div>
+      </section>
+
+      <!-- Slide 35: HTML Implement 1 -->
+      <section class="slide-card" data-group="SESSION 03 · HTML 대시보드" data-title="HTML 구조 및 CSS 레이아웃">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">IMPLEMENT</span></div>
+          <h2 class="slide-title-main">HTML 시맨틱 구조와 CSS 그리드 카드</h2>
+          <p class="slide-subtitle">main, header, section 구조와 반응형 Grid 레이아웃 설계</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 9pt;">&lt;main class="wrap"&gt;
+  &lt;header class="header"&gt;
+    &lt;h1&gt;월간 매출 대시보드&lt;/h1&gt;
+    &lt;select id="monthFilter" aria-label="월 선택"&gt;&lt;/select&gt;
+  &lt;/header&gt;
+  &lt;section id="kpis" class="grid kpis"&gt;&lt;/section&gt;
+  &lt;section class="panel"&gt;
+    &lt;h2&gt;월별 매출 추이&lt;/h2&gt;
+    &lt;div id="chart" class="chart-container"&gt;&lt;/div&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;style&gt;
+  .wrap { max-width: 1000px; margin: auto; padding: 24px; font-family: sans-serif; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+  .panel { background: #fff; border: 1px solid #e5e5ea; border-radius: 12px; padding: 20px; }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+&lt;/style&gt;</pre>
+        </div>
+        <div class="slide-footer-meta">
+          <span>HTML 3/5 · 35</span>
+          <span>페이지 35</span>
+        </div>
+      </section>
+
+      <!-- Slide 36: HTML Implement 2 -->
+      <section class="slide-card" data-group="SESSION 03 · HTML 대시보드" data-title="JS 데이터 렌더링 함수">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">IMPLEMENT</span></div>
+          <h2 class="slide-title-main">JavaScript로 KPI · 차트 · 필터 실시간 렌더링</h2>
+          <p class="slide-subtitle">하나의 데이터 배열(sales)로부터 모든 UI 컴포넌트를 일관되게 업데이트</p>
+        </div>
+        <div class="slide-body">
+          <pre class="code-block" style="font-size: 9pt;">const sales = [
+  { month: '1월', value: 1200, target: 1500 },
+  { month: '2월', value: 1450, target: 1500 },
+  { month: '3월', value: 1380, target: 1600 }
+];
+
+function render(rows) {
+  const total = rows.reduce((s, r) => s + r.value, 0);
+  const avg = rows.length ? Math.round(total / rows.length) : 0;
+  
+  document.querySelector('#kpis').innerHTML = `
+    &lt;article class="card"&gt;&lt;b&gt;총매출&lt;/b&gt;&lt;strong&gt;${total.toLocaleString()}만원&lt;/strong&gt;&lt;/article&gt;
+    &lt;article class="card"&gt;&lt;b&gt;월평균&lt;/b&gt;&lt;strong&gt;${avg.toLocaleString()}만원&lt;/strong&gt;&lt;/article&gt;
+  `;
+  const max = Math.max(1, ...rows.map(r => r.value));
+  document.querySelector('#chart').innerHTML = rows.map(r => `
+    &lt;div class="bar-col"&gt;
+      &lt;div class="bar" style="height:${(r.value/max)*150}px;"&gt;&lt;/div&gt;
+      &lt;span&gt;${r.month}&lt;/span&gt;
+    &lt;/div&gt;
+  `).join('');
+}
+render(sales);</pre>
+        </div>
+        <div class="slide-footer-meta">
+          <span>HTML 4/5 · 36</span>
+          <span>페이지 36</span>
+        </div>
+      </section>
+
+      <!-- Slide 37: HTML Practice Check -->
+      <section class="slide-card" data-group="SESSION 03 · HTML 대시보드" data-title="HTML 실습 검증 및 확장">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">실습</span><span class="slide-category">HTML 검증</span></div>
+          <h2 class="slide-title-main">로컬 실행 · 콘솔 점검 · 데이터 교체 시험</h2>
+          <p class="slide-subtitle">브라우저 개발자 도구(F12) Console에서 에러가 없는지 확인하고 수치를 교체해봅니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> <code>index.html</code> 더블클릭 실행 → F12 개발자 도구 Console 탭에서 에러 0건 확인</li>
+              <li><span class="step-num">2</span> <code>sales</code> 배열의 숫자 데이터를 다른 값으로 바꾼 후 새로고침해 차트 높이와 KPI 변경 확인</li>
+              <li><span class="step-num">3</span> 브라우저 창 너비를 좁혀 모바일 화면에서 1열로 예쁘게 정렬되는지 점검</li>
+              <li><span class="step-num">4</span> <strong>확장 과제:</strong> CSV 텍스트 붙여넣기 기능 추가 / localStorage로 선택 필터 기억</li>
+            </ol>
+          </div>
+          <div class="tip-box">🏆 완료 기준: 계산 수치 100% 일치 · 콘솔 에러 0개 · 인터넷 연결 없이 단독 실행 가능</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>HTML 5/5 · 37</span>
+          <span>페이지 37</span>
+        </div>
+      </section>
+
+      <!-- Slide 38: Session 04 WebApp Intro -->
+      <section class="slide-card" data-group="SESSION 04 · 웹앱" data-title="SESSION 04 웹앱 만들기">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">SESSION 04 · 웹앱</span></div>
+          <h2 class="slide-title-main">계산기 웹앱 만들기 (Streamlit)</h2>
+          <p class="slide-subtitle">파이썬 단 몇 줄로 인터랙티브한 웹 애플리케이션을 완성하는 실습</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box primary-light">
+              <div class="content-box-title">1. 환경 & 진행 순서</div>
+              <p>AI 코딩 도구 설정부터 Streamlit 로컬 서버 실행</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">2. 4요소 프롬프트</div>
+              <p>목적, 입력값, 출력 형식, 제약 조건 구조화</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">3. 기능 확장 & 로드맵</div>
+              <p>계산 기록 누적, 초기화, 팀 전용 업무 도구로 확장</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>SESSION 웹앱 · 38</span>
+          <span>페이지 38</span>
+        </div>
+      </section>
+
+      <!-- Slide 39: WebApp Environment -->
+      <section class="slide-card" data-group="SESSION 04 · 웹앱" data-title="웹앱 실습 환경 및 순서">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">실습 환경</span></div>
+          <h2 class="slide-title-main">웹앱 실습은 이 순서로 진행합니다</h2>
+          <p class="slide-subtitle">AI 코딩 도구(Cursor, VS Code 등)와 Streamlit을 이용한 실습 4단계</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">1</span> 도구 열기</div>
+              <p>AI 코딩 도구에서 새 프로젝트 폴더를 엽니다.</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">2</span> 파일 생성</div>
+              <p><code>calculator_app.py</code> 생성 후 프롬프트 입력</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">3</span> 앱 실행</div>
+              <p>터미널에서 <code>streamlit run calculator_app.py</code> 실행</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">4</span> 브라우저 확인</div>
+              <p>자동으로 열리는 웹 화면에서 동작 테스트</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>실습 환경 · 39</span>
+          <span>페이지 39</span>
+        </div>
+      </section>
+
+      <!-- Slide 40: WebApp Prompt -->
+      <section class="slide-card" data-group="SESSION 04 · 웹앱" data-title="웹앱 프롬프트 4대 요소">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">PROMPT</span></div>
+          <h2 class="slide-title-main">좋은 프롬프트는 4가지를 담습니다</h2>
+          <p class="slide-subtitle">목적, 입력값, 출력 형식, 제약 조건을 구체적으로 전달할수록 결과가 정확해집니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box">
+              <b>1. 목적:</b> 무엇을 만들지 한 문장으로 명확히 전달<br>
+              <b>2. 입력값:</b> 사용자가 입력할 항목과 위젯 형태(숫자 입력창 2개, 연산자 드롭다운 등)
+            </div>
+            <div class="content-box">
+              <b>3. 출력 형식:</b> '계산하기' 클릭 시 결과를 어떤 레이아웃으로 표시할지 명시<br>
+              <b>4. 제약 조건:</b> 0으로 나누는 경우 등 예외 처리 규칙 명시
+            </div>
+          </div>
+          <pre class="code-block" style="font-size: 9.5pt;">Streamlit으로 계산기 웹앱을 만들어 줘.
+- 입력: 숫자 두 개를 입력받는 입력창 2개, 사칙연산(+, -, *, /) 선택 selectbox
+- 동작: '계산하기' 버튼을 누르면 연산 결과를 큰 글씨로 화면에 표시
+- 제약: 0으로 나누는 경우 친절한 오류 안내 문구 표시</pre>
+        </div>
+        <div class="slide-footer-meta">
+          <span>프롬프트 작성법 · 40</span>
+          <span>페이지 40</span>
+        </div>
+      </section>
+
+      <!-- Slide 41: WebApp Practice 1 -->
+      <section class="slide-card" data-group="SESSION 04 · 웹앱" data-title="실습 1: 기본 계산기 만들기">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">실습 1</span></div>
+          <h2 class="slide-title-main">기본 사칙연산 계산기 구현</h2>
+          <p class="slide-subtitle">st.number_input과 st.selectbox를 활용한 기본 웹앱</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box">
+              <div class="content-box-title">💻 코드 예시 (calculator_app.py)</div>
+              <pre class="code-block" style="font-size: 9pt;">import streamlit as st
+
+st.title("🧮 초간단 계산기 웹앱")
+num1 = st.number_input("첫 번째 숫자", value=0.0)
+num2 = st.number_input("두 번째 숫자", value=0.0)
+op = st.selectbox("연산자", ["+", "-", "×", "÷"])
+
+if st.button("계산하기"):
+    if op == "+": res = num1 + num2
+    elif op == "-": res = num1 - num2
+    elif op == "×": res = num1 * num2
+    elif op == "÷":
+        res = "0으로 나눌 수 없습니다." if num2 == 0 else num1 / num2
+    st.success(f"결과: {res}")</pre>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title">🎯 확인 포인트</div>
+              <ul class="step-list" style="margin-top: 10px;">
+                <li>• 브라우저에 숫자 입력창 2개와 연산자 선택 메뉴 표시</li>
+                <li>• '계산하기' 클릭 시 즉시 결과가 박스에 표시</li>
+                <li>• 0으로 나누기 시도 시 에러 대신 친절한 안내 문구 출력</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>실습 1 · 41</span>
+          <span>페이지 41</span>
+        </div>
+      </section>
+
+      <!-- Slide 42: WebApp Practice 2 -->
+      <section class="slide-card" data-group="SESSION 04 · 웹앱" data-title="실습 2: 계산기 기능 확장">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-accent">실습 2</span></div>
+          <h2 class="slide-title-main">계산 기록 누적 및 초기화 기능 추가</h2>
+          <p class="slide-subtitle">Streamlit의 Session State(st.session_state)를 활용하여 상태 유지 구현</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box">
+              <div class="content-box-title">📝 추가 요청 프롬프트</div>
+              <pre class="code-block" style="font-size: 9pt;">방금 만든 계산기에 기능을 추가해 줘.
+1. 계산할 때마다 계산 기록(수식과 결과)을 하단 표에 누적해서 보여줘.
+2. '기록 초기화' 버튼을 누르면 누적된 계산 기록을 모두 지워줘.
+3. Streamlit의 st.session_state를 사용해 구현해 줘.</pre>
+            </div>
+            <div class="content-box accent-light">
+              <div class="content-box-title" style="color: var(--color-accent-text);">💡 점진적 확장의 원칙</div>
+              <p>기능은 한 번에 여러 개를 몰아서 요청하기보다, <strong>기본 기능 완성 → 하나씩 추가 및 검증</strong> 순서로 진행해야 AI 오류를 최소화하고 완성도를 높일 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>실습 2 · 42</span>
+          <span>페이지 42</span>
+        </div>
+      </section>
+
+      <!-- Slide 43: WebApp Caution -->
+      <section class="slide-card" data-group="SESSION 04 · 웹앱" data-title="실무 적용 전 주의사항">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">주의사항</span></div>
+          <h2 class="slide-title-main">실무에 적용하기 전 반드시 확인하세요</h2>
+          <p class="slide-subtitle">편리함과 별개로 생성된 코드는 실무 적용 전 3가지 필수 검증을 거쳐야 합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box" style="border-top: 4px solid var(--color-primary);">
+              <div class="content-box-title">🔍 코드 검증 필수</div>
+              <p>생성된 코드의 계산 수식, 비즈니스 로직, 예외 처리 코드를 사람이 직접 꼼꼼히 검토합니다.</p>
+            </div>
+            <div class="content-box" style="border-top: 4px solid #D32F2F;">
+              <div class="content-box-title">🔒 민감정보 입력 금지</div>
+              <p>프롬프트 입력창이나 코드 내부에 사내 영업기밀이나 고객 개인정보를 포함하지 않습니다.</p>
+            </div>
+            <div class="content-box" style="border-top: 4px solid var(--color-accent);">
+              <div class="content-box-title">📜 라이선스 확인</div>
+              <p>외부 라이브러리를 추가 도입할 경우 사내 오픈소스 보안 및 라이선스 정책을 준수합니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>주의사항 · 43</span>
+          <span>페이지 43</span>
+        </div>
+      </section>
+
+      <!-- Slide 44: WebApp Roadmap -->
+      <section class="slide-card" data-group="SESSION 04 · 웹앱" data-title="업무 적용 로드맵">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">로드맵</span></div>
+          <h2 class="slide-title-main">계산기 실습에서 실무 업무 도구로의 발전 로드맵</h2>
+          <p class="slide-subtitle">개인 실습에서 시작하여 팀 업무 자동화 및 사내 표준 프로세스로 확장하기</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">1</span> 개인 실습</div>
+              <p>계산기, 파일 정리 등 작은 미니 도구로 바이브 코딩 흐름과 대화형 피드백 감각 체득</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title"><span class="step-num">2</span> 팀 업무 자동화</div>
+              <p>반복되는 팀 내 데이터 집계, 양식 생성, 대시보드를 팀 전용 웹 도구로 제작하여 업무 효율화</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">3</span> 사내 표준 프로세스</div>
+              <p>충분히 검증된 도구를 보안 가이드라인에 맞춰 사내 표준 업무 프로세스로 공식 반영</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>로드맵 · 44</span>
+          <span>페이지 44</span>
+        </div>
+      </section>
+
+      <!-- Slide 45: Extend -->
+      <section class="slide-card" data-group="확장 & 체크리스트" data-title="외부 기능 연결과 아키텍처">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">EXTEND</span></div>
+          <h2 class="slide-title-main">외부 기능은 데이터 흐름을 먼저 그린 뒤 하나씩 연결</h2>
+          <p class="slide-subtitle">연결이 늘어날수록 '편리함'보다 '권한 · 비용 · 실패 경로'를 먼저 확인합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">1</span> 데이터베이스</div>
+              <p>무엇을 영구 저장할지, 누가 읽고 바꿀지, 정기 백업 및 삭제 정책을 사전 정의</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">2</span> API · MCP 연결</div>
+              <p>어떤 정보가 외부로 전송되는지, 호출 비용 및 실패 시 대체 경로, 최소 권한 연결</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title"><span class="step-num">3</span> 자동화 트리거</div>
+              <p>실행 조건과 주기, 무한 루프/중복 실행 방지 장치, 중요 작업 시 사람 승인 단계 추가</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>확장 · 45</span>
+          <span>페이지 45</span>
+        </div>
+      </section>
+
+      <!-- Slide 46: Team -->
+      <section class="slide-card" data-group="확장 & 체크리스트" data-title="팀 협업과 문서 기준">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">TEAM</span></div>
+          <h2 class="slide-title-main">팀에서는 대화 기록보다 저장소의 문서와 자동 검사를 기준 삼기</h2>
+          <p class="slide-subtitle">지식은 일회성 채팅 속에 남겨두지 말고, AI가 다시 읽을 수 있는 파일로 저장소에 자산화합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box primary-light">
+              <div class="content-box-title"><span class="step-num">1</span> 규칙 문서</div>
+              <p><code>AGENTS.md</code>, <code>CLAUDE.md</code> 등에 코딩·보안·디자인 기준 및 AI 금지 행동 정의</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title"><span class="step-num">2</span> 계획과 상태</div>
+              <p><code>README.md</code>, <code>PLANS.md</code>에 프로젝트 목표, 비목표(Non-goals), 완료 조건 기록</p>
+            </div>
+            <div class="content-box primary-light">
+              <div class="content-box-title"><span class="step-num">3</span> 자동 검증</div>
+              <p>Lint, 포맷터, 단위 테스트, 보안 스캔을 자동화하여 통과 조건을 표준화</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>협업 · 46</span>
+          <span>페이지 46</span>
+        </div>
+      </section>
+
+      <!-- Slide 47: Harness -->
+      <section class="slide-card" data-group="확장 & 체크리스트" data-title="하네스 엔지니어링 개념">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">HARNESS</span></div>
+          <h2 class="slide-title-main">하네스 엔지니어링: AI가 성공하기 쉬운 환경과 피드백 설계</h2>
+          <p class="slide-subtitle">사람은 의도와 안전 환경을 설계하고, AI 에이전트는 빠른 실행과 피드백 반복을 담당합니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box">
+              <div class="content-box-title">1. 명세 (Spec)</div>
+              <p>목표, 제약, 완료 조건, 예시와 명확한 비목표</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title">2. 맥락 (Context)</div>
+              <p>작은 규칙 파일, 문서 지도, 관련 파일만 로드</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title">3. 도구 (Tools)</div>
+              <p>터미널 실행, 브라우저 테스트, 정밀 검색 연결</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title">4. 피드백 (Loop)</div>
+              <p>Diff 검토, 로그 분석, 자동 리뷰 및 오류 복구</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>하네스 · 47</span>
+          <span>페이지 47</span>
+        </div>
+      </section>
+
+      <!-- Slide 48: Tokens -->
+      <section class="slide-card" data-group="확장 & 체크리스트" data-title="토큰 절약 10대 원칙">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">TOKENS</span></div>
+          <h2 class="slide-title-main">토큰은 프롬프트 길이보다 “매번 다시 읽는 불필요한 맥락”에서 낭비</h2>
+          <p class="slide-subtitle">비용과 시간을 아끼는 스마트한 세션 관리 10가지 원칙</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box">
+              <ul class="step-list" style="font-size: 11pt;">
+                <li><b>1. 새 작업은 새 세션:</b> 무관한 이전 대화 이력을 과감히 비우기</li>
+                <li><b>2. 짧은 지도:</b> 수백 줄 매뉴얼 대신 핵심 규칙 + 파일 경로 제공</li>
+                <li><b>3. 필요한 파일만 지정:</b> 전체 폴더 덤프 금지</li>
+                <li><b>4. 계획 먼저 합의:</b> 구현 전 계획 합의로 재작업 방지</li>
+                <li><b>5. 작업 분리:</b> 한 세션의 목적은 단 하나로 한정</li>
+              </ul>
+            </div>
+            <div class="content-box">
+              <ul class="step-list" style="font-size: 11pt;">
+                <li><b>6. 출력 요약:</b> 거대한 에러 로그는 핵심 10줄만 전달</li>
+                <li><b>7. Skill 활용:</b> 반복 지시는 시스템 프롬프트/도구로 캡슐화</li>
+                <li><b>8. 모델 맞춤:</b> 단순 코드 수정은 빠르고 가벼운 모델 사용</li>
+                <li><b>9. 자동 테스트:</b> 사람의 긴 설명보다 실제 테스트 에러 메시지 전달</li>
+                <li><b>10. 사용량 측정:</b> 긴 세션 종료 후 토큰 소모량 점검</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>토큰 절약 · 48</span>
+          <span>페이지 48</span>
+        </div>
+      </section>
+
+      <!-- Slide 49: Checklist -->
+      <section class="slide-card" data-group="확장 & 체크리스트" data-title="바이브 코딩 6대 체크리스트">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">CHECKLIST</span></div>
+          <h2 class="slide-title-main">작게 만들고, 변경을 읽고, 테스트로 증명한 뒤 확장하세요</h2>
+          <p class="slide-subtitle">실무 프로젝트 수행 시 항상 곁에 두고 확인해야 할 6단계 점검표</p>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <ol class="step-list">
+              <li><span class="step-num">1</span> <strong>과제 선정:</strong> 민감하지 않고 언제든 되돌릴 수 있는 작은 문제부터 시작한다.</li>
+              <li><span class="step-num">2</span> <strong>명세 작성:</strong> 목표 · 맥락 · 제약조건 · 완료 기준을 명확히 명시한다.</li>
+              <li><span class="step-num">3</span> <strong>점진적 구현:</strong> 질문 → 계획 합의 → 작은 단위 구현 → 화면/결과 확인 순서로 진행한다.</li>
+              <li><span class="step-num">4</span> <strong>코드 검토:</strong> 코드 변경점(Diff), 추가된 패키지, 비밀정보 포함 여부를 사람이 직접 검토한다.</li>
+              <li><span class="step-num">5</span> <strong>결과 증명:</strong> 단위 테스트, 콘솔 로그, 보안 점검으로 정상 동작을 객관적으로 증명한다.</li>
+              <li><span class="step-num">6</span> <strong>자산화:</strong> 충분히 검증된 규칙과 절차만 문서(AGENTS.md), 도구로 공식 확장한다.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>체크리스트 · 49</span>
+          <span>페이지 49</span>
+        </div>
+      </section>
+
+      <!-- Slide 50: Summary -->
+      <section class="slide-card" data-group="확장 & 체크리스트" data-title="4가지 실습 종합 비교">
+        <div class="slide-header">
+          <div class="slide-meta"><span class="badge badge-primary">SUMMARY</span></div>
+          <h2 class="slide-title-main">4가지 실습은 목적과 적합한 상황이 다릅니다</h2>
+          <p class="slide-subtitle">내 업무 문제에 딱 맞는 도구를 선택하는 기준</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box">
+              <div class="content-box-title" style="color: var(--color-primary);">VBA</div>
+              <p><b>엑셀 사무 자동화</b></p>
+              <ul class="step-list" style="margin-top:8px; font-size:10.5pt;">
+                <li>• 엑셀만 있으면 즉시 시작</li>
+                <li>• 사무직 필수 자동화</li>
+                <li>• 매크로 보안 정책 주의</li>
+              </ul>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title" style="color: var(--color-primary);">Python RPA</div>
+              <p><b>파일/폴더 반복 업무</b></p>
+              <ul class="step-list" style="margin-top:8px; font-size:10.5pt;">
+                <li>• 대량 파일 정리 및 이동</li>
+                <li>• 클릭보다 안정적인 파일 액션</li>
+                <li>• 작업 스케줄러 연동</li>
+              </ul>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title" style="color: var(--color-primary);">HTML 대시보드</div>
+              <p><b>가벼운 결과물 공유</b></p>
+              <ul class="step-list" style="margin-top:8px; font-size:10.5pt;">
+                <li>• 서버 없이 파일 1개 공유</li>
+                <li>• 브라우저 콘솔 즉각 디버깅</li>
+                <li>• 오프라인 환경 완결</li>
+              </ul>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title" style="color: var(--color-primary);">Streamlit 웹앱</div>
+              <p><b>상태가 있는 내부 도구</b></p>
+              <ul class="step-list" style="margin-top:8px; font-size:10.5pt;">
+                <li>• 인터랙티브한 웹 UI</li>
+                <li>• 세션 상태 및 DB 연동 용이</li>
+                <li>• 팀 전용 업무 도구 제작</li>
+              </ul>
+            </div>
+          </div>
+          <div class="tip-box">💡 <strong>선택 가이드:</strong> 단순 엑셀은 VBA, 파일 처리는 RPA, 결과 공유는 HTML, 인터랙티브 도구는 웹앱!</div>
+        </div>
+        <div class="slide-footer-meta">
+          <span>요약 · 50</span>
+          <span>페이지 50</span>
+        </div>
+      </section>
+
+      <!-- Slide 51: Outro -->
+      <section class="slide-card" data-group="확장 & 체크리스트" data-title="마무리: 작게 만들고 검증하기">
+        <div class="slide-header" style="border-bottom: none; text-align: center; margin-top: 20px;">
+          <div class="slide-meta" style="justify-content: center;">
+            <span class="badge badge-accent">Vibe Coding 교육</span>
+          </div>
+          <h1 class="slide-title-hero" style="font-size: 30pt; margin-top: 16px;">
+            작게 만들고, 이해하고,<br>검증한 뒤에만 확장하세요
+          </h1>
+          <p class="slide-subtitle" style="font-size: 16pt; margin-top: 14px;">
+            오늘 배운 미니 실습부터 시작하여 VBA · RPA · HTML · 웹앱까지,<br>
+            <strong>'말로 만들고 검증으로 완성하는'</strong> 여러분만의 AI 개발 여정을 시작해 보세요.
+          </p>
+        </div>
+        <div class="slide-footer-meta">
+          <span>Vibe Coding & AI 실습 교육</span>
+          <span>마무리</span>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script>
+    (function() {
+      // 1. Merge each prompt and implementation sequence into one Case Study card.
+      document.querySelectorAll('li').forEach((item) => {
+        const bulletText = Array.from(item.childNodes).find((node) =>
+          node.nodeType === Node.TEXT_NODE && /^\s*•\s*/.test(node.nodeValue || '')
+        );
+        if (!bulletText) return;
+
+        bulletText.nodeValue = (bulletText.nodeValue || '').replace(/^(\s*)•\s*/, '$1');
+        item.classList.add('semantic-bullet');
+
+        const bulletContent = document.createElement('span');
+        bulletContent.className = 'semantic-bullet-text';
+        while (item.firstChild) bulletContent.appendChild(item.firstChild);
+        item.appendChild(bulletContent);
+      });
+
+      const overviewAgendaSlide = document.querySelector('.slide-card[data-title="교육 아젠다"]');
+      if (overviewAgendaSlide) overviewAgendaSlide.remove();
+
+      const caseStudyGroups = [
+        {
+          title: 'VBA Case Study · 프롬프트와 구현 코드',
+          slides: ['VBA 프롬프트 작성법', 'VBA 구현: 모듈 및 집계 로직', 'VBA 구현: 결과 출력 및 서식']
+        },
+        {
+          title: 'Python RPA Case Study · 프롬프트와 구현 코드',
+          slides: ['RPA 프롬프트 작성법', 'RPA 구현: 경로 및 폴더 생성', 'RPA 구현: 복사 및 중복 방지']
+        },
+        {
+          title: 'HTML 대시보드 Case Study · 프롬프트와 구현 코드',
+          slides: ['HTML 대시보드 프롬프트', 'HTML 구조 및 CSS 레이아웃', 'JS 데이터 렌더링 함수']
+        },
+        {
+          title: '웹앱 Case Study · 프롬프트와 구현 코드',
+          slides: ['웹앱 프롬프트 4대 요소', '실습 1: 기본 계산기 만들기', '실습 2: 계산기 기능 확장']
+        }
+      ];
+
+      caseStudyGroups.forEach((group) => {
+        const groupSlides = group.slides
+          .map((title) => document.querySelector(`.slide-card[data-title="${title}"]`))
+          .filter(Boolean);
+        if (groupSlides.length !== group.slides.length) return;
+
+        const primarySlide = groupSlides[0];
+        const primaryBody = primarySlide.querySelector('.slide-body');
+        if (!primaryBody) return;
+
+        const promptBlock = document.createElement('section');
+        promptBlock.className = 'case-study-block case-study-prompt-block';
+        const promptTitle = document.createElement('h3');
+        promptTitle.className = 'case-study-block-title';
+        promptTitle.textContent = '프롬프트';
+        const promptScroll = document.createElement('div');
+        promptScroll.className = 'case-study-prompt-scroll';
+        while (primaryBody.firstChild) promptScroll.appendChild(primaryBody.firstChild);
+        promptBlock.append(promptTitle, promptScroll);
+
+        const codeBlock = document.createElement('section');
+        codeBlock.className = 'case-study-block case-study-code-block';
+        const codeTitle = document.createElement('h3');
+        codeTitle.className = 'case-study-block-title';
+        codeTitle.textContent = '구현 코드';
+        const codeScroll = document.createElement('div');
+        codeScroll.className = 'case-study-code-scroll';
+
+        groupSlides.slice(1).forEach((slide) => {
+          const partTitle = document.createElement('h4');
+          partTitle.className = 'case-study-code-part-title';
+          partTitle.textContent = slide.getAttribute('data-title');
+          codeScroll.appendChild(partTitle);
+
+          const body = slide.querySelector('.slide-body');
+          while (body && body.firstChild) codeScroll.appendChild(body.firstChild);
+        });
+        codeBlock.append(codeTitle, codeScroll);
+
+        primarySlide.classList.add('case-study-card');
+        primarySlide.setAttribute('data-title', group.title);
+        const primaryTitle = primarySlide.querySelector('.slide-title-main');
+        if (primaryTitle) primaryTitle.textContent = group.title;
+        primaryBody.classList.add('case-study-content');
+        primaryBody.replaceChildren(promptBlock, codeBlock);
+        groupSlides.slice(1).forEach((slide) => slide.remove());
+      });
+
+      // 2. DOM Elements Caching
+      const slides = Array.from(document.querySelectorAll('.slide-card'));
+      const totalSlides = slides.length;
+      let currentIndex = 0;
+
+      const currPageText = document.getElementById('curr-page-text');
+      const totalPageText = document.getElementById('total-page-text');
+      const progressPercent = document.getElementById('progress-percent');
+      const progressFill = document.getElementById('progress-fill');
+      const agendaNavList = document.getElementById('agenda-nav-list');
+      const stageArea = document.getElementById('stage-area');
+
+      totalPageText.textContent = totalSlides;
+
+      slides.forEach((slide, index) => {
+        const footer = slide.querySelector('.slide-footer-meta');
+        if (!footer) return;
+
+        if (index === 0 || index === totalSlides - 1) {
+          footer.hidden = true;
+          return;
+        }
+
+        footer.classList.add('card-next-hint');
+        footer.innerHTML = '<span>카드를 클릭하면 다음 내용으로 이동합니다</span><span class="down-arrow">↓</span>';
+      });
+
+      // 3. Build Agenda Sidebar
+      let currentGroup = '';
+      slides.forEach((slide, idx) => {
+        const group = slide.getAttribute('data-group') || 'General';
+        const title = slide.getAttribute('data-title') || `슬라이드 ${idx + 1}`;
+
+        if (group !== currentGroup) {
+          currentGroup = group;
+          const groupEl = document.createElement('div');
+          groupEl.className = 'agenda-group-title';
+          groupEl.textContent = group;
+          agendaNavList.appendChild(groupEl);
+        }
+
+        const itemEl = document.createElement('div');
+        itemEl.className = `agenda-item ${idx === 0 ? 'active' : ''}`;
+        itemEl.setAttribute('data-index', idx);
+        itemEl.innerHTML = `
+          <span class="item-num">${String(idx + 1).padStart(2, '0')}</span>
+          <span class="item-text">${title}</span>
+        `;
+        itemEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          goToSlide(idx);
+        });
+        agendaNavList.appendChild(itemEl);
+      });
+
+      const agendaItems = Array.from(document.querySelectorAll('.agenda-item'));
+
+      // 4. Slide Navigation Function
+      function goToSlide(index) {
+        if (index < 0 || index >= totalSlides) return;
+
+        // Deactivate current
+        slides[currentIndex].classList.remove('active');
+        if (agendaItems[currentIndex]) agendaItems[currentIndex].classList.remove('active');
+
+        // Activate target
+        currentIndex = index;
+        slides[currentIndex].classList.add('active');
+        if (agendaItems[currentIndex]) {
+          agendaItems[currentIndex].classList.add('active');
+          agendaItems[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Update Progress
+        const pageNum = currentIndex + 1;
+        currPageText.textContent = pageNum;
+        const percent = Math.round((pageNum / totalSlides) * 100);
+        progressPercent.textContent = `${percent}%`;
+        progressFill.style.width = `${percent}%`;
+
+        // Reset scroll position of stage
+        stageArea.scrollTop = 0;
+      }
+
+      // Stage Click (Ignore if user is selecting/dragging text)
+      stageArea.addEventListener('click', (e) => {
+        const selection = window.getSelection();
+        if (selection && selection.toString().length > 0) {
+          return; // text selected
+        }
+        // Don't trigger if clicked on interactive elements
+        if (e.target.closest('button, a, input, select, textarea, pre')) {
+          return;
+        }
+        if (currentIndex < totalSlides - 1) {
+          goToSlide(currentIndex + 1);
+        }
+      });
+
+      // Keyboard Navigation
+      window.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) {
+          if (currentIndex < totalSlides - 1) {
+            e.preventDefault();
+            goToSlide(currentIndex + 1);
+          }
+        } else if (['ArrowLeft', 'PageUp'].includes(e.key)) {
+          if (currentIndex > 0) {
+            e.preventDefault();
+            goToSlide(currentIndex - 1);
+          }
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          goToSlide(0);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          goToSlide(totalSlides - 1);
+        }
+      });
+
+      // Initial Call
+      goToSlide(0);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,2762 @@
+<!DOCTYPE html>
+
+
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT · Work · Codex 실습 교육</title>
+  <style>
+    :root {
+      /* Brand Color Palette */
+      --primary: #1F3BB3;       /* Reference Royal Blue */
+      --primary-dark: #102766;  /* Reference Dark Navy */
+      --primary-light: #EEF2FC; /* Reference Light Blue */
+      --accent: #86C832;        /* Reference Highlight Lime */
+      --accent-light: #f7fee7;  /* Highlight Lime Light BG */
+      --accent-dark: #1a2e05;   /* Lime Text Dark */
+      --text-dark: #1D1D1F;     /* Body Text */
+      --text-muted: #6E6E73;    /* Subtitle & Caption */
+      --bg-white: #FFFFFF;      /* Main & Card Background */
+      --border-color: #E5E5EA;  /* Border Gray */
+
+
+  /* Typography Hierarchy */
+  --font-hero: clamp(36px, 4.4vw, 64px);
+  --font-title: clamp(29px, 2.05vw, 36px);
+  --font-subtitle: clamp(17px, 1.25vw, 21px);
+  --font-body: clamp(14px, .98vw, 17px);
+  --font-sub: clamp(13px, .9vw, 16px);
+  --font-caption: clamp(11px, .76vw, 13px);
+
+  --sidebar-width: 280px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  background-color: #F8F9FA;
+  color: var(--text-dark);
+  font-size: var(--font-body);
+  line-height: 1.6;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* App Container (Flex 2-Column) */
+.app-container {
+  display: flex;
+  flex: 1;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* 1. Sidebar Component */
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background-color: #0f172a;
+  color: #fff;
+  border-right: 0;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.progress-header {
+  background-color: transparent;
+  color: #FFFFFF;
+  padding: 20px 18px;
+}
+
+.sidebar-brand {
+  color: #fff;
+  font-size: clamp(17px, 1.2vw, 21px);
+  font-weight: 850;
+  line-height: 1.3;
+  letter-spacing: -.02em;
+  margin-bottom: 14px;
+}
+
+.sidebar-brand span {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.62);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .08em;
+}
+
+.progress-title {
+  font-size: 11pt;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 2.27%;
+  background-color: var(--accent);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 9.5pt;
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  justify-content: space-between;
+}
+
+.agenda-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
+.session-group {
+  margin-bottom: 12px;
+}
+
+.session-group-title {
+  font-size: 10.5pt;
+  font-weight: 800;
+  color: rgba(255,255,255,.82);
+  padding: 8px 18px 4px 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.agenda-item {
+  padding: 8px 18px;
+  font-size: 11pt;
+  color: rgba(255,255,255,.74);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agenda-item:hover {
+  background-color: rgba(255,255,255,.09);
+  color: #fff;
+}
+
+.agenda-item.active {
+  background-color: var(--text-muted);
+  color: #FFFFFF;
+  font-weight: 400;
+}
+
+.agenda-item .page-num {
+  font-size: 9.5pt;
+  opacity: 0.78;
+  min-width: 22px;
+}
+
+.sidebar-home {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 13px 18px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.84);
+  font-size: 13px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.sidebar-home:hover,
+.sidebar-home:focus-visible {
+  color: #fff;
+  background: rgba(255,255,255,.09);
+  outline: none;
+}
+
+.sidebar-home::before {
+  content: "←";
+  color: #a3e635;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* 2. Main Stage Component */
+.main-stage {
+  flex: 1;
+  background-color: #F4F6F9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.slide-card {
+  background-color: var(--bg-white);
+  width: 100%;
+  max-width: min(1280px, calc((100dvh - 48px) * 1.7778));
+  height: auto;
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+  max-height: calc(100dvh - 48px);
+  border-radius: 10px;
+  box-shadow: 0 5px 18px rgba(16,39,102,0.08);
+  border: 1px solid #DCE2EC;
+  padding: clamp(28px, 4vh, 48px) clamp(38px, 4.5vw, 64px) 0;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: fadeIn 0.25s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide-card.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide Header */
+.slide-header {
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+  flex: 0 0 auto;
+}
+
+.slide-category {
+  font-size: var(--font-caption);
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 1.15px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.slide-title {
+  font-size: var(--font-title);
+  font-weight: 800;
+  color: var(--primary-dark);
+  line-height: 1.22;
+  margin-bottom: 9px;
+}
+
+.slide-description {
+  font-size: clamp(15px, 1.08vw, 18px);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Slide Content */
+.slide-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 1.6vh, 20px);
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 2px 4px 8px 0;
+}
+
+.slide-card,
+.slide-card p,
+.slide-card li,
+.step-item,
+.recommendation-box {
+  text-align: left;
+  line-break: strict;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.slide-title,
+.hero-title,
+.content-box-title {
+  text-wrap: balance;
+}
+
+.slide-description,
+.slide-card p,
+.slide-card li,
+.step-item {
+  text-wrap: pretty;
+}
+
+.step-item > :last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Grid Layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* Content Cards & Boxes */
+.content-box {
+  background-color: var(--primary-light);
+  border-radius: 7px;
+  padding: 20px;
+  border: 1px solid transparent;
+}
+
+.content-box.lime {
+  background-color: var(--accent-light);
+  border-color: rgba(134, 200, 50, .35);
+}
+
+.content-box-title {
+  font-size: var(--font-subtitle);
+  font-weight: 750;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+}
+
+.content-box.lime .content-box-title {
+  color: var(--accent-dark);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background-color: var(--primary);
+  color: #FFFFFF;
+  font-size: 11pt;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.badge.lime {
+  background-color: var(--accent);
+  color: #FFFFFF;
+}
+
+/* Image Container */
+.image-container {
+  width: 100%;
+  height: clamp(120px, 20vh, 190px);
+  max-height: 190px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #FFFFFF;
+  border: 1px solid #CCD6EA;
+}
+
+.image-container img {
+  max-width: 100%;
+  max-height: 370px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.image-container svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Tip / Recommendation Box */
+.recommendation-box {
+  background-color: var(--accent-light);
+  border-radius: 8px;
+  padding: 14px 18px;
+  border: 1px solid var(--accent);
+  font-size: var(--font-body);
+  color: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.recommendation-box strong {
+  background-color: var(--accent);
+  color: #FFFFFF;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11pt;
+  white-space: nowrap;
+}
+
+/* Number Step Items */
+.step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background-color: var(--primary-light);
+  border: 1px solid transparent;
+  padding: 14px 18px;
+  border-radius: 8px;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 12pt;
+  flex-shrink: 0;
+}
+
+/* Hero / Title Slide Styling */
+.hero-slide {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  height: 100%;
+}
+
+.hero-series {
+  color: var(--text-muted);
+  font-size: 16pt;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.hero-title {
+  font-size: var(--font-hero);
+  font-weight: 900;
+  color: var(--primary-dark);
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 20pt;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.hero-pills {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero-pill {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13pt;
+  font-weight: 600;
+}.card-next-hint {
+  flex: 0 0 auto;
+  min-height: 41px;
+  margin: 10px calc(-1 * clamp(38px, 4.5vw, 64px)) 0;
+  padding: 10px clamp(38px, 4.5vw, 64px);
+  border-top: 1px solid var(--border-color);
+  background: #fbfdff;
+  color: var(--text-muted);
+  font-size: var(--font-caption);
+  font-weight: 400;
+  text-align: right;
+}
+
+/* Reference-deck layout and emphasis rules */
+.dark-card,
+.content-box.dark-card,
+.step-item.dark-card {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  color: #FFFFFF !important;
+}
+
+.dark-card .content-box-title,
+.dark-card p,
+.dark-card li,
+.dark-card strong {
+  color: #FFFFFF !important;
+}
+
+.slide-card[data-slide="4"] .grid-3 {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  min-height: clamp(250px, 42vh, 390px);
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .grid-2 {
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.18fr);
+  min-height: clamp(260px, 43vh, 405px);
+  align-items: stretch;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .step-list {
+  justify-content: center;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .step-item {
+  min-height: clamp(68px, 10vh, 94px);
+  align-items: center;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .image-container {
+  height: clamp(88px, 14vh, 132px);
+  margin: 10px 0 0;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .recommendation-box {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  padding-block: 8px;
+  font-size: var(--font-sub);
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .recommendation-box strong {
+  background: transparent;
+  color: var(--accent-dark);
+  padding: 0;
+}
+
+.slide-card:is([data-slide="17"], [data-slide="32"], [data-slide="33"], [data-slide="34"]) .recommendation-box {
+  background-color: #FFF8E1;
+  border-color: #F0E1A8;
+  color: #735C12;
+  padding-block: 9px;
+}
+
+.slide-card:is([data-slide="17"], [data-slide="32"], [data-slide="33"], [data-slide="34"]) .recommendation-box strong {
+  background: transparent;
+  color: #B7791F;
+  padding: 0;
+}
+
+.slide-card[data-slide="17"] .step-list {
+  gap: clamp(20px, 2.6vh, 28px);
+}
+
+.slide-card:is([data-slide="32"], [data-slide="33"]) .grid-2 {
+  grid-template-columns: 1fr;
+}
+
+.slide-card:is([data-slide="32"], [data-slide="33"]) .image-container {
+  display: none;
+}
+
+.slide-card[data-slide="25"] .slide-body > .grid-2 {
+  grid-template-columns: 1fr;
+}
+
+.slide-card[data-slide="25"] .slide-body > .grid-2 > .grid-2 {
+  min-height: clamp(250px, 42vh, 390px);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.slide-card[data-slide="25"] .content-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: clamp(22px, 3vh, 34px);
+}
+
+.slide-card[data-slide="4"] .content-box-title {
+  font-size: 20pt;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .grid-2 {
+  min-height: clamp(390px, 57vh, 510px);
+  align-items: stretch;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .grid-2 > :first-child {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .grid-2 > :first-child > .content-box {
+  background-color: #F3F4F6;
+  border-color: #E2E5EA;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .image-container {
+  flex: 1 1 auto;
+  width: 100%;
+  height: clamp(210px, 34vh, 300px);
+  max-height: 300px;
+  margin: 12px 0 0;
+  background: #FFFFFF;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .image-container img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+
+.slide-card[data-slide="11"] .site-demo-link {
+  display: block;
+  margin-top: 8px;
+  color: var(--primary);
+  font-size: 11pt;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .step-list {
+  height: 100%;
+  justify-content: space-between;
+  gap: clamp(20px, 3vh, 32px);
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .step-item {
+  flex: 1 1 0;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="11"], [data-slide="12"]) .grid-2 {
+  align-items: stretch;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="11"], [data-slide="12"]) .grid-2 > .step-list {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  align-self: stretch;
+  height: auto;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="11"], [data-slide="12"]) .grid-2 > .step-list .step-item {
+  height: 100%;
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .recommendation-box {
+  background-color: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  padding: 14px 18px;
+  font-size: var(--font-body);
+}
+
+.slide-card:is([data-slide="6"], [data-slide="7"], [data-slide="8"], [data-slide="9"], [data-slide="10"], [data-slide="11"], [data-slide="12"]) .recommendation-box strong {
+  background-color: var(--accent);
+  color: #FFFFFF;
+  padding: 2px 8px;
+}
+
+.work-choose-image {
+  width: 100%;
+  height: clamp(135px, 22vh, 200px);
+  object-fit: contain;
+  border: 1px solid #D8E0EF;
+  border-radius: 8px;
+  background: #FFFFFF;
+}
+
+.slide-card[data-slide="14"] .grid-3 {
+  align-items: stretch;
+}
+
+.slide-card[data-slide="14"] .content-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.slide-card[data-slide="14"] .choose-card-image {
+  width: 100%;
+  height: clamp(145px, 22vh, 205px);
+  margin-top: auto;
+  border: 1px solid #D8E0EF;
+  border-radius: 7px;
+  background: #FFFFFF;
+  object-fit: contain;
+}
+
+.slide-card[data-slide="14"] .content-box p {
+  margin-top: 0;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+
+.slide-card:is([data-slide="16"], [data-slide="18"], [data-slide="29"], [data-slide="31"]) .content-box {
+  justify-content: flex-start;
+  padding-top: clamp(34px, 5vh, 48px);
+}
+
+.slide-card:is([data-slide="16"], [data-slide="18"], [data-slide="29"], [data-slide="31"]) .badge {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.slide-card[data-slide="19"] .content-box li {
+  line-height: 3.2;
+}
+
+.slide-card[data-slide="21"] .grid-2 {
+  min-height: clamp(240px, 38vh, 360px);
+  align-items: stretch;
+}
+
+.split-visual-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 40px);
+  width: 100%;
+  min-height: clamp(340px, 53vh, 470px);
+  align-items: stretch;
+}
+
+.slide-card[data-slide="27"] .split-visual-layout {
+  height: clamp(238px, 37vh, 329px);
+  min-height: 0;
+  max-height: 329px;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.slide-card[data-slide="27"] .split-visual-layout > .step-list,
+.slide-card[data-slide="27"] .split-visual-layout > .actual-image-box {
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.slide-card[data-slide="27"] .split-visual-layout .step-item {
+  min-height: 0;
+  padding: 10px 16px;
+}
+
+.split-visual-layout > .step-list,
+.split-visual-layout > .split-copy {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.split-visual-layout .step-item {
+  flex: 1 1 0;
+  align-items: center;
+}
+
+.actual-image-box {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border: 1px solid #D4DDEC;
+  border-radius: 8px;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.actual-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.side-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  min-height: clamp(350px, 54vh, 470px);
+}
+
+.slide-card[data-slide="24"] .side-feature-grid {
+  min-height: clamp(280px, 43vh, 376px);
+}
+
+.slide-card[data-slide="24"] .side-feature-example {
+  flex: 0 0 145px;
+  height: 145px;
+  padding: 12px;
+  overflow: hidden;
+  font-size: 10pt;
+  line-height: 1.3;
+}
+
+.side-feature-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px;
+  border: 1px solid #E7EBF3;
+  border-radius: 9px;
+  box-shadow: 0 2px 8px rgba(16,39,102,.06);
+  background: #FFFFFF;
+}
+
+.side-feature-card > h3 {
+  padding: 12px;
+  margin-bottom: 18px;
+  border-radius: 6px;
+  background: #252F70;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 18px;
+}
+
+.side-feature-label {
+  margin-bottom: 14px;
+  color: #3155D9;
+  font-weight: 750;
+}
+
+.side-feature-card > p {
+  flex: 1 1 auto;
+  color: #46536B;
+  line-height: 1.55;
+}
+
+.side-feature-example {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 6px;
+  background: var(--primary-light);
+  color: #23345F;
+  line-height: 1.5;
+}
+
+.play-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.play-circle {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #DDE8FF;
+  color: var(--primary);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.slide-card:is([data-slide="15"], [data-slide="16"], [data-slide="18"], [data-slide="29"], [data-slide="31"], [data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="41"], [data-slide="42"]) .slide-body > [class^="grid-"] {
+  min-height: clamp(220px, 37vh, 350px);
+  align-items: stretch;
+}
+
+.slide-card:is([data-slide="15"], [data-slide="16"], [data-slide="18"], [data-slide="29"], [data-slide="31"], [data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="41"], [data-slide="42"]) .content-box,
+.slide-card:is([data-slide="15"], [data-slide="16"], [data-slide="18"], [data-slide="29"], [data-slide="31"], [data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="41"], [data-slide="42"]) .step-item {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(22px, 3vh, 34px);
+}
+
+.slide-card:is([data-slide="30"], [data-slide="32"], [data-slide="33"], [data-slide="43"]) .step-list .step-item {
+  min-height: clamp(46px, 6.2vh, 62px);
+  align-items: center;
+}
+
+/* Slides 32–43: o5–o7 reference layout */
+.slide-card:is([data-slide="32"], [data-slide="33"]) .slide-body {
+  justify-content: center;
+}
+
+.slide-card:is([data-slide="32"], [data-slide="33"]) .step-list {
+  gap: clamp(7px, 1vh, 11px);
+}
+
+.slide-card[data-slide="32"] .step-list {
+  gap: clamp(18px, 2.2vh, 24px);
+}
+
+.slide-card:is([data-slide="32"], [data-slide="33"]) .step-item {
+  padding: clamp(9px, 1.25vh, 13px) 18px;
+  line-height: 1.35;
+}
+
+.slide-card:is([data-slide="32"], [data-slide="33"], [data-slide="37"]) .recommendation-box {
+  margin-top: 4px;
+  background-color: #FFF8E1;
+  border-color: #F0E1A8;
+  color: #735C12;
+  padding: 10px 16px;
+}
+
+.slide-card:is([data-slide="32"], [data-slide="33"], [data-slide="37"]) .recommendation-box strong {
+  padding: 0;
+  background: transparent;
+  color: #B7791F;
+}
+
+.slide-card[data-slide="34"] .grid-2 {
+  min-height: clamp(230px, 37vh, 340px);
+  align-items: stretch;
+}
+
+.slide-card[data-slide="34"] .content-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(22px, 3.2vw, 38px);
+}
+
+.slide-card[data-slide="34"] .content-box-title {
+  color: var(--text-muted);
+  font-size: 11pt;
+  margin-bottom: 14px;
+}
+
+.result-key {
+  margin-bottom: 18px;
+  color: var(--primary-dark);
+  font-size: clamp(24px, 2.3vw, 34px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.lime-text { color: var(--accent) !important; }
+
+.slide-card:is([data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="39"], [data-slide="41"], [data-slide="42"]) .grid-2,
+.slide-card:is([data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="39"], [data-slide="41"], [data-slide="42"]) .grid-3 {
+  min-height: clamp(245px, 39vh, 365px);
+  align-items: stretch;
+}
+
+.slide-card:is([data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="39"], [data-slide="41"], [data-slide="42"]) .content-box,
+.slide-card[data-slide="35"] .step-item {
+  height: 100%;
+  justify-content: flex-start;
+  padding: clamp(22px, 3vw, 34px);
+}
+
+.slide-card[data-slide="35"] .step-item {
+  align-items: flex-start;
+}
+
+.slide-card[data-slide="35"] .step-item strong,
+.slide-card:is([data-slide="36"], [data-slide="37"], [data-slide="41"], [data-slide="42"]) .content-box-title {
+  font-size: var(--font-subtitle);
+}
+
+.slide-card:is([data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="41"], [data-slide="42"]) .content-box p,
+.slide-card[data-slide="35"] .step-item p {
+  margin-top: 12px;
+  line-height: 1.55;
+}
+
+.slide-card:is([data-slide="36"], [data-slide="37"]) .badge {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  line-height: 1;
+}
+
+.bottom-note {
+  margin: 2px 2px 0;
+  color: var(--text-muted);
+  font-size: var(--font-caption);
+  line-height: 1.45;
+}
+
+.slide-card:is([data-slide="32"], [data-slide="33"], [data-slide="34"], [data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="38"], [data-slide="39"], [data-slide="40"], [data-slide="41"], [data-slide="42"]) .recommendation-box,
+.slide-card:is([data-slide="32"], [data-slide="33"], [data-slide="34"], [data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="38"], [data-slide="39"], [data-slide="40"], [data-slide="41"], [data-slide="42"]) .bottom-note {
+  width: 100%;
+  margin: 4px 0 0;
+  padding: 14px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background-color: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: var(--font-body);
+  line-height: 1.45;
+}
+
+.slide-card:is([data-slide="32"], [data-slide="33"], [data-slide="34"], [data-slide="35"], [data-slide="36"], [data-slide="37"], [data-slide="38"], [data-slide="39"], [data-slide="40"], [data-slide="41"], [data-slide="42"]) .recommendation-box strong {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: var(--accent);
+  color: #FFFFFF;
+}
+
+.security-note {
+  display: inline-block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 14px;
+  border-radius: 6px;
+  background: #FFF8E1;
+  color: #735C12;
+}
+
+.slide-card[data-slide="38"] .grid-2 {
+  min-height: clamp(245px, 39vh, 360px);
+  align-items: stretch;
+}
+
+.slide-card[data-slide="38"] .content-box {
+  padding: clamp(20px, 2.7vw, 32px);
+}
+
+.slide-card[data-slide="38"] li {
+  margin-bottom: 10px;
+  line-height: 1.45;
+}
+
+.slide-card[data-slide="39"] .content-box p {
+  line-height: 1.8;
+}
+
+.slide-card[data-slide="40"] .cli-layout {
+  display: grid;
+  height: clamp(286px, 45vh, 395px);
+  min-height: 0;
+  max-height: 395px;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
+  justify-items: stretch;
+  column-gap: clamp(24px, 3vw, 40px);
+}
+
+.slide-card[data-slide="40"] .cli-left-panel {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  align-self: stretch;
+}
+
+.slide-card[data-slide="40"] .cli-left-panel .step-item {
+  flex: 1 1 0;
+  height: auto;
+  min-height: 0;
+  justify-content: center;
+  gap: 0;
+  padding: 10px 16px;
+  overflow: hidden;
+}
+
+.slide-card[data-slide="40"] .cli-right-panel {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+}
+
+.slide-card[data-slide="40"] .step-item {
+  flex-direction: column;
+  align-items: stretch;
+  padding-block: 12px;
+}
+
+.slide-card[data-slide="40"] .cli-step-title {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.slide-card[data-slide="40"] .cli-step-title strong {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  font-size: 16pt;
+  line-height: 1.2;
+}
+
+.slide-card[data-slide="40"] .step-number {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  font-size: 13pt;
+}
+
+.slide-card[data-slide="40"] .step-item p {
+  flex: 0 0 auto;
+  margin-top: 6px;
+  padding-left: 48px;
+  color: var(--text-muted);
+  font-size: 12pt;
+  line-height: 1.3;
+}
+
+.slide-card[data-slide="40"] .bottom-note {
+  font-size: 13pt;
+}
+
+.slide-card[data-slide="40"] .actual-image-box {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 8px;
+}
+
+.slide-card[data-slide="40"] .actual-image-box img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+
+.slide-card[data-slide="41"] .content-box.lime {
+  background: var(--accent);
+  color: var(--accent-dark);
+}
+
+.slide-card[data-slide="41"] .content-box.lime .content-box-title,
+.slide-card[data-slide="41"] .content-box.lime p {
+  color: var(--accent-dark);
+}
+
+.slide-card[data-slide="41"] .badge {
+  align-self: flex-start;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.slide-card[data-slide="42"] .content-box p {
+  font-size: 11pt;
+  line-height: 1.65;
+}
+
+.slide-card[data-slide="43"] .step-list {
+  gap: clamp(7px, .9vh, 10px);
+}
+
+.slide-card[data-slide="43"] .final-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.slide-card[data-slide="43"] .final-check .step-number {
+  background: var(--accent-dark);
+  color: #FFFFFF;
+}
+
+.slide-card[data-slide="1"] .hero-slide {
+  align-items: flex-start;
+  text-align: left;
+  padding-inline: clamp(18px, 4vw, 54px);
+}
+
+.slide-card[data-slide="1"] .hero-pills {
+  justify-content: flex-start;
+}
+
+.slide-card:is([data-slide="5"], [data-slide="13"], [data-slide="20"], [data-slide="44"]) {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #FFFFFF;
+  padding: 0;
+}
+
+.slide-card:is([data-slide="5"], [data-slide="13"], [data-slide="20"]) .slide-body > div {
+  width: 100%;
+  height: 100%;
+  border-radius: 0 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(48px, 6vw, 80px) !important;
+}
+
+.slide-card[data-slide="44"] .hero-slide {
+  align-items: flex-start;
+  text-align: left;
+  padding: clamp(48px, 6vw, 80px);
+}
+
+.slide-card[data-slide="44"] .hero-series { color: var(--accent); }
+.slide-card[data-slide="44"] .hero-title,
+.slide-card[data-slide="44"] .hero-subtitle { color: #FFFFFF; }
+
+.slide-card:is([data-slide="5"], [data-slide="13"], [data-slide="20"], [data-slide="44"]) .card-next-hint {
+  margin-inline: 0;
+  border-top-color: rgba(255,255,255,.16);
+  background: var(--primary-dark);
+  color: rgba(255,255,255,.58);
+}
+
+/* 3. Footer Control Bar Component */
+.footer-bar {
+  height: 60px;
+  background-color: #FFFFFF;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  z-index: 100;
+  user-select: none;
+}
+
+.control-btn {
+  background-color: var(--text-muted);
+  color: #FFFFFF;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 12pt;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.control-btn:disabled {
+  background-color: #E5E5EA;
+  color: #A1A1A6;
+  cursor: not-allowed;
+}
+
+.footer-info {
+  font-size: 11pt;
+  color: var(--text-muted);
+}
+
+.footer-info span {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+@media (max-height: 760px) {
+  .slide-card {
+    height: auto;
+    padding-top: clamp(24px, 4vh, 32px);
+  }
+  .slide-header { margin-bottom: 12px; }
+  .slide-body { gap: 10px; }
+  .content-box { padding-block: 11px; }
+  .step-list { gap: 8px; }
+  .step-item { padding-block: 9px; }
+}
+
+@media (max-width: 900px) {
+  body { height: auto; min-height: 100dvh; overflow: auto; }
+  .app-container { flex-direction: column; height: auto; min-height: 100dvh; }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .progress-header { padding: 10px 16px; }
+  .sidebar-brand { margin-bottom: 8px; }
+  .agenda-nav, .sidebar-home { display: none; }
+  .main-stage { min-height: 0; padding: 10px; overflow: visible; }
+  .slide-card { height: auto; min-height: calc(100dvh - 154px); max-height: none; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .slide-body { overflow: visible; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+
+
+  <div class="app-container">
+    <!-- 1. Agenda Sidebar (Max 30% Width / Fixed 280px) -->
+    <aside class="sidebar">
+      <div class="progress-header">
+        <div class="sidebar-brand">
+          ChatGPT · Work · Codex
+          <span>AI WORK &amp; CODING PRACTICE</span>
+        </div>
+        <div class="progress-title">
+          <span>학습 진행률</span>
+          <span id="progress-percent">2%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-text">
+          <span>ChatGPT · Work · Codex</span>
+          <span id="page-indicator">01 / 44</span>
+        </div>
+      </div>
+
+
+  <nav class="agenda-nav" id="agenda-nav">
+    <!-- Dynamically Populated or Static Agenda Items -->
+  </nav>
+  <a class="sidebar-home" href="/" target="_top" aria-label="교육 자료 목록으로 이동">목록으로</a>
+</aside>
+
+<!-- 2. Main Slide Stage -->
+<main class="main-stage" id="main-stage">
+
+  <!-- Slide 01: Cover -->
+  <article class="slide-card active" data-slide="1">
+    <div class="slide-body">
+      <div class="hero-slide">
+        <div class="hero-series">AX 실무 교육 시리즈</div>
+        <h1 class="hero-title">ChatGPT · Work · Codex</h1>
+        <p class="hero-subtitle">핵심 기능부터 업무 자동화까지 초보자 실습 교육</p>
+        <div class="hero-pills">
+          <span class="hero-pill">핵심 기능</span>
+          <span class="hero-pill">업무 준비</span>
+          <span class="hero-pill">화면 구성</span>
+          <span class="hero-pill">사용법</span>
+        </div>
+        <div style="margin-top: 15px; font-size: 13pt; color: var(--accent-dark); background-color: var(--accent-light); padding: 8px 20px; border-radius: 20px;">
+          비개발자용 · 세션별 구성
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 02: Agenda -->
+  <article class="slide-card" data-slide="2">
+    <div class="slide-header">
+      <div class="slide-category">AGENDA</div>
+      <h2 class="slide-title">세 세션을 이 순서로 진행합니다</h2>
+      <p class="slide-description">하나의 계정, 하나의 앱 안에서 Chat · Work · Codex 세 화면이 어떻게 이어지는지 순서대로 익힙니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="content-box">
+          <span class="badge">SESSION 1</span>
+          <div class="content-box-title">ChatGPT</div>
+          <p style="font-size: 13pt; margin-top: 8px;">핵심 기능 7가지:<br>Library · Projects · Scheduled · Plugins · Images · Sites · GPTs</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">SESSION 2</span>
+          <div class="content-box-title">Work</div>
+          <p style="font-size: 13pt; margin-top: 8px;">업무 준비 7단계:<br>설치 · 첫 세션 · 환경 · 신뢰 폴더까지</p>
+        </div>
+        <div class="content-box" style="background-color: var(--primary-dark); color: #FFF;">
+          <span class="badge lime">SESSION 3</span>
+          <div class="content-box-title" style="color: #FFF;">Codex</div>
+          <p style="font-size: 13pt; margin-top: 8px; color: #E5E5EA;">화면 · 실행 · 확장 22단계:<br>패널 구성부터 CLI · 보안 · 로드맵까지</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 03: 2026-07 Update -->
+  <article class="slide-card" data-slide="3">
+    <div class="slide-header">
+      <div class="slide-category">2026-07 UPDATE</div>
+      <h2 class="slide-title">이 자료는 2026년 7월 업데이트를 반영했습니다</h2>
+      <p class="slide-description">OpenAI가 2026년 7월 9일 한 번에 발표한 세 가지 변화입니다. 오늘 배우는 내용은 이 기준으로 최신화했습니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="content-box">
+          <span class="badge">1</span>
+          <div class="content-box-title">ChatGPT Work 정식 공개</div>
+          <p>연구 · 파일 · 앱 연동 · 문서/시트/슬라이드 · Sites 제작까지 지원하는 장시간 에이전트 <br>(베타, Free/Go 제외)</p>
+        </div>
+        <div class="content-box lime">
+          <span class="badge lime">2</span>
+          <div class="content-box-title">Sites 베타 동시 출시</div>
+          <p>대화에서 바로 웹사이트 · 대시보드를 만들고 <br> 호스팅. Canvas의 웹 제작 기능을 대체</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">3</span>
+          <div class="content-box-title">Plugins 디렉터리로 통합</div>
+          <p>기존 App Directory가 Plugin Directory로 이동<br>플러그인이 앱 · 스킬 · 템플릿을<br>함께 묶는 발견 창구가 됨</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 04: Glossary -->
+  <article class="slide-card" data-slide="4">
+    <div class="slide-header">
+      <div class="slide-category">GLOSSARY</div>
+      <h2 class="slide-title">생소한 용어는 미리 알아두면 훨씬 편합니다</h2>
+      <p class="slide-description">개발 경험이 없어도 괜찮습니다. Work · Codex 세션에서 나올 용어를 쉬운 말로 먼저 정리합니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="step-item">
+          <div>
+            <strong style="color: var(--text-muted); font-size: 16pt;">Git</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">파일이 바뀐 기록을 저장해두는 서랍. 되돌리기가 쉬워집니다.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div>
+            <strong style="color: var(--text-muted); font-size: 16pt;">Diff</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">바뀌기 전과 후를 나란히 보여주는 비교 화면입니다.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div>
+            <strong style="color: var(--text-muted); font-size: 16pt;">PR (Pull Request)</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">“이렇게 바꿔도 될까요?”라고 정리해서 올리는 변경 제안서입니다.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div>
+            <strong style="color: var(--text-muted); font-size: 16pt;">CLI</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">마우스 클릭 대신 글자로 명령을 입력하는 화면입니다.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div>
+            <strong style="color: var(--text-muted); font-size: 16pt;">Terminal</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">CLI 명령을 입력하고 실행 결과를 보는 창입니다.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div>
+            <strong style="color: var(--text-muted); font-size: 16pt;">Sandbox</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">실제 자료에 영향 없이 안전하게 연습할 수 있는 격리 공간입니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>안내</strong> 오늘은 이 용어들을 직접 실습하며 익히므로 외우지 않아도 됩니다.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 05: Session 01 Intro -->
+  <article class="slide-card" data-slide="5">
+    <div class="slide-body">
+      <div style="background-color: var(--primary-dark); color: #FFF; padding: 48px; border-radius: 12px;">
+        <div class="slide-category" style="color: var(--accent);">SESSION 01</div>
+        <h1 style="font-size: 30pt; font-weight: 900; margin-bottom: 24px;">ChatGPT 핵심 기능</h1>
+        <div class="step-list">
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">1</span>
+            <div><strong>결과물 관리:</strong> Library · Projects</div>
+          </div>
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">2</span>
+            <div><strong>자동화 · 확장:</strong> Scheduled · Plugins</div>
+          </div>
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">3</span>
+            <div><strong>콘텐츠 제작:</strong> Images · Sites · GPTs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 06: Feature 01 Library -->
+  <article class="slide-card" data-slide="6">
+    <div class="slide-header">
+      <div class="slide-category">FEATURE 01 · LIBRARY</div>
+      <h2 class="slide-title">라이브러리는 결과물을 다시 쓰게 만드는 개인 작업 보관함입니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div>
+          <div class="content-box" style="margin-bottom: 12px;">
+            <p>ChatGPT가 만든 문서 · PPT · 표 · 이미지와 업로드 파일을 보관하고, 검색해 다음 작업의 자료로 다시 사용하는 공간입니다.</p>
+          </div>
+          <div class="image-container" aria-label="Library 화면 예시">
+            <img src="ChatGPT_Work_Codex_image/chatgpt-library.png" alt="ChatGPT Library 화면">
+          </div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div>왼쪽 메뉴에서 Library를 열고 파일명이나 내용으로 찾습니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div>파일을 열어 미리보기 · 다운로드 · 버전 정보를 확인합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div>새 대화에서 파일을 선택하거나 ‘이 파일로 …’라고 후속 작업을 요청합니다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>추천</strong> 완성본은 ‘주제_용도_날짜’로 이름을 붙이고, 반복해서 쓸 템플릿은 별도 폴더로 구분하세요. (Library는 파일 재사용, Project는 장기 맥락 관리에 적합)
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 07: Feature 02 Projects -->
+  <article class="slide-card" data-slide="7">
+    <div class="slide-header">
+      <div class="slide-category">FEATURE 02 · PROJECTS</div>
+      <h2 class="slide-title">프로젝트는 같은 목표의 대화 · 파일 · 지침을 한 맥락으로 묶습니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div>
+          <div class="content-box" style="margin-bottom: 12px;">
+          <p>오래 이어지는 업무를 주제별로 정리하고, 관련 채팅 · 업로드 파일 · 연결 소스 · 프로젝트 지침을 여러 대화에서 공유합니다.</p>
+          </div>
+          <div class="image-container">
+          <img src="ChatGPT_Work_Codex_image/chatgpt-project.png" alt="ChatGPT Projects 화면">
+          </div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div>Projects에서 새 프로젝트를 만들고 목표가 드러나는 이름을 붙입니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div>Sources에 파일을 추가하고 반복 규칙은 Project instructions에 적습니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div>결과물마다 새 채팅을 시작해 맥락은 공유하되 대화 목적은 분리합니다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>추천</strong> 강의자료, 시장조사, 논문처럼 여러 산출물이 같은 자료를 쓰는 장기 업무에 사용하세요.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 08: Feature 03 Scheduled -->
+  <article class="slide-card" data-slide="8">
+    <div class="slide-header">
+      <div class="slide-category">FEATURE 03 · SCHEDULED</div>
+      <h2 class="slide-title">예약 작업은 반복 업무를 정해진 시간이나 조건에 맞춰 실행합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div>
+          <div class="content-box" style="margin-bottom: 12px;">
+          <p>보고서 갱신 · 모니터링 · 리마인더처럼 같은 작업을 한 번, 주기적으로, 또는 조건이 충족될 때 백그라운드에서 실행합니다.</p>
+          </div>
+          <div class="image-container">
+          <img src="ChatGPT_Work_Codex_image/chatgpt-scheduled.png" alt="ChatGPT Scheduled 화면">
+          </div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div>일반 채팅에서 먼저 프롬프트를 수동 실행해 결과를 검증합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div>무엇을 · 언제 · 어디에 보고할지 말하고 예약 생성을 요청합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div>Scheduled에서 실행 기록을 확인하고 범위 · 도구 · 주기를 조정합니다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>추천</strong> 주간 동향 요약, 마감 알림, 승인 대기 상태 확인처럼 결과 기준이 명확한 일부터 시작하세요.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 09: Feature 04 Plugins -->
+  <article class="slide-card" data-slide="9">
+    <div class="slide-header">
+      <div class="slide-category">FEATURE 04 · PLUGINS</div>
+      <h2 class="slide-title">플러그인은 ChatGPT에 외부 서비스와 반복 업무 능력을 연결합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div>
+          <div class="content-box" style="margin-bottom: 12px;">
+          <p>플러그인은 스킬 · 커넥터 · MCP 도구 등을 묶어 Google Drive, Slack, GitHub 같은 서비스의 정보를 읽거나 지원되는 작업을 수행하게 합니다.</p>
+          </div>
+          <div class="image-container">
+          <img src="ChatGPT_Work_Codex_image/chatgpt-plugin.png" alt="ChatGPT Plugins 화면">
+          </div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div>Plugins에서 필요한 플러그인을 검색하고 상세 권한을 확인합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div>설치 후 서비스 연결이 필요하면 로그인하고 최소 권한만 승인합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div>새 채팅에서 @플러그인명과 함께 자료 위치 · 원하는 결과를 구체적으로 요청합니다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>추천</strong> 자료 검색은 Drive, 협업 요약은 Slack, 코드 작업은 GitHub처럼 원본이 있는 서비스부터 연결하세요.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 10: Feature 05 Images -->
+  <article class="slide-card" data-slide="10">
+    <div class="slide-header">
+      <div class="slide-category">FEATURE 05 · IMAGES</div>
+      <h2 class="slide-title">이미지는 설명만으로 만들고, 참조 이미지를 붙여 원하는 부분만 수정합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div>
+          <div class="content-box" style="margin-bottom: 12px;">
+          <p>ChatGPT에서 배너 · 일러스트 · UI 자산 등을 생성하거나 기존 이미지를 참조해 추가 · 삭제 · 스타일 변경을 자연어로 요청할 수 있습니다.</p>
+          </div>
+          <div class="image-container">
+          <img src="ChatGPT_Work_Codex_image/chatgpt-image.png" alt="ChatGPT Images 화면">
+          </div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div>용도 · 주제 · 구도 · 스타일 · 크기 · 금지 요소를 1~3문장으로 설명합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div>수정할 때 참조 이미지를 첨부하고 ‘바꿀 것’과 ‘유지할 것’을 나눠 말합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div>확대 보기나 Canvas에서 영역별 피드백을 주고 최종본을 다운로드합니다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>추천</strong> 첫 요청에서 완벽함을 기대하기보다 구도 → 내용 → 글자 · 세부 순서로 2~3회 다듬으세요.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 11: Feature 06 Sites -->
+  <article class="slide-card" data-slide="11">
+    <div class="slide-header">
+      <div class="slide-category">FEATURE 06 · SITES</div>
+      <h2 class="slide-title">Sites는 아이디어를 바로 실행 가능한 웹사이트와 앱으로 배포합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div>
+          <div class="content-box" style="margin-bottom: 12px;">
+          <p>프롬프트나 호환되는 기존 프로젝트에서 웹사이트 · 대시보드 · 내부 도구 · 게임을 만들고, OpenAI 호스팅으로 저장 · 수정 · 공유합니다.</p>
+          </div>
+          <div class="image-container">
+          <img src="ChatGPT_Work_Codex_image/chatgpt-sites.png" alt="ChatGPT Sites 화면">
+          </div>
+          <a class="site-demo-link" href="https://ax-consulting-edu.okhjson.chatgpt.site/" target="_blank" rel="noopener noreferrer">https://ax-consulting-edu.okhjson.chatgpt.site/</a>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div>프롬프트에 ‘website’ 또는 @Sites를 명시합니다. (예: ChatGPT Sites로 내부 프로젝트 관리 사이트를 만들어줘)</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div>사용자 · 목적 · 핵심 행동 · 사용할 정보 · 저장 필요 여부를 설명합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div>미리보기에서 기능을 검토하고 수정한 뒤 공개 범위를 정해 공유합니다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>추천</strong> 행사 안내, 신청 폼, 프로젝트 현황판처럼 화면과 상호작용이 필요한 결과물에 사용하세요.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 12: Feature 07 GPTs -->
+  <article class="slide-card" data-slide="12">
+    <div class="slide-header">
+      <div class="slide-category">FEATURE 07 · GPTS</div>
+      <h2 class="slide-title">GPT는 지침 · 지식 · 기능을 결합한 나만의 전문 ChatGPT입니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div>
+          <div class="content-box" style="margin-bottom: 12px;">
+          <p>반복되는 역할과 답변 규칙, 참고 문서, 사용할 기능을 미리 구성해 특정 업무에 일관되게 답하는 맞춤형 ChatGPT를 만듭니다.</p>
+          </div>
+          <div class="image-container">
+          <img src="ChatGPT_Work_Codex_image/chatgpt-gpts.png" alt="Custom GPTs 화면">
+          </div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div>Explore GPTs에서 기존 GPT를 시험하거나 Create를 선택합니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div>이름 · 목적 · 지침 · 지식 파일 · 사용 기능을 설정하고 예시 질문을 넣습니다.</div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div>대표 질문 5~10개로 정확성 · 거절 기준 · 출처 사용을 테스트한 뒤 공유 범위를 정합니다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>추천</strong> FAQ 응답, 글쓰기 코치, 사내 규정 안내처럼 입력과 출력 형식이 반복되는 개인 업무부터 만드세요.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 13: Session 02 Intro -->
+  <article class="slide-card" data-slide="13">
+    <div class="slide-body">
+      <div style="background-color: var(--primary-dark); color: #FFF; padding: 48px; border-radius: 12px;">
+        <div class="slide-category" style="color: var(--accent);">SESSION 02</div>
+        <h1 style="font-size: 30pt; font-weight: 900; margin-bottom: 24px;">ChatGPT Work로 업무 준비하기</h1>
+        <div class="step-list">
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">1</span>
+            <div>Chat · Work · Codex 세 화면 구분</div>
+          </div>
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">2</span>
+            <div>파일과 앱 연결, 설치 실습</div>
+          </div>
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">3</span>
+            <div>환경 선택과 신뢰 폴더</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 14: Choose -->
+  <article class="slide-card" data-slide="14">
+    <div class="slide-header">
+      <div class="slide-category">CHOOSE</div>
+      <h2 class="slide-title">세 탭은 목적과 파일 접근 방식이 다릅니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="content-box">
+          <div class="content-box-title">Chat</div>
+          <p>• 질문 · 글쓰기 · 분석<br>• 일반 대화 중심<br>• 로컬 프로젝트 직접 수정 아님</p>
+          <img class="choose-card-image" src="ChatGPT_Work_Codex_image/work-choose-chat.png" alt="Chat 화면">
+        </div>
+          <div class="content-box dark-card">
+            <div class="content-box-title">Work</div>
+          <p>• 장시간 · 다단계 업무<br>• 샌드박스/클라우드 작업<br>• 비개발 업무 자동화</p>
+          <img class="choose-card-image" src="ChatGPT_Work_Codex_image/work-choose-work.png" alt="Work 화면">
+        </div>
+        <div class="content-box">
+          <div class="content-box-title">Codex</div>
+          <p>• 파일 · 프로젝트 실행<br>• 로컬 파일 직접 접근<br>• 변경을 실시간 검토</p>
+          <img class="choose-card-image" src="ChatGPT_Work_Codex_image/work-choose-codex.png" alt="Codex 화면">
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>안내</strong> 이번 세션은 Work 탭을 중심으로, 다음 세션은 Codex 화면을 중심으로 설명합니다.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 15: Ready -->
+  <article class="slide-card" data-slide="15">
+    <div class="slide-header">
+      <div class="slide-category">READY</div>
+      <h2 class="slide-title">Work는 파일 · 앱 · 도구를 한 업무 흐름으로 연결합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="step-item">
+          <span class="step-number">1</span>
+          <div>
+            <strong>계정</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">ChatGPT 계정과 데스크톱 앱 최신 버전</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-number">2</span>
+          <div>
+            <strong>앱</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">macOS · Windows용 최신 ChatGPT 데스크톱 앱</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-number">3</span>
+          <div>
+            <strong>프로젝트</strong>
+            <p style="font-size: 12pt; margin-top: 4px;">연습용 폴더 또는 Git 저장소 준비</p>
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 12pt; color: var(--text-muted); margin-top: 15px;">초보자 교육은 데스크톱 앱에서 시작하고 CLI는 Codex 세션 마지막에 소개합니다.</p>
+    </div>
+  </article>
+
+  <!-- Slide 16: Install -->
+  <article class="slide-card" data-slide="16">
+    <div class="slide-header">
+      <div class="slide-category">INSTALL</div>
+      <h2 class="slide-title">설치는 다운로드 → 로그인 → Work/Codex 화면 순서입니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-4">
+        <div class="content-box">
+          <span class="badge">1</span>
+          <div class="content-box-title">다운로드</div>
+          <p style="font-size: 11pt;">chatgpt.com/download에서 운영체제 선택</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">2</span>
+          <div class="content-box-title">설치</div>
+          <p style="font-size: 11pt;">다운로드 파일 실행 후 앱 열기</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">3</span>
+          <div class="content-box-title">로그인</div>
+          <p style="font-size: 11pt;">OpenAI 계정으로 로그인</p>
+        </div>
+        <div class="content-box lime">
+          <span class="badge lime">4</span>
+          <div class="content-box-title">화면 선택</div>
+          <p style="font-size: 11pt;">사이드바에서 Work 또는 Codex 화면 선택</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 17: Practice 1 -->
+  <article class="slide-card" data-slide="17">
+    <div class="slide-header">
+      <div class="slide-category">실습 1</div>
+      <h2 class="slide-title">실습: 데스크톱 앱 설치하고 Work 화면까지 들어가 보기</h2>
+      <p class="slide-description">목표: 내 컴퓨터에 앱을 설치하고 Work 화면을 직접 열어봅니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="step-list">
+        <div class="step-item">
+          <span class="step-number">1</span>
+          <div>chatgpt.com/download 에 접속해 내 운영체제(Windows/macOS)용 설치 파일을 내려받습니다.</div>
+        </div>
+        <div class="step-item">
+          <span class="step-number">2</span>
+          <div>내려받은 설치 파일을 실행하고, 안내에 따라 앱을 엽니다.</div>
+        </div>
+        <div class="step-item">
+          <span class="step-number">3</span>
+          <div>회사 계정이 아닌 본인 OpenAI 계정으로 로그인합니다.</div>
+        </div>
+        <div class="step-item">
+          <span class="step-number">4</span>
+          <div>상단 탭에서 Chat 옆의 Work를 찾아 클릭해 열어봅니다.</div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 18: Environment -->
+  <article class="slide-card" data-slide="18">
+    <div class="slide-header">
+      <div class="slide-category">ENVIRONMENT</div>
+      <h2 class="slide-title">프로젝트는 같은 목표의 대화와 자료를 묶습니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-4">
+        <div class="content-box lime">
+          <span class="badge lime">1</span>
+          <div class="content-box-title">Local</div>
+          <p style="font-size: 11pt;">내 컴퓨터의 파일과 도구 사용. 초보자 실습 추천</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">2</span>
+          <div class="content-box-title">Cloud</div>
+          <p style="font-size: 11pt;">앱을 닫아도 클라우드에서 계속 실행</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">3</span>
+          <div class="content-box-title">SSH</div>
+          <p style="font-size: 11pt;">원격 서버 · 개발 머신에 연결</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">4</span>
+          <div class="content-box-title">WSL</div>
+          <p style="font-size: 11pt;">Windows에서 Linux 환경과 경로 사용</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 19: Trust -->
+  <article class="slide-card" data-slide="19">
+    <div class="slide-header">
+      <div class="slide-category">TRUST</div>
+      <h2 class="slide-title">Work의 결과를 Codex 실행 명세로 바꿉니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="content-box-title">신뢰해도 좋은 폴더</div>
+          <ul style="padding-left: 20px; font-size: 12pt;">
+            <li>내가 만든 프로젝트</li>
+            <li>출처를 아는 저장소</li>
+            <li>비밀정보가 제거된 복사본</li>
+            <li>변경 복구가 가능한 Git 폴더</li>
+          </ul>
+        </div>
+        <div class="content-box" style="background-color: var(--primary-dark); color: #FFF;">
+          <div class="content-box-title" style="color: #FFF;">먼저 확인할 폴더</div>
+          <ul style="padding-left: 20px; font-size: 12pt; color: #E5E5EA;">
+            <li>다운로드한 낯선 코드</li>
+            <li>고객 · 개인정보 포함 폴더</li>
+            <li>홈 디렉터리 전체</li>
+            <li>백업 없는 유일한 원본</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 20: Session 03 Intro -->
+  <article class="slide-card" data-slide="20">
+    <div class="slide-body">
+      <div style="background-color: var(--primary-dark); color: #FFF; padding: 48px; border-radius: 12px;">
+        <div class="slide-category" style="color: var(--accent);">SESSION 03</div>
+        <h1 style="font-size: 30pt; font-weight: 900; margin-bottom: 24px;">Codex로 파일과 프로젝트를 완성하기</h1>
+        <div class="step-list">
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">1</span>
+            <div>화면 구성: 사이드바 · 프로젝트 · 입력창 옵션</div>
+          </div>
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">2</span>
+            <div>안전한 요청: 권한 · 승인 · 검증</div>
+          </div>
+          <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+            <span class="step-number" style="background-color: var(--accent);">3</span>
+            <div>확장: Git · PR · 보안 · CLI · 로드맵</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 21: Concept -->
+  <article class="slide-card" data-slide="21">
+    <div class="slide-header">
+      <div class="slide-category">CONCEPT</div>
+      <h2 class="slide-title">Codex는 답변보다 “프로젝트의 실제 변경”을 만듭니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="content-box-title">일반 Chat</div>
+          <p>질문에 답하고 문장을 만듭니다. 로컬 프로젝트 파일을 직접 바꾸는 작업은 기본 목적이 아닙니다.</p>
+        </div>
+        <div class="content-box" style="background-color: var(--primary-dark); color: #FFF;">
+          <div class="content-box-title" style="color: #FFF;">Codex 화면</div>
+          <p style="color: #E5E5EA;">선택한 폴더를 읽고 → 계획하고 → 파일을 수정하고 → 명령과 테스트로 검증합니다.</p>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>핵심</strong> 최종 판단과 승인 책임은 사용자에게 있습니다.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 22: Map -->
+  <article class="slide-card" data-slide="22">
+    <div class="slide-header">
+      <div class="slide-category">MAP</div>
+      <h2 class="slide-title">Codex 화면은 “세션 목록 + 작업 공간 + 입력 영역”으로 읽습니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="split-visual-layout">
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div><strong>왼쪽 사이드바</strong><p>메뉴(새 채팅·풀 리퀘스트·예약·플러그인) · 프로젝트 목록 · 최근 대화</p></div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div><strong>가운데 작업 공간</strong><p>시작 화면 추천 카드 · 사용 한도 알림 · 프로젝트 선택</p></div>
+          </div>
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div><strong>하단 입력 영역</strong><p>프롬프트 입력, 환경 · 모델 · 권한 · 사용량 확인</p></div>
+          </div>
+        </div>
+        <div class="actual-image-box">
+          <img src="ChatGPT_Work_Codex_image/codex-map.png" alt="Codex 화면 구성">
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 23: Sidebar -->
+  <article class="slide-card" data-slide="23">
+    <div class="slide-header">
+      <div class="slide-category">SIDEBAR</div>
+      <h2 class="slide-title">세션 하나는 독립된 대화 · 폴더 · 변경 기록을 가집니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="split-visual-layout">
+        <div class="step-list">
+          <div class="step-item"><span class="step-number">1</span><div><strong>새 채팅:</strong> 새 작업은 새 세션으로 시작</div></div>
+          <div class="step-item"><span class="step-number">2</span><div><strong>풀 리퀘스트:</strong> 코드 저장소 연결</div></div>
+          <div class="step-item"><span class="step-number">3</span><div><strong>예약:</strong> 작업 수행 예약</div></div>
+          <div class="step-item"><span class="step-number">4</span><div><strong>프로젝트:</strong> 앱·도구 단위로 코드 컨텍스트 참고</div></div>
+          <div class="step-item"><span class="step-number">5</span><div><strong>세션:</strong> 이전 작업을 다시 열기</div></div>
+        </div>
+        <div class="actual-image-box"><img src="ChatGPT_Work_Codex_image/codex-sidebar.png" alt="Codex 사이드바 화면"></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 24: Side Panel -->
+  <article class="slide-card" data-slide="24">
+    <div class="slide-header">
+      <div class="slide-category">SIDE PANEL</div>
+      <h2 class="slide-title">풀 리퀘스트 · 예약 · 플러그인</h2>
+      <p class="slide-description">왼쪽 메뉴 중 세 기능의 역할과 사용 예시를 자세히 살펴봅니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="side-feature-grid">
+        <div class="side-feature-card">
+          <h3>풀 리퀘스트</h3>
+          <div class="side-feature-label">기능 설명</div>
+          <p>Codex가 생성했거나 연결된 코드 저장소의 Pull Request 목록을 한 곳에서 확인하는 기능. 리뷰 상태와 병합 여부를 추적합니다.</p>
+          <div class="side-feature-example"><strong>예시</strong><br><br>“로그인 버그 수정 PR #128”이 “리뷰 대기” 상태로 표시되며, 클릭 시 연결된 저장소(GitHub 등)의 PR 상세 화면으로 이동합니다.</div>
+        </div>
+        <div class="side-feature-card">
+          <h3>예약</h3>
+          <div class="side-feature-label">기능 설명</div>
+          <p>특정 시간 또는 주기로 반복 실행할 작업을 등록해두는 기능. 원하는 주기로 Codex가 자동으로 작업을 수행하도록 예약합니다.</p>
+          <div class="side-feature-example"><strong>예시</strong><br><br>“매일 오전 9시에 어제 커밋 내역을 요약해줘”처럼 등록해두면, 별도 요청 없이 정해진 시각에 자동 실행됩니다.</div>
+        </div>
+        <div class="side-feature-card">
+          <h3>플러그인</h3>
+          <div class="side-feature-label">기능 설명</div>
+          <p>외부 서비스·도구와 Codex를 연동하기 위한 확장 기능. 필요한 플러그인을 추가·제거해 작업 범위를 넓힐 수 있습니다.</p>
+          <div class="side-feature-example"><strong>예시</strong><br><br>Slack 플러그인 연결 시 작업 완료 알림을 채널로 전송하거나, Jira 플러그인으로 이슈를 자동 생성할 수 있습니다.</div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 25: Main Panel -->
+  <article class="slide-card" data-slide="25">
+    <div class="slide-header">
+      <div class="slide-category">MAIN PANEL</div>
+      <h2 class="slide-title">추천 카드</h2>
+      <p class="slide-description">새 작업을 시작할 때 “무엇을 만들까요?” 문구와 함께 자주 쓰는 요청 4가지를 빠르게 선택할 수 있습니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="grid-2">
+          <div class="content-box"><strong class="play-title"><span class="play-circle">▶</span>코드를 살펴보고 이해해줘</strong><p>기존 코드베이스의 구조와 동작 방식을 분석하고 설명합니다.</p></div>
+          <div class="content-box"><strong class="play-title"><span class="play-circle">▶</span>새 기능이나 앱·도구를 만들어줘</strong><p>신규 기능을 구현하거나 새로운 앱과 도구를 개발합니다.</p></div>
+          <div class="content-box"><strong class="play-title"><span class="play-circle">▶</span>코드를 검토해서 수정할 부분을 제안해줘</strong><p>코드를 리뷰하고 개선할 지점을 제안합니다.</p></div>
+          <div class="content-box"><strong class="play-title"><span class="play-circle">▶</span>문제와 오류를 고쳐줘</strong><p>버그와 오류의 원인을 진단하고 수정합니다.</p></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 26: Session Options -->
+  <article class="slide-card" data-slide="26">
+    <div class="slide-header">
+      <div class="slide-category">SESSION</div>
+      <h2 class="slide-title">파일 · 폴더는 해야 할 일과 함께 전달합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="split-visual-layout">
+        <div class="step-list">
+          <div class="step-item"><span class="step-number">1</span><div><strong>파일 및 폴더:</strong> Codex가 참고할 대상 지정</div></div>
+          <div class="step-item"><span class="step-number">2</span><div><strong>프로젝트에서 Work 시작:</strong> 읽고 바꿀 프로젝트 선택</div></div>
+          <div class="step-item"><span class="step-number">3</span><div><strong>플러그인 & 도구 연동:</strong> Docs, PDF, Spreadsheets 등 연결</div></div>
+          <div class="step-item"><span class="step-number">4</span><div><strong>계획 모드 & 목표 관리:</strong> Plan Mode로 단계별 로드맵 자동 수립</div></div>
+        </div>
+        <div class="actual-image-box"><img src="ChatGPT_Work_Codex_image/codex-session.png" alt="Codex 세션 설정 화면"></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 27: Authority -->
+  <article class="slide-card" data-slide="27">
+    <div class="slide-header">
+      <div class="slide-category">AUTHORITY</div>
+      <h2 class="slide-title">액션 승인 · 권한 제어는 단계적으로 제어해야 합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="split-visual-layout">
+        <div class="step-list">
+          <div class="step-item"><span class="step-number">1</span><div><strong>승인 요청:</strong> 외부 수정·인터넷 사용 시 매번 승인 창 확인</div></div>
+          <div class="step-item"><span class="step-number">2</span><div><strong>나 대신 승인:</strong> 고위험 작업에만 승인 요청</div></div>
+          <div class="step-item"><span class="step-number">3</span><div><strong>전체 권한:</strong> 모든 파일 및 인터넷 무제한 액세스</div></div>
+        </div>
+        <div class="actual-image-box"><img src="ChatGPT_Work_Codex_image/codex-authority.png" alt="Codex 권한 설정 화면"></div>
+      </div>
+      <div class="recommendation-box">
+        <strong>권장</strong> 반복적인 문서 요약 시 '나 대신 승인'으로 설정하여 작업 연속성을 유지합니다.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 28: Panel -->
+  <article class="slide-card" data-slide="28">
+    <div class="slide-header">
+      <div class="slide-category">PANEL</div>
+      <h2 class="slide-title">Views 메뉴에서 작업에 필요한 패널만 Codex가 자동으로 엽니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="split-visual-layout">
+        <div class="step-list">
+          <div class="step-item"><span class="step-number">1</span><div><strong>Chat:</strong> 지시 · 진행 · 결과</div></div>
+          <div class="step-item"><span class="step-number">2</span><div><strong>Diff / File:</strong> 변경 전후 비교, 파일 열기 및 편집</div></div>
+          <div class="step-item"><span class="step-number">3</span><div><strong>Browser / Terminal:</strong> 앱 미리보기 및 명령 직접 실행</div></div>
+          <div class="step-item"><span class="step-number">4</span><div><strong>Plan / Tasks:</strong> 실행 전 계획 검토 및 할 일 상태</div></div>
+        </div>
+        <div class="actual-image-box"><img src="ChatGPT_Work_Codex_image/codex-panel.png" alt="Codex Views 패널 화면"></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 29: Prompt -->
+  <article class="slide-card" data-slide="29">
+    <div class="slide-header">
+      <div class="slide-category">PROMPT</div>
+      <h2 class="slide-title">좋은 요청은 목표 · 대상 · 제약 · 완료 조건을 담습니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-4">
+        <div class="content-box">
+          <span class="badge">1</span>
+          <div class="content-box-title">목표</div>
+          <p style="font-size: 11pt;">무엇을 만들거나 고칠까요?</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">2</span>
+          <div class="content-box-title">대상</div>
+          <p style="font-size: 11pt;">어떤 폴더 · 파일인가요?</p>
+        </div>
+        <div class="content-box">
+          <span class="badge">3</span>
+          <div class="content-box-title">제약</div>
+          <p style="font-size: 11pt;">형식 · 도구 · 보안 조건은?</p>
+        </div>
+        <div class="content-box lime">
+          <span class="badge lime">4</span>
+          <div class="content-box-title">완료 조건</div>
+          <p style="font-size: 11pt;">어떻게 확인하면 끝인가요?</p>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>예시</strong> “회의록 폴더를 읽고 담당자 · 과제 · 기한 표를 summary.md로 만들고 누락 파일을 확인해 줘.”
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 30: Approve Check -->
+  <article class="slide-card" data-slide="30">
+    <div class="slide-header">
+      <div class="slide-category">APPROVE</div>
+      <h2 class="slide-title">승인 창에서는 대상 · 행동 · 영향을 확인합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="step-list">
+        <div class="step-item"><span class="step-number">1</span><div>어떤 파일이나 명령이 대상인가?</div></div>
+        <div class="step-item"><span class="step-number">2</span><div>요청한 범위 안의 행동인가?</div></div>
+        <div class="step-item"><span class="step-number">3</span><div>삭제 · 덮어쓰기 · 외부 전송이 있는가?</div></div>
+        <div class="step-item"><span class="step-number">4</span><div>Allow once가 충분한가?</div></div>
+        <div class="step-item"><span class="step-number">5</span><div>결과를 되돌릴 Git · 백업이 있는가?</div></div>
+      </div>
+      <div style="background-color: var(--primary-dark); color: #FFF; padding: 10px 18px; border-radius: 6px; margin-top: 10px; font-weight: 400;">
+        STOP: 이해되지 않으면 Deny 후 설명을 요청한다.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 31: Loop -->
+  <article class="slide-card" data-slide="31">
+    <div class="slide-header">
+      <div class="slide-category">LOOP</div>
+      <h2 class="slide-title">안전한 기본 흐름은 탐색 → 계획 → 실행 → 검토 → 검증입니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-4" style="grid-template-columns: repeat(5, 1fr);">
+        <div class="content-box"><span class="badge">1</span><div><strong>탐색</strong></div><p style="font-size: 10.5pt; margin-top: 4px;">파일 구조 파악</p></div>
+        <div class="content-box"><span class="badge">2</span><div><strong>계획</strong></div><p style="font-size: 10.5pt; margin-top: 4px;">변경 범위 합의</p></div>
+        <div class="content-box"><span class="badge">3</span><div><strong>실행</strong></div><p style="font-size: 10.5pt; margin-top: 4px;">편집 및 명령</p></div>
+        <div class="content-box"><span class="badge">4</span><div><strong>검토</strong></div><p style="font-size: 10.5pt; margin-top: 4px;">Diff 및 댓글</p></div>
+        <div class="content-box lime"><span class="badge lime">5</span><div><strong>검증</strong></div><p style="font-size: 10.5pt; margin-top: 4px;">테스트/미리보기</p></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 32: Practice 2 -->
+  <article class="slide-card" data-slide="32">
+    <div class="slide-header">
+      <div class="slide-category">실습 2</div>
+      <h2 class="slide-title">실습: 연습용 폴더에서 첫 요청 보내보기</h2>
+      <p class="slide-description">목표: 실제 업무 폴더가 아닌 연습용 복사본 폴더로 첫 요청을 실행해봅니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="step-list">
+        <div class="step-item"><span class="step-number">1</span><div>Codex 화면에서 새 세션을 만들고,<br>연습용 폴더(회의록이나 문서 모음)를 선택합니다.</div></div>
+        <div class="step-item"><span class="step-number">2</span><div>작업 폴더의 간단한 회의록을 저장합니다.</div></div>
+        <div class="step-item"><span class="step-number">3</span><div>입력창에 “이 폴더의 파일들을 읽고,<br>핵심 내용을 summary.md 파일로 정리해 줘”라고 요청합니다.</div></div>
+        <div class="step-item"><span class="step-number">4</span><div>Chat 패널에서 진행 상황을 지켜보고,<br>결과가 나오면 File 패널에서 summary.md를 열어 확인합니다.</div></div>
+      </div>
+      <div class="recommendation-box"><strong>TIP</strong> 요청은 한 번에 하나의 결과물만, 검토하기가 훨씬 쉽습니다.</div>
+    </div>
+  </article>
+
+  <!-- Slide 33: Practice 3 -->
+  <article class="slide-card" data-slide="33">
+    <div class="slide-header">
+      <div class="slide-category">실습 3</div>
+      <h2 class="slide-title">실습: Diff를 검토하고 승인해보기</h2>
+      <p class="slide-description">목표: Codex가 만든 변경을 Diff 패널에서 확인하고, 이해한 뒤에만 승인합니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="step-list">
+        <div class="step-item"><span class="step-number">1</span><div>실습 2에서 만든 summary.md에<br>“표 형식으로 다시 정리해 줘”라고 추가 요청합니다.</div></div>
+        <div class="step-item"><span class="step-number">2</span><div>Codex가 변경을 시작하면 승인 창에서<br>대상 파일과 실행 내용을 먼저 읽습니다.</div></div>
+        <div class="step-item"><span class="step-number">3</span><div>승인 창에서 대상 파일과<br>바뀌는 내용을 다시 확인합니다.</div></div>
+        <div class="step-item"><span class="step-number">4</span><div>Diff 패널을 열어<br><strong>+ 추가된 줄</strong>과 <strong>- 삭제된 줄</strong>을 확인합니다.</div></div>
+        <div class="step-item"><span class="step-number">5</span><div>이해된 변경이면 Allow,<br>이해되지 않으면 Deny 후 이유를 물어봅니다.</div></div>
+      </div>
+      <div class="recommendation-box"><strong>TIP</strong> 승인은 “빠르게”보다 “이해하고” 누르는 것이 안전합니다.</div>
+    </div>
+  </article>
+
+  <!-- Slide 34: Result -->
+  <article class="slide-card" data-slide="34">
+    <div class="slide-header">
+      <div class="slide-category">RESULT</div>
+      <h2 class="slide-title">혼자 할 때와 Codex와 함께할 때, 무엇이 달라지나요</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="content-box-title">직접 정리할 때</div>
+          <div class="result-key">반복 작업</div>
+          <p>회의록을 열어 하나씩 읽고,<br>담당자 · 기한을 직접 표로 옮겨 적습니다.<br>파일이 많아질수록 시간이 늘어납니다.</p>
+        </div>
+          <div class="content-box dark-card">
+            <div class="content-box-title">Codex와 함께할 때</div>
+          <div class="result-key lime-text">요청 1번 + 검토</div>
+          <p>요청 한 번으로 초안이 만들어지고,<br>사람은 Diff에서 결과만 검토 · 승인합니다.<br>승인한 내용만 실제 파일에 반영됩니다.</p>
+        </div>
+      </div>
+      <div class="recommendation-box">
+        <strong>핵심</strong> ‘시간 단축’이 아니라 ‘검토자로서의 역할 전환’입니다. 최종 확인은 항상 사람이 합니다.
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 35: Git & Worktree -->
+  <article class="slide-card" data-slide="35">
+    <div class="slide-header">
+      <div class="slide-category">GIT · WORKTREE</div>
+      <h2 class="slide-title">Git과 Worktree는 병렬 작업의 안전망입니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="step-item"><span class="step-number">1</span><div><strong>Git 상태</strong><p>변경 파일 확인,<br>커밋 전 Diff 검토</p></div></div>
+        <div class="step-item dark-card"><span class="step-number">2</span><div><strong>Worktree</strong><p>세션마다 격리된 작업 공간,<br>같은 저장소의 충돌 감소</p></div></div>
+        <div class="step-item"><span class="step-number">3</span><div><strong>병렬 세션</strong><p>서로 독립적인 작업만 동시에,<br>각 결과를 별도 검토</p></div></div>
+      </div>
+      <div class="recommendation-box"><strong>TIP</strong> Git을 모르면 먼저 복사본 폴더 한 개로 실습하세요.</div>
+    </div>
+  </article>
+
+  <!-- Slide 36: PR & CI -->
+  <article class="slide-card" data-slide="36">
+    <div class="slide-header">
+      <div class="slide-category">PR · CI</div>
+      <h2 class="slide-title">Pull Request를 만든 뒤 검사 상태까지 한 세션에서 봅니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="content-box"><span class="badge">1</span><div class="content-box-title">PR 생성</div><p>변경 요약과 테스트 결과를 확인한 뒤<br>Pull Request를 생성합니다.</p></div>
+        <div class="content-box dark-card"><span class="badge">2</span><div class="content-box-title">Auto-fix</div><p>CI 실패 출력을 읽고<br>Codex가 수정 작업을 시도합니다.</p></div>
+        <div class="content-box"><span class="badge">3</span><div class="content-box-title">Auto-merge</div><p>모든 검사가 통과하면 squash merge로<br>저장소 변경 사항을 반영합니다.</p></div>
+      </div>
+      <div class="recommendation-box"><strong>TIP</strong> 자동 병합은 팀 규칙과 리뷰 절차가 합의된 저장소에서만 사용합니다.</div>
+    </div>
+  </article>
+
+  <!-- Slide 37: Extend -->
+  <article class="slide-card" data-slide="37">
+    <div class="slide-header">
+      <div class="slide-category">EXTEND</div>
+      <h2 class="slide-title">반복 업무는 기억 · 연결 · 예약 기능으로 확장합니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="content-box"><span class="badge">1</span><div class="content-box-title">AGENTS.md</div><p>프로젝트 규칙과 반복 지시를 저장하고,<br>Desktop과 CLI가 함께 읽습니다.</p></div>
+        <div class="content-box dark-card"><span class="badge">2</span><div class="content-box-title">Connectors · MCP</div><p>GitHub · Slack · Linear 등<br>외부 도구와 연결합니다.</p></div>
+        <div class="content-box"><span class="badge">3</span><div class="content-box-title">Scheduled</div><p>Local 예약 작업을 생성하고,<br>정해진 시간에 실행합니다.</p></div>
+      </div>
+      <div class="recommendation-box"><strong>TIP</strong> AGENTS.md에 빌드 및 테스트 조건, 프로젝트 규칙 및 금지 사항, 프로젝트 아키텍처 및 기술 스택을 정의하여 오류를 방지합니다.</div>
+    </div>
+  </article>
+
+  <!-- Slide 38: Security -->
+  <article class="slide-card" data-slide="38">
+    <div class="slide-header">
+      <div class="slide-category">SECURITY</div>
+      <h2 class="slide-title">회사 데이터를 다룰 때는 이 원칙을 지킵니다</h2>
+      <p class="slide-description security-note">AI 도구도 회사의 보안 · 개인정보 정책을 그대로 따릅니다.</p>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="content-box-title" style="color: var(--text-muted);">이렇게 합니다</div>
+          <ul style="padding-left: 20px; font-size: 12pt;">
+            <li>연습은 항상 복사본 폴더에서 시작합니다.</li>
+            <li>고객 · 개인정보가 포함된 파일은 먼저 회사 정책을 확인합니다.</li>
+            <li>승인 창에서 대상과 영향을 직접 읽고 승인합니다.</li>
+            <li>중요한 작업 전에는 Git이나 백업으로 되돌릴 방법을 준비합니다.</li>
+          </ul>
+        </div>
+        <div class="content-box" style="background-color: var(--primary-dark); color: #FFF;">
+          <div class="content-box-title" style="color: #FFF;">이렇게 하지 않습니다</div>
+          <ul style="padding-left: 20px; font-size: 12pt; color: #E5E5EA;">
+            <li>출처 모르는 폴더/홈 디렉터리를 신뢰 폴더로 등록하지 않음</li>
+            <li>이해하지 못한 변경을 “일단 승인”하지 않음</li>
+            <li>Full access 권한을 일반 업무 PC에서 사용하지 않음</li>
+            <li>외부 연동 기능을 필요 이상으로 연결하지 않음</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 39: Computer Use -->
+  <article class="slide-card" data-slide="39">
+    <div class="slide-header">
+      <div class="slide-category">COMPUTER USE</div>
+      <h2 class="slide-title">Computer Use는 다른 방법이 없을 때만 켭니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="content-box-title">먼저 쓰는 방법</div>
+          <p>1. Connector<br>2. Bash 명령<br>3. Browser / Chrome<br>4. 전용 시뮬레이터</p>
+        </div>
+        <div class="content-box" style="background-color: var(--primary-dark); color: #FFF;">
+          <div class="content-box-title" style="color: #FFF;">Computer Use</div>
+          <p style="color: #E5E5EA;">• 마지막 수단으로 화면 클릭 · 입력<br>• 기본 비활성화<br>• 실제 데스크톱 권한에 주의</p>
+        </div>
+      </div>
+      <p class="bottom-note">Settings → General → Computer use에서 활성화합니다.</p>
+    </div>
+  </article>
+
+  <!-- Slide 40: CLI Intro -->
+  <article class="slide-card" data-slide="40">
+    <div class="slide-header">
+      <div class="slide-category">CLI INTRO</div>
+      <h2 class="slide-title">CLI는 스크립트 · 자동화가 필요할 때 다음 단계로 배웁니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="split-visual-layout cli-layout">
+        <div class="step-list cli-left-panel">
+          <div class="step-item"><div class="cli-step-title"><span class="step-number">1</span><strong>시작</strong></div><p>프로젝트 폴더에서 codex 실행<br>→ 대화형 세션 실행</p></div>
+          <div class="step-item"><div class="cli-step-title"><span class="step-number">2</span><strong>이어가기</strong></div><p>codex resume<br>→ 이전 세션 재개</p></div>
+          <div class="step-item"><div class="cli-step-title"><span class="step-number">3</span><strong>Desktop으로 이동</strong></div><p>/new<br>→ CLI 세션을 앱에서 열기</p></div>
+        </div>
+        <div class="actual-image-box image-container cli-right-panel">
+          <img src="ChatGPT_Work_Codex_image/codex-cli.png" alt="Codex CLI 실행 화면">
+        </div>
+      </div>
+      <div class="recommendation-box"><strong>TIP</strong> Desktop은 시각적 검토 · 병렬 관리, CLI는 스크립트 · 파이프라인 · 터미널 중심 작업에 적합합니다.</div>
+    </div>
+  </article>
+
+  <!-- Slide 41: Roadmap -->
+  <article class="slide-card" data-slide="41">
+    <div class="slide-header">
+      <div class="slide-category">ROADMAP</div>
+      <h2 class="slide-title">개인 실습에서 팀 표준까지, 3단계로 넓혀갑니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="content-box"><span class="badge">1단계</span><div class="content-box-title">개인 실습</div><p style="font-size: 11pt;">복사본 폴더에서 반복 문서 작업 1가지를 골라 Manual 권한으로 연습</p></div>
+        <div class="content-box"><span class="badge">2단계</span><div class="content-box-title">팀 파일럿</div><p style="font-size: 11pt;">검증된 요청을 팀 내 2~3명과 함께 시도하고 결과 비교</p></div>
+        <div class="content-box"><span class="badge">3단계</span><div class="content-box-title">사내 가이드라인</div><p style="font-size: 11pt;">허용 폴더, 권한 모드, 승인 절차를 팀 규칙으로 공유</p></div>
+      </div>
+      <p class="bottom-note">각 단계로 넘어가기 전, 이전 단계에서 문제가 없었는지 먼저 확인하세요.</p>
+    </div>
+  </article>
+
+  <!-- Slide 42: Summary -->
+  <article class="slide-card" data-slide="42">
+    <div class="slide-header">
+      <div class="slide-category">SUMMARY</div>
+      <h2 class="slide-title">ChatGPT · Work · Codex는 업무의 길이와 파일 접근 범위로 나뉩니다</h2>
+    </div>
+    <div class="slide-body">
+      <div class="grid-3">
+        <div class="content-box">
+          <div class="content-box-title">ChatGPT</div>
+          <p>짧은 대화 · 결과물 제작<br>• Library/Projects로 결과물 재사용<br>• Images · Sites로 콘텐츠 제작<br>• GPTs로 반복 업무 재활용</p>
+        </div>
+          <div class="content-box dark-card">
+            <div class="content-box-title">Work</div>
+          <p>장시간 에이전트 · 업무 자동화<br>• 연구 · 파일 · 앱 연동 작업 수행<br>• Scheduled로 반복 작업 예약<br>• Store에서 목적에 맞는 앱 선택</p>
+        </div>
+          <div class="content-box">
+            <div class="content-box-title">Codex</div>
+          <p>로컬 파일 직접 편집<br>• 선택한 폴더를 직접 읽고 수정<br>• Diff와 PR로 변경 검토<br>• CLI 스크립트와 자동화 확장</p>
+        </div>
+      </div>
+      <p class="bottom-note">결과물만 필요하면 ChatGPT, 여러 단계의 조사·자동화가 필요하면 Work, 실제 코드·파일을 직접 바꿔야 하면 Codex를 선택하세요.</p>
+    </div>
+  </article>
+
+  <!-- Slide 43: Checklist -->
+  <article class="slide-card" data-slide="43">
+    <div class="slide-header">
+      <div class="slide-category">CHECKLIST</div>
+      <h2 class="slide-title">작은 복사본에서 시작해 계획 · 변경 · 결과를 확인하세요</h2>
+    </div>
+    <div class="slide-body">
+      <div class="step-list">
+        <div class="step-item"><span class="step-number">1</span><div>최신 Desktop 앱과 유료 플랜을 준비한다.</div></div>
+        <div class="step-item"><span class="step-number">2</span><div>Codex 화면에서 Local과 작은 복사본 폴더를 선택한다.</div></div>
+        <div class="step-item"><span class="step-number">3</span><div>복잡한 작업은 Plan, 첫 실행은 Manual로 시작한다.</div></div>
+        <div class="step-item"><span class="step-number">4</span><div>Diff와 실행 명령을 승인 전에 읽는다.</div></div>
+        <div class="step-item"><span class="step-number">5</span><div>Browser · 테스트 · 누락 점검으로 결과를 검증한다.</div></div>
+        <div class="step-item final-check"><span class="step-number">6</span><div>검증된 반복 작업만 AGENTS.md · Scheduled · CLI로 확장한다.</div></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Slide 44: Outro -->
+  <article class="slide-card" data-slide="44">
+    <div class="slide-body">
+      <div class="hero-slide">
+        <div class="hero-series">AX 실무 교육 시리즈</div>
+        <h1 class="hero-title" style="font-size: 28pt;">작은 실습 하나가 오늘부터 업무 습관이 됩니다</h1>
+        <p class="hero-subtitle" style="font-size: 16pt; margin-top: 10px;">ChatGPT · Work · Codex 모두 복사본 폴더에서 시작하고, 승인 전에 항상 확인하세요.</p>
+      </div>
+    </div>
+  </article>
+
+</main>
+
+
+  </div>
+
+
+  <script>
+    // State Management
+    let currentSlide = 1;
+    let totalSlides = 0;
+
+    // Slide Titles for Agenda Sidebar
+    const slideTitles = [
+      "표지: ChatGPT Work Codex",
+      "AGENDA: 세 세션 개요",
+      "2026-07 UPDATE 주요 변화",
+      "GLOSSARY 핵심 용어",
+      "SESSION 01: ChatGPT 핵심 기능",
+      "Feature 01: Library",
+      "Feature 02: Projects",
+      "Feature 03: Scheduled",
+      "Feature 04: Plugins",
+      "Feature 05: Images",
+      "Feature 06: Sites",
+      "Feature 07: GPTs",
+      "SESSION 02: Work 업무 준비",
+      "Choose: 세 탭의 차이",
+      "Ready: Work 업무 연결",
+      "Install: 설치 절차",
+      "실습 1: 데스크톱 앱 접속",
+      "Environment: 실행 환경",
+      "Trust: 신뢰 폴더 설정",
+      "SESSION 03: Codex 완성하기",
+      "Concept: 프로젝트 변경",
+      "Map: Codex 화면 구조",
+      "Sidebar: 세션 관리",
+      "Side Panel: 풀 리퀘스트",
+      "Main Panel: 추천 카드",
+      "Session: 파일/폴더 및 Plan",
+      "Authority: 액션 승인 권한",
+      "Panel: Views 패널 모음",
+      "Prompt: 프롬프트 4요소",
+      "Approve: 승인 전 체크리스트",
+      "Loop: 안전한 기본 흐름",
+      "실습 2: 첫 요청 보내기",
+      "실습 3: Diff 검토 및 승인",
+      "Result: Codex 활용 변화",
+      "Git & Worktree: 병렬 작업",
+      "PR & CI: 자동화 워크플로우",
+      "Extend: AGENTS.md 확장",
+      "Security: 보안 및 수칙",
+      "Computer Use: 제어 안내",
+      "CLI Intro: CLI 시작하기",
+      "Roadmap: 3단계 표준화",
+      "Summary: 세 기능 핵심 요약",
+      "Checklist: 최종 점검",
+      "마무리: 교육 종료"
+    ];
+
+    // DOM Elements Caching
+    const slides = document.querySelectorAll('.slide-card');
+    totalSlides = slides.length;
+    const progressBar = document.getElementById('progress-bar');
+    const progressPercent = document.getElementById('progress-percent');
+    const pageIndicator = document.getElementById('page-indicator');
+    const agendaNav = document.getElementById('agenda-nav');
+    const mainStage = document.getElementById('main-stage');
+
+    // Local crops from the user-provided reference sheets.
+    // SVG viewBox keeps the source files intact while showing only the UI example area.
+    const referenceCrops = {
+      22: { file: 'o4.png', viewBox: '218 84 260 190', width: 1602, height: 703 },
+      28: { file: 'o5.png', viewBox: '42 88 205 165', width: 1645, height: 702 }
+    };
+
+    function applyReferenceImages() {
+      Object.entries(referenceCrops).forEach(([slideNum, crop]) => {
+        const container = document.querySelector(`.slide-card[data-slide="${slideNum}"] .image-container`);
+        if (!container) return;
+        const imagePath = `ChatGPT_Work_Codex_image/6_open_260825/${crop.file}`;
+        container.innerHTML = `<svg viewBox="${crop.viewBox}" role="img" aria-label="첨부 자료의 화면 예시" preserveAspectRatio="xMidYMid meet"><image href="${imagePath}" width="${crop.width}" height="${crop.height}" /></svg>`;
+      });
+    }
+
+    function prepareSlides() {
+      slides.forEach((slide, index) => {
+        const slideNum = index + 1;
+        const title = slideTitles[index] || `페이지 ${slideNum}`;
+
+        slide.dataset.slide = slideNum;
+        slide.dataset.title = title;
+        slide.setAttribute('tabindex', '0');
+        slide.setAttribute('role', 'group');
+        slide.setAttribute('aria-label', `${slideNum} / ${totalSlides} · ${title}`);
+if (slideNum < totalSlides) {
+          const hint = document.createElement('div');
+          hint.className = 'card-next-hint';
+          hint.textContent = '카드를 클릭하면 다음 내용으로 이동합니다 ↓';
+          slide.appendChild(hint);
+        }
+      });
+    }
+
+    // Build Agenda Sidebar Items
+    function initSidebar() {
+      let currentSessionGroup = null;
+
+      slideTitles.forEach((title, index) => {
+        const slideNum = index + 1;
+
+        // Add Session Group Headers
+        if (slideNum === 1) {
+          createGroupHeader("INTRO & OVERVIEW");
+        } else if (slideNum === 5) {
+          createGroupHeader("SESSION 01 · CHATGPT");
+        } else if (slideNum === 13) {
+          createGroupHeader("SESSION 02 · WORK");
+        } else if (slideNum === 20) {
+          createGroupHeader("SESSION 03 · CODEX");
+        }
+
+        const item = document.createElement('div');
+        item.className = `agenda-item ${slideNum === 1 ? 'active' : ''}`;
+        item.dataset.slide = slideNum;
+        item.innerHTML = `<span class="page-num">${String(slideNum).padStart(2, '0')}</span><span>${title}</span>`;
+        
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          goToSlide(slideNum);
+        });
+
+        agendaNav.appendChild(item);
+      });
+    }
+
+    function createGroupHeader(text) {
+      const header = document.createElement('div');
+      header.className = 'session-group-title';
+      header.innerText = text;
+      agendaNav.appendChild(header);
+    }
+
+    // Slide Navigation Core
+    function goToSlide(slideNum) {
+      if (slideNum < 1 || slideNum > totalSlides) return;
+
+      // Active Slide Switch
+      slides.forEach(slide => slide.classList.remove('active'));
+      const targetSlide = document.querySelector(`.slide-card[data-slide="${slideNum}"]`);
+      if (targetSlide) {
+        targetSlide.classList.add('active');
+        const slideBody = targetSlide.querySelector('.slide-body');
+        if (slideBody) slideBody.scrollTop = 0;
+      }
+
+      currentSlide = slideNum;
+
+      // Update UI Indicators
+      const percent = Math.round((currentSlide / totalSlides) * 100);
+      progressBar.style.width = `${percent}%`;
+      progressPercent.innerText = `${percent}%`;
+      pageIndicator.innerText = `${String(currentSlide).padStart(2, '0')} / ${totalSlides}`;
+
+      // Update Sidebar Active State & Auto Scroll
+      const agendaItems = document.querySelectorAll('.agenda-item');
+      agendaItems.forEach(item => {
+        if (parseInt(item.dataset.slide) === currentSlide) {
+          item.classList.add('active');
+          item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      if (targetSlide) targetSlide.focus({ preventScroll: true });
+    }
+
+    // Event Listeners
+    // Stage Click Navigation (Prevents trigger when selecting text)
+    mainStage.addEventListener('click', (e) => {
+      if (currentSlide === totalSlides) return;
+      if (e.target.closest('a, button, input, textarea, select, pre, code, [data-no-slide-nav]')) return;
+      if (window.getSelection()?.toString()) return;
+      goToSlide(currentSlide + 1);
+    });
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      const tagName = document.activeElement?.tagName;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tagName)) return;
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        goToSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        goToSlide(currentSlide - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        goToSlide(1);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        goToSlide(totalSlides);
+      }
+    });
+
+    // Initialize
+    applyReferenceImages();
+    prepareSlides();
+    initSidebar();
+    goToSlide(1);
+  </script>
+
+
+</body>
+</html>

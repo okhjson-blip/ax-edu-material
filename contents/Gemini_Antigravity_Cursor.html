@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini · Antigravity · Cursor AI 코딩 및 생산성 도구 교육</title>
+  <style>
+    :root {
+      /* AX Education Color System */
+      --primary: #1428A0;
+      --action-blue: #0064D2;
+      --sky-blue: #00A9E0;
+      --primary-dark: #071A52;
+      --primary-light: #F6F9FF;
+      --accent: #00A9E0;
+      --accent-light: #EAF7FF;
+      --accent-dark: #071A52;
+      --text-dark: #17233E;
+      --text-muted: #63718B;
+      --bg-white: #FFFFFF;
+      --border-color: #DBE6F4;
+
+      /* Typography Hierarchy */
+      --font-hero: clamp(34px, 4.5vw, 64px);
+      --font-title: clamp(27px, 1.85vw, 32px);
+      --font-subtitle: clamp(18px, 1.3vw, 22px);
+      --font-body: clamp(15px, 1.05vw, 18px);
+      --font-sub: clamp(13px, .9vw, 16px);
+      --font-caption: clamp(11px, .76vw, 13px);
+
+      --sidebar-width: 300px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      background-color: #F8F9FA;
+      color: var(--text-dark);
+      font-size: var(--font-body);
+      line-height: 1.65;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* App Container (Flex 2-Column) */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* 1. Sidebar Component (Width <= 30%) */
+    .sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      color: #FFFFFF;
+      background-color: #0f172a;
+      border-right: 0;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    .progress-header {
+      background-color: transparent;
+      color: #FFFFFF;
+      padding: 20px 18px;
+    }
+
+    .progress-title {
+      font-size: 11pt;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 2%;
+      background: linear-gradient(90deg, #43C9FF, #FFFFFF);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 9.5pt;
+      color: rgba(255, 255, 255, 0.85);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .agenda-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+
+    .session-group-title {
+      font-size: 10.5pt;
+      font-weight: 800;
+      color: #7FDBFF;
+      padding: 10px 18px 4px 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .agenda-item {
+      padding: 8px 18px;
+      font-size: 11pt;
+      color: rgba(255,255,255,.74);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .agenda-item:hover {
+      background-color: rgba(255,255,255,.09);
+      color: #FFFFFF;
+    }
+
+    .agenda-item.active {
+      background: linear-gradient(90deg, #0064D2, #0879DC);
+      color: #FFFFFF;
+      font-weight: 400;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 7px 18px rgba(0, 24, 92, .22);
+    }
+
+    .agenda-item .page-num {
+      font-size: 9.5pt;
+      opacity: 0.75;
+      min-width: 22px;
+    }
+
+    /* 2. Main Stage Component */
+    .main-stage {
+      flex: 1;
+      background: linear-gradient(135deg, #EEF4FC, #F8FBFF);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(14px, 2vh, 24px);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .slide-card {
+      background-color: var(--bg-white);
+      width: 100%;
+      max-width: 1280px;
+      height: min(92dvh, 900px);
+      min-height: 0;
+      max-height: calc(100dvh - 28px);
+      border-radius: 18px;
+      box-shadow: 0 16px 42px rgba(7, 26, 82, .10);
+      border: 1px solid var(--border-color);
+      padding: clamp(22px, 3.2vh, 38px) clamp(26px, 3.6vw, 48px) 0;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      animation: fadeIn 0.25s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide-card.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Slide Header */
+    .slide-header {
+      margin-bottom: clamp(10px, 1.6vh, 18px);
+      flex: 0 0 auto;
+    }
+
+    .slide-category {
+      font-size: var(--font-sub);
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .slide-title {
+      font-size: var(--font-title);
+      font-weight: 800;
+      color: var(--primary-dark);
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .slide-description {
+      font-size: 15pt;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Slide Content */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: clamp(10px, 1.5vh, 18px);
+      min-height: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      padding: 2px 4px 8px 0;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(12px, 1.4vw, 20px);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(10px, 1.2vw, 18px);
+    }
+
+    .agenda-session-card {
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      padding: clamp(20px, 2.4vh, 28px) clamp(16px, 1.8vw, 24px);
+      border-radius: 12px;
+      background: #F0F4F9;
+      border: 0;
+    }
+
+    .agenda-session-card h3 {
+      font-size: clamp(16px, 1.25vw, 20px);
+      font-weight: 800;
+      color: var(--primary-dark);
+      line-height: 1.35;
+    }
+
+    .agenda-session-card p {
+      font-size: var(--font-sub);
+      color: var(--text-muted);
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .agenda-session-card.featured {
+      background: var(--primary-dark);
+    }
+
+    .agenda-session-card.featured h3 {
+      color: #FFFFFF;
+    }
+
+    .agenda-session-card.featured p {
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(9px, 1vw, 16px);
+    }
+
+    /* Content Cards & Boxes */
+    .content-box {
+      background-color: var(--primary-light);
+      border-radius: 8px;
+      padding: clamp(12px, 1.6vh, 18px) clamp(14px, 1.5vw, 20px);
+      border-left: 4px solid var(--primary);
+    }
+
+    .content-box.lime {
+      background-color: #f7fee7;
+      border-left-color: #65a30d;
+    }
+
+    .content-box-title {
+      font-size: var(--font-subtitle);
+      font-weight: 400;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+      text-wrap: balance;
+    }
+
+    .content-box.lime .content-box-title {
+      color: #1a2e05;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background-color: var(--text-muted);
+      color: #FFFFFF;
+      font-size: 11pt;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+
+    .badge.lime {
+      background-color: var(--accent);
+      color: #FFFFFF;
+    }
+
+    /* Visual Mockup Image Containers */
+    .visual-image-card {
+      background-color: #1E1E24;
+      color: #F1F5F9;
+      border-radius: 10px;
+      padding: 18px;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 11pt;
+      line-height: 1.5;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+      border: 1px solid #334155;
+    }
+
+    .visual-image-card.light-ui {
+      background-color: #F8FAFC;
+      color: #1E293B;
+      border: 1px solid #CBD5E1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .feature-image-card {
+      align-self: center;
+      min-width: 0;
+      width: 100%;
+      margin: 0;
+      padding: 10px;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 8px 22px rgba(7, 26, 82, .08);
+    }
+
+    .feature-image-frame {
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #F8FAFC;
+      border-radius: 8px;
+    }
+
+    .feature-image-card img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .feature-image-card figcaption {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .tool-detail-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(14px, 1.8vw, 24px);
+      align-items: center;
+      min-height: 0;
+    }
+
+    .tool-info-column,
+    .tool-usage-column { min-width: 0; }
+
+    .tool-section-label {
+      margin-bottom: 7px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .04em;
+    }
+
+    .tool-description {
+      color: var(--text-muted);
+      font-size: clamp(13px, .95vw, 16px);
+      line-height: 1.55;
+    }
+
+    .tool-screen {
+      width: 100%;
+      margin: 10px 0 0;
+      padding: 7px;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    .tool-screen img {
+      display: block;
+      width: 100%;
+      height: clamp(132px, 23vh, 220px);
+      object-fit: contain;
+      object-position: center;
+      border-radius: 5px;
+    }
+
+    .tool-usage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tool-usage-step {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      min-height: 54px;
+      padding: 11px 13px;
+      background: #F0F4FC;
+      border-radius: 7px;
+      color: var(--text-dark);
+      font-size: clamp(13px, .92vw, 16px);
+      line-height: 1.45;
+    }
+
+    .tool-usage-step > span:first-child {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tool-recommendation {
+      width: 100%;
+    }
+
+    .tool-usage-title {
+      margin-top: 14px;
+    }
+
+    .tool-preview {
+      margin-top: 10px;
+      overflow: hidden;
+      border: 1px solid #B9C8E8;
+      border-radius: 6px;
+      background: #F8FAFF;
+    }
+
+    .tool-preview-bar {
+      padding: 5px 10px;
+      background: #0B2362;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .tool-preview-cells {
+      display: grid;
+      grid-template-columns: repeat(var(--preview-columns, 2), minmax(0, 1fr));
+      min-height: clamp(118px, 19vh, 180px);
+    }
+
+    .tool-preview-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border-right: 1px solid #CAD6EE;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .tool-preview-cell:last-child { border-right: 0; }
+
+    .feature-image-frame .tool-preview {
+      width: calc(100% - 16px);
+      margin: 8px;
+    }
+
+    .ui-header-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .light-ui .ui-header-bar {
+      border-bottom-color: #E2E8F0;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background-color: #FF5F56; }
+    .dot-yellow { background-color: #FFBD2E; }
+    .dot-green { background-color: #27C93F; }
+
+    /* Recommendation Box */
+    .recommendation-box {
+      background-color: #f7fee7;
+      border-radius: 8px;
+      padding: 12px 18px;
+      border: 1px solid rgba(101, 163, 13, 0.45);
+      font-size: var(--font-body);
+      color: #1a2e05;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .recommendation-box strong {
+      background-color: #65a30d;
+      color: #FFFFFF;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11pt;
+      white-space: nowrap;
+    }
+
+    /* Step List & Items */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+
+    .step-item > :last-child {
+      flex: 1 1 auto;
+      min-width: 0;
+      text-align: left;
+    }
+
+    .slide-card,
+    .slide-card p,
+    .slide-card li,
+    .step-item,
+    .recommendation-box {
+      text-align: left;
+      line-break: strict;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      hyphens: none;
+    }
+
+    .slide-title,
+    .hero-title,
+    .content-box-title {
+      text-wrap: balance;
+    }
+
+    .slide-description,
+    .slide-card p,
+    .slide-card li,
+    .step-item {
+      text-wrap: pretty;
+    }
+
+    .content-box > .content-box-title ~ *,
+    .slide-body > h3 ~ *,
+    .slide-body > h4 ~ * {
+      margin-inline-start: 1em;
+      max-width: calc(100% - 1em);
+    }
+
+    .semantic-bullet-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .semantic-bullet {
+      display: flex;
+      align-items: flex-start;
+      gap: .65em;
+      padding-inline-start: 0;
+      list-style: none;
+      text-align: left;
+    }
+
+    .semantic-bullet::before {
+      content: "•";
+      flex: 0 0 auto;
+      width: .65em;
+      font-weight: 800;
+    }
+
+    .semantic-bullet-text {
+      display: block;
+      flex: 1 1 auto;
+      min-width: 0;
+      text-align: left;
+    }
+
+    .step-number {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background-color: var(--text-muted);
+      color: #FFFFFF;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 400;
+      font-size: 11pt;
+      flex-shrink: 0;
+    }
+
+    /* Hero / Cover Styling */
+    .hero-slide {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 18px;
+      height: 100%;
+    }
+
+    .hero-series {
+      color: var(--text-muted);
+      font-size: 16pt;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .hero-title {
+      font-size: var(--font-hero);
+      font-weight: 900;
+      color: var(--primary-dark);
+      line-height: 1.25;
+    }
+
+    .hero-subtitle {
+      font-size: 20pt;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .hero-pill {
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13pt;
+      font-weight: 600;
+    }
+
+    .slide-card:first-of-type {
+      color: #FFFFFF;
+      background:
+        radial-gradient(circle at 88% 12%, rgba(0,169,224,.26), transparent 22rem),
+        linear-gradient(135deg, #111D3A, #203A78);
+      border-color: rgba(255,255,255,.12);
+    }
+
+    .slide-card:first-of-type .hero-slide {
+      justify-content: center;
+      padding-inline: clamp(30px, 5vw, 72px);
+    }
+
+    .slide-card:first-of-type .hero-series { color: #43C9FF; }
+    .slide-card:first-of-type .hero-title { color: #FFFFFF; }
+    .slide-card:first-of-type .hero-subtitle { color: rgba(255,255,255,.88); }
+    .slide-card:first-of-type .hero-pill {
+      color: #FFFFFF;
+      background: rgba(255,255,255,.14);
+    }.card-next-hint {
+      flex: 0 0 auto;
+      min-height: 41px;
+      margin: 10px calc(-1 * clamp(26px, 3.6vw, 48px)) 0;
+      padding: 10px clamp(26px, 3.6vw, 48px);
+      border-top: 1px solid var(--border-color);
+      background: #FBFDFF;
+      color: var(--text-muted);
+      font-size: var(--font-caption);
+      font-weight: 400;
+      text-align: right;
+    }/* 3. Footer Control Bar */
+    .footer-bar {
+      height: 60px;
+      background-color: #FFFFFF;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 100;
+      user-select: none;
+    }
+
+    .control-btn {
+      background-color: var(--text-muted);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 12pt;
+      font-weight: 400;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .control-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .control-btn:disabled {
+      background-color: #E5E5EA;
+      color: #A1A1A6;
+      cursor: not-allowed;
+    }
+
+    .footer-info {
+      font-size: 11pt;
+      color: var(--text-muted);
+    }
+
+    .footer-info span {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    @media (max-height: 760px) {
+      .slide-card {
+        height: calc(100dvh - 20px);
+        padding-top: 18px;
+      }
+      .slide-header { margin-bottom: 8px; }
+      .slide-body { gap: 8px; }
+      .content-box { padding-block: 10px; }
+      .step-list { gap: 7px; }
+      .step-item { padding-block: 8px; }
+      .feature-image-frame { max-height: 32vh; aspect-ratio: 1 / 1; }
+    }
+
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+      .app-container { flex-direction: column; min-height: 100dvh; height: auto; }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+      .progress-header { padding: 10px 16px; }
+      .agenda-nav { display: none; }
+      .main-stage { min-height: 0; padding: 10px; overflow: visible; }
+      .slide-card { height: auto; min-height: calc(100dvh - 94px); max-height: none; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .tool-detail-layout { grid-template-columns: 1fr; }
+      .tool-recommendation { grid-column: 1; }
+      .tool-screen img { height: auto; max-height: 34vh; }
+      .content-box > .content-box-title ~ *,
+      .slide-body > h3 ~ *,
+      .slide-body > h4 ~ * {
+        margin-inline-start: .5em;
+        max-width: calc(100% - .5em);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    @media print {
+      body, .app-container { height: auto; overflow: visible; }
+      .sidebar, .footer-bar, .card-next-hint { display: none !important; }
+      .main-stage { display: block; padding: 0; overflow: visible; }
+      .slide-card { display: flex !important; height: auto; max-height: none; page-break-after: always; }
+      .slide-body { overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- 1. Agenda Sidebar (Max 30% Width / Fixed 280px) -->
+    <aside class="sidebar">
+      <div class="progress-header">
+        <div class="progress-title">
+          <span>진행율</span>
+          <span id="progress-percent">2%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-text">
+          <span>AI 코딩·생산성 도구 교육</span>
+          <span id="page-indicator">01 / 45</span>
+        </div>
+      </div>
+
+      <nav class="agenda-nav" id="agenda-nav">
+        <!-- Dynamically Populated Agenda Items -->
+      </nav>
+      <a href="/" target="_top" style="display:inline-block;margin:auto 16px 18px;padding:6px 0;color:rgba(255,255,255,.82);font-size:14.5px;text-decoration:none;">← 목록으로</a>
+    </aside>
+
+    <!-- 2. Main Slide Stage -->
+    <main class="main-stage" id="main-stage">
+
+      <!-- Page 01: Cover -->
+      <article class="slide-card active" data-slide="1">
+        <div class="slide-body">
+          <div class="hero-slide">
+            <div class="hero-series">AX 실무 교육 시리즈</div>
+            <h1 class="hero-title">AI 코딩 · 생산성 도구<br>Gemini · Antigravity · Cursor</h1>
+            <p class="hero-subtitle">핵심 기능 · 설치 · 화면 구성 · 안전한 사용법</p>
+            <div class="hero-pills">
+              <span class="hero-pill">비개발자 · 개발 초보자</span>
+              <span class="hero-pill">실습형 구성</span>
+              <span class="hero-pill">Gemini → Antigravity → Cursor</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 02: Agenda -->
+      <article class="slide-card" data-slide="2">
+        <div class="slide-header">
+          <div class="slide-category">AGENDA</div>
+          <h2 class="slide-title">세 도구를 이 순서로 실습합니다</h2>
+          <p class="slide-description">각 도구는 독립된 세션으로 진행되며, 실무에서 가장 많이 함께 쓰이는 순서(생산성 → 에이전틱 IDE → 코드 편집기)로 배치했습니다.</p>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="agenda-session-card">
+              <h3>SESSION 1 · Gemini</h3>
+              <p>핵심 기능 6가지: Library · Notebook · Spark · Import code · Canvas · Personal Intelligence</p>
+            </div>
+            <div class="agenda-session-card featured">
+              <h3>SESSION 2 · Antigravity</h3>
+              <p>Google의 에이전틱 개발 플랫폼 15단계: 설치부터 안전한 워크플로우까지</p>
+            </div>
+            <div class="agenda-session-card">
+              <h3>SESSION 3 · Cursor</h3>
+              <p>AI 코드 에디터 14단계: Overview · Interface · Tab · Agent · Cloud Agents까지</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 03: SESSION 01 Intro -->
+      <article class="slide-card" data-slide="3">
+        <div class="slide-body">
+          <div style="background-color: var(--primary-dark); color: #FFF; padding: 44px; border-radius: 12px;">
+            <div class="slide-category" style="color: var(--accent);">SESSION 01</div>
+            <h1 style="font-size: 30pt; font-weight: 900; margin-bottom: 20px;">Gemini 핵심 기능</h1>
+            <div class="step-list">
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">1</span>
+                <div>생성 콘텐츠 관리: Library · Canvas</div>
+              </div>
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">2</span>
+                <div>지식 · 자동화: Notebook · Spark</div>
+              </div>
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">3</span>
+                <div>코드 · 개인화: Import code · Personal Intelligence</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 04: FEATURE 01 · LIBRARY -->
+      <article class="slide-card" data-slide="4">
+        <div class="slide-header">
+          <div class="slide-category">FEATURE 01 · LIBRARY</div>
+          <h2 class="slide-title">라이브러리는 생성 이미지를 다시 찾고 편집하는 공간입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div>
+              <div class="content-box-title">기능 설명</div>
+              <p style="margin-bottom: 12px;">Gemini에서 만든 이미지를 한곳에서 찾아 다시 열고, 추가 편집·다운로드·공유로 이어가는 공간입니다.</p>
+              <div class="step-list">
+                <div class="step-item"><span class="step-number">1</span><div>Gemini 메뉴에서 Library를 열어 생성 이미지를 찾습니다.</div></div>
+                <div class="step-item"><span class="step-number">2</span><div>이미지를 확대해 다운로드하거나 공유 옵션을 확인합니다.</div></div>
+                <div class="step-item"><span class="step-number">3</span><div>Edit 구체적 요청으로 바꿀 부분과 유지할 부분을 지정합니다.</div></div>
+              </div>
+            </div>
+            <figure class="feature-image-card" data-no-slide-nav>
+              <div class="feature-image-frame">
+                <img src="./G_A_C_image/gemini-library.png" alt="Gemini Library 화면" loading="lazy">
+              </div>
+              <figcaption>Gemini Library에서 생성 이미지를 찾고 다시 편집하는 화면</figcaption>
+            </figure>
+          </div>
+          <div class="recommendation-box">
+            <strong>추천</strong> Library는 재편집용으로 쓰고, 확정본은 원본 크기로 내려받아 Drive의 프로젝트 폴더에도 보관하세요.
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 05: FEATURE 02 · NOTEBOOK -->
+      <article class="slide-card" data-slide="5">
+        <div class="slide-header">
+          <div class="slide-category">FEATURE 02 · NOTEBOOK</div>
+          <h2 class="slide-title">노트북은 채팅 · 파일 · 지침을 묶어 프로젝트 지식을 이어갑니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div>
+              <div class="content-box-title">기능 설명</div>
+              <p style="margin-bottom: 12px;">과거 채팅 · 문서 · PDF · 맞춤 지침을 모아 Gemini가 공통 맥락으로 사용하며 NotebookLM과 소스가 동기화됩니다.</p>
+              <div class="step-list">
+                <div class="step-item"><span class="step-number">1</span><div>New notebook을 선택하고 프로젝트 이름을 붙입니다.</div></div>
+                <div class="step-item"><span class="step-number">2</span><div>관련 채팅을 이동하고 파일 · 소스 · 지침을 추가합니다.</div></div>
+                <div class="step-item"><span class="step-number">3</span><div>오디오 · 영상 · 인포그래픽으로 지식을 확장합니다.</div></div>
+              </div>
+            </div>
+            <figure class="feature-image-card" data-no-slide-nav>
+              <div class="feature-image-frame">
+                <img src="./G_A_C_image/gemini-notebook.png" alt="Gemini Notebook 화면" loading="lazy">
+              </div>
+              <figcaption>채팅과 파일, 지침을 프로젝트 지식으로 연결하는 Notebook 화면</figcaption>
+            </figure>
+          </div>
+          <div class="recommendation-box">
+            <strong>추천</strong> 과목 · 고객 · 프로젝트별로 노트북을 분리하고, 소스는 파일명을 명확히 붙이세요.
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 06: FEATURE 03 · SPARK -->
+      <article class="slide-card" data-slide="6">
+        <div class="slide-header">
+          <div class="slide-category">FEATURE 03 · SPARK</div>
+          <h2 class="slide-title">Spark는 24시간 업무를 이어가는 개인 AI 에이전트입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div>
+              <div class="content-box-title">기능 설명</div>
+              <p style="margin-bottom: 12px;">Google Cloud 가상머신에서 실행되어 기기가 꺼져도 백그라운드 작업을 계속하며 Connected Apps와 연동됩니다.</p>
+              <div class="step-list">
+                <div class="step-item"><span class="step-number">1</span><div>Spark에서 목표 · 완료 시점 · 소스를 설명합니다.</div></div>
+                <div class="step-item"><span class="step-number">2</span><div>제안된 계획 · 연결 앱 · 권한 확인 지점을 검토합니다.</div></div>
+                <div class="step-item"><span class="step-number">3</span><div>Tasks/Schedules에서 진행 상황을 관리합니다.</div></div>
+              </div>
+            </div>
+            <figure class="feature-image-card" data-no-slide-nav>
+              <div class="feature-image-frame">
+                <img src="./G_A_C_image/gemini-spark.png" alt="Gemini Spark 화면" loading="lazy">
+              </div>
+              <figcaption>백그라운드 작업과 일정을 관리하는 Gemini Spark 화면</figcaption>
+            </figure>
+          </div>
+          <div class="recommendation-box">
+            <strong>추천</strong> 뉴스 다이제스트 · 메일함 정리처럼 되돌리기 쉬운 일부터 시작하세요.
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 07: FEATURE 04 · IMPORT CODE -->
+      <article class="slide-card" data-slide="7">
+        <div class="slide-header">
+          <div class="slide-category">FEATURE 04 · IMPORT CODE</div>
+          <h2 class="slide-title">코드 가져오기는 GitHub 저장소를 분석 자료로 붙입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div>
+              <div class="content-box-title">기능 설명</div>
+              <p style="margin-bottom: 12px;">GitHub 저장소나 브랜치를 첨부해 코드 구조 · 함수 · 오류 · 개선안을 저장소 맥락으로 질문할 수 있습니다.</p>
+              <div class="step-list">
+                <div class="step-item"><span class="step-number">1</span><div>Add files > More uploads > Import code 선택</div></div>
+                <div class="step-item"><span class="step-number">2</span><div>GitHub 저장소 또는 브랜치 URL 입력</div></div>
+                <div class="step-item"><span class="step-number">3</span><div>구조 설명 → 위험 찾기 → 수정 제안 질문 진행</div></div>
+              </div>
+            </div>
+            <figure class="feature-image-card" data-no-slide-nav>
+              <div class="feature-image-frame">
+                <img src="./G_A_C_image/gemini-import_code.png" alt="Gemini Import code 화면" loading="lazy">
+              </div>
+              <figcaption>GitHub 저장소 또는 브랜치를 가져오는 Import code 화면</figcaption>
+            </figure>
+          </div>
+          <div class="recommendation-box">
+            <strong>제약</strong> 웹 전용, 채팅당 저장소 1개 (최대 5,000파일 · 100MB). 자동 동기화 안 됨.
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 08: FEATURE 05 · CANVAS -->
+      <article class="slide-card" data-slide="8">
+        <div class="slide-header">
+          <div class="slide-category">FEATURE 05 · CANVAS</div>
+          <h2 class="slide-title">Canvas는 문서 · 앱 · 슬라이드 · 코드를 대화 옆에서 만들고 다듬습니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div>
+              <div class="content-box-title">기능 설명</div>
+              <p style="margin-bottom: 12px;">Gemini 대화와 편집 화면을 나란히 두고 특정 영역만 선택해 실시간으로 수정하고 내보냅니다.</p>
+              <div class="step-list">
+                <div class="step-item"><span class="step-number">1</span><div> + > 도구 더보기 > Canvas 선택 또는 생성 요청</div></div>
+                <div class="step-item"><span class="step-number">2</span><div>목적 · 대상 · 형식을 말해 첫 결과물 생성</div></div>
+                <div class="step-item"><span class="step-number">3</span><div>영역 선택 후 톤 · 기능 수정 및 내보내기</div></div>
+              </div>
+            </div>
+            <figure class="feature-image-card" data-no-slide-nav>
+              <div class="feature-image-frame">
+                <img src="./G_A_C_image/gemini-canvas.png" alt="Gemini Canvas 화면" loading="lazy">
+              </div>
+              <figcaption>대화 옆에서 문서와 코드를 만들고 수정하는 Gemini Canvas 화면</figcaption>
+            </figure>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 09: FEATURE 06 · PERSONAL INTELLIGENCE -->
+      <article class="slide-card" data-slide="9">
+        <div class="slide-header">
+          <div class="slide-category">FEATURE 06 · PERSONAL INTELLIGENCE</div>
+          <h2 class="slide-title">개인 인텔리전스는 내 Google 정보로 맞춤 도움을 만듭니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div>
+              <div class="content-box-title">기능 설명</div>
+              <p style="margin-bottom: 12px;">과거 대화의 기억, Gmail · Photos · YouTube 정보, 지정 응답 지침을 조합해 맞춤 답변을 제공합니다.</p>
+              <div class="step-list">
+                <div class="step-item"><span class="step-number">1</span><div>Settings > Personal Intelligence에서 기능 사용 선택</div></div>
+                <div class="step-item"><span class="step-number">2</span><div>Memory · Connected Apps · Instructions 항목 켜기</div></div>
+                <div class="step-item"><span class="step-number">3</span><div>Sources 확인 및 정정 적용</div></div>
+              </div>
+            </div>
+            <figure class="feature-image-card" data-no-slide-nav>
+              <div class="feature-image-frame">
+                <img src="./G_A_C_image/gemini-personal_intelligence.png" alt="Gemini Personal Intelligence 화면" loading="lazy">
+              </div>
+              <figcaption>Google 앱의 정보를 연결해 맞춤 도움을 제공하는 Personal Intelligence 화면</figcaption>
+            </figure>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 10: SESSION 02 Intro -->
+      <article class="slide-card" data-slide="10">
+        <div class="slide-body">
+          <div style="background-color: var(--primary-dark); color: #FFF; padding: 44px; border-radius: 12px;">
+            <div class="slide-category" style="color: var(--accent);">SESSION 02</div>
+            <h1 style="font-size: 30pt; font-weight: 900; margin-bottom: 20px;">Antigravity 초보자 교육</h1>
+            <div class="step-list">
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">1</span>
+                <div>제품군 이해: Overview · Product Map · Install</div>
+              </div>
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">2</span>
+                <div>화면과 안전 모드: Interface · Projects · Agent Mode</div>
+              </div>
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">3</span>
+                <div>확장과 안전 흐름: Customize · MCP · Schedule · Safe Workflow</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 11: 01 · OVERVIEW -->
+      <article class="slide-card" data-slide="11">
+        <div class="slide-header">
+          <div class="slide-category">01 · OVERVIEW</div>
+          <h2 class="slide-title">Antigravity는 여러 AI 에이전트를 지휘하는 개발 작업 공간입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box">
+              <div class="content-box-title">기능 설명</div>
+              <p>Google의 에이전틱 개발 플랫폼으로, 목표를 설명하면 에이전트가 파일 · 터미널 · 브라우저를 사용해 수행합니다.</p>
+            </div>
+            <div class="content-box lime">
+              <div class="content-box-title">사용법</div>
+              <p>1. 개발 목표 한 문장 정리<br>2. Antigravity 앱에서 프로젝트 생성 및 작업 폴더 연결<br>3. 작은 작업 요청 후 단계별 검증</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 12: 02 · PRODUCT MAP -->
+      <article class="slide-card" data-slide="12">
+        <div class="slide-header">
+          <div class="slide-category">02 · PRODUCT MAP</div>
+          <h2 class="slide-title">앱 · IDE · CLI · SDK는 같은 에이전트를 서로 다른 방식으로 사용합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box lime"><span class="badge lime">Antigravity 앱 (2.0)</span><p style="font-size: 11pt;">다중 에이전트 지휘, 기획/검토 중심</p></div>
+            <div class="content-box"><span class="badge">Antigravity IDE</span><p style="font-size: 11pt;">직접 코드 편집, Open IDE 연동</p></div>
+            <div class="content-box"><span class="badge">CLI</span><p style="font-size: 11pt;">터미널 파이프라인 및 자동화</p></div>
+            <div class="content-box"><span class="badge">SDK</span><p style="font-size: 11pt;">프로그램 커스텀 통합</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 13: 03 · INSTALL -->
+      <article class="slide-card" data-slide="13">
+        <div class="slide-header">
+          <div class="slide-category">03 · INSTALL</div>
+          <h2 class="slide-title">설치할 때는 계정 · Chrome · 권한 정책을 먼저 확인합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="step-list">
+              <div class="step-item"><span class="step-number">1</span><div>공식 페이지에서 다운로드 및 설치</div></div>
+              <div class="step-item"><span class="step-number">2</span><div>Google 계정 로그인 및 최소 확장 선택</div></div>
+              <div class="step-item"><span class="step-number">3</span><div>Review-driven development 모드 권장</div></div>
+            </div>
+            <div class="visual-image-card light-ui">
+              <div class="ui-header-bar"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div><span style="font-weight:bold; color:#475569;">Antigravity Policy Config</span></div>
+              <div style="font-size:10pt;">
+                ✔ Review-driven development (RECOMMENDED)<br>
+                Terminal execution: Request Review
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 14: 04 · INTERFACE -->
+      <article class="slide-card" data-slide="14">
+        <div class="slide-header">
+          <div class="slide-category">04 · INTERFACE</div>
+          <h2 class="slide-title">왼쪽은 프로젝트, 가운데는 대화, 오른쪽은 검토 공간입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box"><div class="content-box-title">왼쪽 패널</div><p style="font-size: 11pt;">프로젝트 선택 및 대화 기록 관리</p></div>
+            <div class="content-box"><div class="content-box-title">가운데 입력창</div><p style="font-size: 11pt;">모델 · 모드 · 컨텍스트 지정 후 요청</p></div>
+            <div class="content-box lime"><div class="content-box-title">오른쪽 보조 패널</div><p style="font-size: 11pt;">계획, 코드 diff, Artifacts 검토</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 15: 05 · PROJECTS -->
+      <article class="slide-card" data-slide="15">
+        <div class="slide-header">
+          <div class="slide-category">05 · PROJECTS</div>
+          <h2 class="slide-title">프로젝트는 에이전트가 접근할 폴더 · 도구 · 권한의 경계입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="step-list">
+              <div class="step-item"><span class="step-number">1</span><div>New Project > Add Folder 선택</div></div>
+              <div class="step-item"><span class="step-number">2</span><div>관련 저장소만 추가하고 명확한 이름 지정</div></div>
+              <div class="step-item"><span class="step-number">3</span><div>파일 접근 · 터미널 · MCP 권한 검토</div></div>
+            </div>
+            <div class="visual-image-card light-ui">
+              <div style="font-weight:bold; color:var(--primary);">Workspace Scope Boundary</div>
+              <p style="font-size:10pt; color:#64748B;">my-first-project (scoped to local repo only)</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 16: 06 · AGENT MODE -->
+      <article class="slide-card" data-slide="16">
+        <div class="slide-header">
+          <div class="slide-category">06 · AGENT MODE</div>
+          <h2 class="slide-title">Local은 현재 폴더, Worktree는 격리된 복사본에서 작업합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box">
+              <div class="content-box-title">Local Mode</div>
+              <p>활성 폴더를 직접 수정. 빠른 소규모 수정에 적합.</p>
+            </div>
+            <div class="content-box lime">
+              <div class="content-box-title">New Worktree Mode</div>
+              <p>독립된 Git worktree에서 변경. 안전한 병렬 작업 및 큰 변경에 권장.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 17: 07 · PROMPTING -->
+      <article class="slide-card" data-slide="17">
+        <div class="slide-header">
+          <div class="slide-category">07 · PROMPTING</div>
+          <h2 class="slide-title">좋은 요청은 목표 · 범위 · 제약 · 검증 방법을 함께 제시합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box"><span class="badge">1. 목표</span><p style="font-size:11pt;">완료 조건 정의</p></div>
+            <div class="content-box"><span class="badge">2. 범위</span><p style="font-size:11pt;">수정 가능 파일 지정</p></div>
+            <div class="content-box"><span class="badge">3. 제약</span><p style="font-size:11pt;">금지 영역 기술</p></div>
+            <div class="content-box lime"><span class="badge lime">4. 검증</span><p style="font-size:11pt;">실행할 테스트 요청</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 18: 08 · ARTIFACTS -->
+      <article class="slide-card" data-slide="18">
+        <div class="slide-header">
+          <div class="slide-category">08 · ARTIFACTS</div>
+          <h2 class="slide-title">Artifacts는 에이전트의 계획과 결과를 사람이 검토하는 증거입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box"><div class="content-box-title">1. Implementation Plan</div><p style="font-size:11pt;">범위와 순서 사전에 확인</p></div>
+            <div class="content-box"><div class="content-box-title">2. Task & Code diffs</div><p style="font-size:11pt;">진행 중 코멘트로 방향 조정</p></div>
+            <div class="content-box lime"><div class="content-box-title">3. Walkthrough</div><p style="font-size:11pt;">스크린샷 및 테스트 결과 재검증</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 19: 09 · IDE EDITOR -->
+      <article class="slide-card" data-slide="19">
+        <div class="slide-header">
+          <div class="slide-category">09 · IDE EDITOR</div>
+          <h2 class="slide-title">IDE는 Tab 자동완성과 직접 편집을 에이전트 작업과 결합합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">Tab 완성</div><p>짧고 예측 가능한 입력에 유용</p></div>
+            <div class="content-box lime"><div class="content-box-title">Agent Panel</div><p>여러 파일 수정 및 리팩터링 처리</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 20: 10 · CONTEXT -->
+      <article class="slide-card" data-slide="20">
+        <div class="slide-header">
+          <div class="slide-category">10 · CONTEXT</div>
+          <h2 class="slide-title">@와 /는 에이전트에게 필요한 맥락과 행동을 명시합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">@파일명</div><p>파일, 디렉터리, 터미널, MCP 지정</p></div>
+            <div class="content-box lime"><div class="content-box-title">/명령어</div><p>/browser, /schedule, /goal 실행</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 21: 11 · BROWSER & TERMINAL -->
+      <article class="slide-card" data-slide="21">
+        <div class="slide-header">
+          <div class="slide-category">11 · BROWSER & TERMINAL</div>
+          <h2 class="slide-title">브라우저와 터미널은 만들기보다 검증에 먼저 활용합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="step-list">
+              <div class="step-item"><span class="step-number">1</span><div>수정 전 기존 테스트/실행 명령 확인</div></div>
+              <div class="step-item"><span class="step-number">2</span><div>변경 후 터미널 테스트 및 /browser 흐름 실행</div></div>
+              <div class="step-item"><span class="step-number">3</span><div>실패 로그와 스크린샷 남겨 수정</div></div>
+            </div>
+            <div class="visual-image-card">
+              <div class="ui-header-bar"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div><span>Integrated Terminal & Browser Debug</span></div>
+              <p style="color:var(--accent);">Terminal: npm test PASSED (4/4)</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 22: 12 · CUSTOMIZE -->
+      <article class="slide-card" data-slide="22">
+        <div class="slide-header">
+          <div class="slide-category">12 · CUSTOMIZE</div>
+          <h2 class="slide-title">Rules · Workflows · Skills는 반복되는 팀 방식을 재사용하게 합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box"><div class="content-box-title">Rules</div><p style="font-size:11pt;">상시 원칙 (코드 스타일 등)</p></div>
+            <div class="content-box"><div class="content-box-title">Workflows</div><p style="font-size:11pt;">호출형 순서 (/이름)</p></div>
+            <div class="content-box lime"><div class="content-box-title">Skills</div><p style="font-size:11pt;">SKILL.md 전문 패키지</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 23: 13 · MCP & PLUGINS -->
+      <article class="slide-card" data-slide="23">
+        <div class="slide-header">
+          <div class="slide-category">13 · MCP & PLUGINS</div>
+          <h2 class="slide-title">MCP와 플러그인은 외부 데이터와 안전한 도구를 연결합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">MCP</div><p>DB, 로그, GitHub 표준 연결</p></div>
+            <div class="content-box lime"><div class="content-box-title">Plugins</div><p>MCP, Skills, 설정 원클릭 패키지</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 24: 14 · SCHEDULE & PARALLEL -->
+      <article class="slide-card" data-slide="24">
+        <div class="slide-header">
+          <div class="slide-category">14 · SCHEDULE & PARALLEL</div>
+          <h2 class="slide-title">예약과 병렬 에이전트는 검증된 반복 작업의 속도를 높입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="step-list">
+              <div class="step-item"><span class="step-number">1</span><div>동일 프롬프트 수동 실행으로 결과 검증</div></div>
+              <div class="step-item"><span class="step-number">2</span><div>/schedule에서 주기 및 조건 설정</div></div>
+              <div class="step-item"><span class="step-number">3</span><div>Worktree 활용 병렬 작업 수행</div></div>
+            </div>
+            <div class="visual-image-card light-ui">
+              <div style="font-weight:bold; color:var(--primary);">New Scheduled Task UI</div>
+              <p style="font-size:10pt; color:#64748B;">Daily at 6:00 PM | Auto Test & Summarize</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 25: 15 · SAFE WORKFLOW -->
+      <article class="slide-card" data-slide="25">
+        <div class="slide-header">
+          <div class="slide-category">15 · SAFE WORKFLOW</div>
+          <h2 class="slide-title">초보자의 표준 흐름은 범위 설정 → 계획 → 격리 실행 → 검증입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box"><span class="badge">1. 범위</span><p style="font-size:11pt;">Git 상태 확인</p></div>
+            <div class="content-box"><span class="badge">2. 계획</span><p style="font-size:11pt;">Worktree 승인</p></div>
+            <div class="content-box"><span class="badge">3. 실행</span><p style="font-size:11pt;">테스트/브라우저</p></div>
+            <div class="content-box lime"><span class="badge lime">4. 검증</span><p style="font-size:11pt;">Diff 최종 병합</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 26: SESSION 03 Intro -->
+      <article class="slide-card" data-slide="26">
+        <div class="slide-body">
+          <div style="background-color: var(--primary-dark); color: #FFF; padding: 44px; border-radius: 12px;">
+            <div class="slide-category" style="color: var(--accent);">SESSION 03</div>
+            <h1 style="font-size: 30pt; font-weight: 900; margin-bottom: 20px;">Cursor 초보자 교육</h1>
+            <div class="step-list">
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">1</span>
+                <div>편집기 기본: Overview · Interface · Tab · Inline Edit</div>
+              </div>
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">2</span>
+                <div>에이전트: Agent · Plan Mode · Cloud Agents</div>
+              </div>
+              <div class="step-item" style="background-color: rgba(255,255,255,0.1); border: none; color: #FFF;">
+                <span class="step-number" style="background-color: var(--accent);">3</span>
+                <div>확장과 안전: Rules · MCP · Automation · Privacy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 27: 01 · OVERVIEW -->
+      <article class="slide-card" data-slide="27">
+        <div class="slide-header">
+          <div class="slide-category">01 · OVERVIEW</div>
+          <h2 class="slide-title">Cursor는 코드 편집기와 AI 에이전트를 한 작업 흐름으로 묶습니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">Editor + Agent</div><p>자동완성, 직접 편집, 다중 파일 변경, 터미널 검증을 한 앱에서 수행하는 AI 코딩 도구입니다.</p></div>
+            <div class="visual-image-card">
+              <div class="ui-header-bar"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div><span>Cursor IDE Window</span></div>
+              <p style="color:#A7F3D0;">Central Code Editor + Right Side Agent Panel</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 28: 02 · INSTALL & MIGRATE -->
+      <article class="slide-card" data-slide="28">
+        <div class="slide-header">
+          <div class="slide-category">02 · INSTALL & MIGRATE</div>
+          <h2 class="slide-title">VS Code 사용자는 설정을 가져와 익숙한 환경에서 시작할 수 있습니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="step-list">
+            <div class="step-item"><span class="step-number">1</span><div>공식 사이트 설치 후 폴더 열기</div></div>
+            <div class="step-item"><span class="step-number">2</span><div>Settings > General > Account > VS Code Import 선택</div></div>
+            <div class="step-item"><span class="step-number">3</span><div>필요한 확장만 활성화 후 재시작</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 29: 03 · INTERFACE -->
+      <article class="slide-card" data-slide="29">
+        <div class="slide-header">
+          <div class="slide-category">03 · INTERFACE</div>
+          <h2 class="slide-title">편집기 · Agent 패널 · 터미널 · 변경 검토가 핵심 작업 공간입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="content-box"><div class="content-box-title">Explorer</div><p style="font-size:11pt;">파일 탐색기</p></div>
+            <div class="content-box"><div class="content-box-title">Editor</div><p style="font-size:11pt;">중앙 편집기</p></div>
+            <div class="content-box"><div class="content-box-title">Agent (Cmd+I)</div><p style="font-size:11pt;">AI 에이전트 창</p></div>
+            <div class="content-box lime"><div class="content-box-title">Terminal</div><p style="font-size:11pt;">하단 실행 영역</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 30: 04 · TAB -->
+      <article class="slide-card" data-slide="30">
+        <div class="slide-header">
+          <div class="slide-category">04 · TAB</div>
+          <h2 class="slide-title">Cursor Tab은 다음 코드와 다음 편집 위치를 빠르게 제안합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">Tab 작동법</div><p>회색 제안 수락 시 Tab, 거절 시 Esc. 보일러플레이트 및 반복 코드 작성에 최적.</p></div>
+            <div class="visual-image-card">
+              <span style="color:#64748B;">def main():</span><br>
+              <span style="color:#A7F3D0;">&nbsp;&nbsp;&nbsp;&nbsp;print("Hello, World!") [Tab to Accept]</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 31: 05 · INLINE EDIT -->
+      <article class="slide-card" data-slide="31">
+        <div class="slide-header">
+          <div class="slide-category">05 · INLINE EDIT</div>
+          <h2 class="slide-title">Inline Edit은 선택한 코드 범위만 자연어로 빠르게 바꿉니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="content-box lime">
+            <div class="content-box-title">Cmd/Ctrl + K</div>
+            <p>수정할 코드 블록을 선택하고 Cmd/Ctrl+K 입력 후 원하는 변화 지시.</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 32: 06 · AGENT -->
+      <article class="slide-card" data-slide="32">
+        <div class="slide-header">
+          <div class="slide-category">06 · AGENT</div>
+          <h2 class="slide-title">Agent는 여러 파일을 찾아 수정하고 터미널까지 실행합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">Cmd/Ctrl + I</div><p>Instructions + Tools + Model 조합으로 전체 프로젝트 단위 다중 파일 변경 수행.</p></div>
+            <div class="visual-image-card">
+              <p style="color:#F87171;">Agent Auto-Fix Lints: On</p>
+              <p style="color:#CBD5E1;">Review Policy: Request Review</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 33: 07 · PLAN MODE -->
+      <article class="slide-card" data-slide="33">
+        <div class="slide-header">
+          <div class="slide-category">07 · PLAN MODE</div>
+          <h2 class="slide-title">Plan Mode는 복잡한 변경을 코드보다 계획부터 검토하게 합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="step-list">
+            <div class="step-item"><span class="step-number">1</span><div>Shift+Tab으로 Plan 모드 선택</div></div>
+            <div class="step-item"><span class="step-number">2</span><div>질문 답변 및 계획 검토/보완</div></div>
+            <div class="step-item"><span class="step-number">3</span><div>Build 클릭하여 실행</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 34: 08 · CONTEXT -->
+      <article class="slide-card" data-slide="34">
+        <div class="slide-header">
+          <div class="slide-category">08 · CONTEXT</div>
+          <h2 class="slide-title">컨텍스트는 많이 넣기보다 관련성과 최신성이 중요합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="recommendation-box">
+            <strong>원칙</strong> @파일 1~3개 핵심만 지정. 무관한 파일 추가는 AI 판단을 흐릴 수 있음.
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 35: 09 · TERMINAL & BROWSER -->
+      <article class="slide-card" data-slide="35">
+        <div class="slide-header">
+          <div class="slide-category">09 · TERMINAL & BROWSER</div>
+          <h2 class="slide-title">터미널과 브라우저로 생성한 코드가 실제로 동작하는지 확인합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">Terminal Execution</div><p>단위 테스트 및 빌드 자동 실행</p></div>
+            <div class="content-box lime"><div class="content-box-title">Browser Validation</div><p>UI 및 핵심 사용자 흐름 직접 검증</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 36: 10 · REVIEW -->
+      <article class="slide-card" data-slide="36">
+        <div class="slide-header">
+          <div class="slide-category">10 · REVIEW</div>
+          <h2 class="slide-title">변경 검토는 파일별 diff와 테스트 증거를 기준으로 합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="step-list">
+            <div class="step-item"><span class="step-number">1</span><div>예상치 못한 변경 파일 유무 확인</div></div>
+            <div class="step-item"><span class="step-number">2</span><div>보안 · 데이터 · API 변경 우선 검토</div></div>
+            <div class="step-item"><span class="step-number">3</span><div>테스트 확인 후 커밋</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 37: 11 · RULES -->
+      <article class="slide-card" data-slide="37">
+        <div class="slide-header">
+          <div class="slide-category">11 · RULES</div>
+          <h2 class="slide-title">Rules와 AGENTS.md는 프로젝트의 반복 지침을 일관되게 적용합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">.cursor/rules</div><p>저장소 버전 관리 규칙</p></div>
+            <div class="content-box lime"><div class="content-box-title">AGENTS.md</div><p>Markdown 기반 간단 공통 지침</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 38: 12 · MCP & PLUGINS -->
+      <article class="slide-card" data-slide="38">
+        <div class="slide-header">
+          <div class="slide-category">12 · MCP & PLUGINS</div>
+          <h2 class="slide-title">MCP와 플러그인은 Cursor를 외부 개발 도구와 연결합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="content-box">
+            <div class="content-box-title">외부 도구 연결</div>
+            <p>GitHub 이슈, DB, 문서 검색 등 읽기 전용 권한부터 순차적 연결 권장.</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 39: 13 · AGENTS WINDOW -->
+      <article class="slide-card" data-slide="39">
+        <div class="slide-header">
+          <div class="slide-category">13 · AGENTS WINDOW [신규]</div>
+          <h2 class="slide-title">Agents Window는 여러 에이전트를 한 화면에서 지휘하는 전용 화면입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div>
+              <div class="content-box-title">Cursor 3 신규 기능</div>
+              <p>Cmd/Ctrl+Shift+P > Open Agents Window 실행.<br>Local, Cloud, SSH, Worktree 에이전트를 사이드바에서 병렬 관리.</p>
+            </div>
+            <div class="visual-image-card">
+              <div class="ui-header-bar"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div><span>Agents Window Layout</span></div>
+              <p style="color:var(--accent);">Parallel Agents: Agent-1 (Local) | Agent-2 (Cloud)</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 40: 14 · CLOUD AGENTS -->
+      <article class="slide-card" data-slide="40">
+        <div class="slide-header">
+          <div class="slide-category">14 · CLOUD AGENTS</div>
+          <h2 class="slide-title">Cloud Agents는 격리된 VM에서 여러 작업을 병렬로 처리합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="content-box lime">
+            <div class="content-box-title">백그라운드 VM 처리</div>
+            <p>PC가 꺼져도 클라우드 환경에서 저장소 복제, 빌드, 테스트 후 PR 생성 가능.</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 41: 15 · AUTOMATION & COST -->
+      <article class="slide-card" data-slide="41">
+        <div class="slide-header">
+          <div class="slide-category">15 · AUTOMATION & COST</div>
+          <h2 class="slide-title">자동화와 모델 선택은 반복 가치와 사용량을 함께 관리합니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="content-box"><div class="content-box-title">자동화 대상</div><p>PR 요약, 의존성 점검, 정기 보고</p></div>
+            <div class="content-box lime"><div class="content-box-title">비용 관리</div><p>Usage 및 모델 사용량 정기적 모니터링</p></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 42: 16 · PRIVACY & WORKFLOW -->
+      <article class="slide-card" data-slide="42">
+        <div class="slide-header">
+          <div class="slide-category">16 · PRIVACY & WORKFLOW</div>
+          <h2 class="slide-title">초보자의 표준 흐름은 작은 요청 → 계획 → 검증 → 커밋입니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="step-list">
+            <div class="step-item"><span class="step-number">1</span><div>Settings에서 Privacy Mode 및 데이터 정책 확인</div></div>
+            <div class="step-item"><span class="step-number">2</span><div>작은 범위의 목표, 제약, 테스트 요청</div></div>
+            <div class="step-item"><span class="step-number">3</span><div>Diff 및 테스트 확인 후 사람이 직접 커밋</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 43: SUMMARY -->
+      <article class="slide-card" data-slide="43">
+        <div class="slide-header">
+          <div class="slide-category">SUMMARY</div>
+          <h2 class="slide-title">세 도구는 경쟁 관계가 아니라 서로 다른 업무 구간을 맡습니다</h2>
+        </div>
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="content-box">
+              <div class="content-box-title">Gemini</div>
+              <p style="font-size:11pt;">• 문서 · 이미지 · 자료 정리<br>• 24시간 개인 비서 (Spark)<br>• 코드는 분석 및 질문 위주</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title">Antigravity</div>
+              <p style="font-size:11pt;">• 여러 에이전트 동시 지휘<br>• 브라우저 검증 자동화<br>• 팀 Rules/Workflows 재사용</p>
+            </div>
+            <div class="content-box">
+              <div class="content-box-title">Cursor</div>
+              <p style="font-size:11pt;">• Tab/Inline Edit 빠른 수정<br>• 하네스 엔지니어링 알고리즘 내재<br>• VS Code 계열 에디터 사용자에게 익숙</p>
+            </div>
+          </div>
+          <div class="recommendation-box">
+            <strong>추천</strong>
+            <span>업무 문서·일정 자동화는 Gemini, 아이디어를 에이전트가 처음부터 만들게 하려면 Antigravity, <br>기존 코드베이스를 직접 검토하며 빠르게 반복하려면 Cursor를 선택하세요.</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Page 44: OUTRO -->
+      <article class="slide-card" data-slide="44">
+        <div class="slide-body">
+          <div class="hero-slide">
+            <div class="hero-series">AX 실무 교육 시리즈</div>
+            <h1 class="hero-title" style="font-size:26pt;">도구는 다르지만 원칙은 같습니다<br> — 작게 시작하고, 계획을 검토하고, 결과를 확인하세요</h1>
+            <p class="hero-subtitle" style="font-size:16pt; margin-top:10px;">Gemini · Antigravity · Cursor 모두 되돌리기 쉬운 작업으로 첫 실습을 시작하세요.</p>
+          </div>
+        </div>
+      </article>
+
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const slideTitlesByOriginalPage = [
+        "Gemini · Antigravity · Cursor",
+        "AGENDA : 세 도구 사용법",
+        "SESSION 01: Gemini 핵심 기능",
+        "01. Library: 이미지 재편집",
+        "02. Notebook: 지식 연결",
+        "03. Spark: 24시간 AI 비서",
+        "04. Import Code: GitHub 연동",
+        "05. Canvas: 대화형 편집",
+        "06. Personal Intelligence: 맞춤",
+        "SESSION 02: Antigravity 교육",
+        "01. Overview: 에이전틱 공간",
+        "02. Product Map: 앱/IDE/CLI",
+        "03. Install: 설치 및 정책",
+        "04. Interface: 패널 구조",
+        "05. Projects: 경계 설정",
+        "06. Agent Mode: Local vs Worktree",
+        "07. Prompting: 요청 작성법",
+        "08. Artifacts: 검증 증거",
+        "09. IDE Editor: Tab & Panel",
+        "10. Context: @와 / 사용법",
+        "11. Browser & Terminal: 검증",
+        "12. Customize: Rules & Skills",
+        "13. MCP & Plugins: 외부 연결",
+        "14. Schedule & Parallel: 자동화",
+        "15. Safe Workflow: 표준 흐름",
+        "SESSION 03: Cursor 교육",
+        "01. Overview: AI 코딩 에디터",
+        "02. Install & Migrate: VS Code",
+        "02. Interface: 핵심 공간",
+        "03. Tab: 자동 제안",
+        "04. Inline Edit: 부분 수정",
+        "05. Agent: 다중 파일 작업",
+        "06. Plan Mode: 계획 사전검토",
+        "07. Context: 관련성 지정",
+        "08. Terminal & Browser: 테스트",
+        "09. Review: Diff 검토",
+        "10. Rules: AGENTS.md 적용",
+        "11. MCP & Plugins: 도구 연동",
+        "13. Agents Window: 병렬 지휘",
+        "12. Cloud Agents: 격리 VM",
+        "13. Automation & Cost: 사용량",
+        "14. Privacy & Workflow: 안전",
+        "Summary: 세 도구 비교",
+        "Outro: 마무리 및 원칙"
+      ];
+
+      [28, 39].forEach((pageNumber) => {
+        document.querySelector(`.slide-card[data-slide="${pageNumber}"]`)?.remove();
+      });
+
+      const slides = Array.from(document.querySelectorAll('.slide-card'));
+      const totalSlides = slides.length;
+      const progressBar = document.getElementById('progress-bar');
+      const progressPercent = document.getElementById('progress-percent');
+      const pageIndicator = document.getElementById('page-indicator');
+      const agendaNav = document.getElementById('agenda-nav');
+      const mainStage = document.getElementById('main-stage');
+      let currentSlide = 1;
+
+      const groupLabels = new Map([
+        [1, 'INTRO'],
+        [3, 'SESSION 01 · GEMINI'],
+        [10, 'SESSION 02 · ANTIGRAVITY'],
+        [26, 'SESSION 03 · CURSOR'],
+        [43, 'SUMMARY']
+      ]);
+
+      const toolSessionPages = [
+        { page: 11, category: '01 · OVERVIEW', title: 'Antigravity는 여러 AI 에이전트를 지휘하는 개발 작업 공간입니다', description: 'Google의 에이전틱 개발 플랫폼으로, 목표를 설명하면 AI 에이전트가 파일 · 터미널 · 브라우저를 사용해 계획부터 검증까지 수행합니다.', image: 'agy-overview.png', steps: ['개발 목표와 완료 조건을 한 문장으로 정리합니다.', 'Antigravity 앱에서 프로젝트를 만들고 작업 폴더를 연결합니다.', '작은 작업을 요청하고 계획 · 변경 · 검증 결과를 차례로 확인합니다.'], recommendation: '처음에는 문서 수정이나 작은 UI 개선처럼 되돌리기 쉬운 작업으로 전체 흐름을 익히세요.' },
+        { page: 12, category: '02 · PRODUCT MAP', title: '앱 · IDE · CLI · SDK는 같은 에이전트를 서로 다른 방식으로 사용합니다', description: '앱은 다중 에이전트 지휘, IDE는 직접 코드 편집, CLI는 터미널 자동화, SDK는 제품 안에 에이전트를 통합하는 데 초점을 둡니다.', image: 'agy-product_map.png', steps: ['첫 시작은 여러 작업을 지휘하는 Antigravity 앱에서 시작합니다.', '코드를 직접 읽고 고칠 때는 Open IDE로 전환합니다.', '터미널 반복 작업이나 자동화가 필요해지면 CLI · SDK를 검토합니다.'], recommendation: '기획 · 검토 중심은 앱, 직접 코딩 중심은 IDE라는 기준으로 선택하세요.' },
+        { page: 13, category: '03 · INSTALL', title: '설치할 때는 계정 · Chrome · 권한 정책을 먼저 확인합니다', description: 'macOS · Windows 지원 여부와 AI 정책, Google 계정, Chrome 연동 조건을 먼저 확인하고 공식 설치 파일을 사용합니다.', image: 'agy-install.png', steps: ['공식 다운로드 페이지에서 운영체제용 설치 파일을 받습니다.', 'Google 계정으로 로그인하고 필요한 확장과 연결만 선택합니다.', '초보자는 Review-driven development와 제한된 권한을 선택합니다.'], recommendation: '회사 크리덴셜과 개인 정보가 조직의 AI 사용 정책과 충돌하지 않는지 먼저 확인하세요.' },
+        { page: 14, category: '04 · INTERFACE', title: '왼쪽은 프로젝트, 가운데는 대화, 오른쪽은 검토 공간입니다', description: '프로젝트와 대화를 탐색하고, 입력창에서 목표와 모델을 선택하며, Artifacts와 Walkthrough에서 계획과 결과를 검토합니다.', image: 'agy-interface.png', steps: ['왼쪽에서 프로젝트와 대화 기록을 선택합니다.', '가운데 입력창에서 모델 · 모드 · 컨텍스트를 정해 요청합니다.', '오른쪽 보조 패널에서 계획 · 코드 차이 · Walkthrough를 확인합니다.'], recommendation: '패널을 모두 열기보다 현재 단계에 필요한 패널만 열어 집중하세요.' },
+        { page: 15, category: '05 · PROJECTS', title: '프로젝트는 에이전트가 접근할 폴더 · 도구 · 권한의 경계입니다', description: '한 개 이상의 로컬 폴더와 저장소를 묶고, 프로젝트별 도구 · MCP · 행동 정책을 분리해 에이전트의 작업 범위를 정합니다.', image: 'agy-project.png', steps: ['왼쪽 + 아이콘에서 New Project > Add Folder를 선택합니다.', '관련 저장소만 추가하고 프로젝트를 이동해 위치를 확인합니다.', '기어 아이콘에서 파일 접근 · 터미널 · MCP 권한을 검토합니다.'], recommendation: 'frontend와 backend처럼 함께 수정해야 하는 저장소만 한 프로젝트로 묶으세요.' },
+        { page: 16, category: '06 · AGENT MODE', title: 'Local은 현재 폴더, Worktree는 격리된 복사본에서 작업합니다', description: 'Local은 현재 작업 폴더를 직접 수정하고, New Worktree Mode는 독립 Git worktree에서 변경하므로 큰 작업과 병렬 실행에 안전합니다.', image: 'agy-agent_mode.png', steps: ['변경할 프로젝트 폴더를 열고 Enter를 누릅니다.', '작은 수정은 Local, 큰 변경 · 병렬 작업은 New Worktree를 선택합니다.', '작업 후 diff와 테스트를 확인하고 필요한 변경만 반영합니다.'], recommendation: '초보자는 중요한 저장소에서 Worktree를 기본값으로 사용하면 복구가 쉽습니다.' },
+        { page: 17, category: '07 · PROMPTING', title: '좋은 요청은 목표 · 범위 · 제약 · 검증 방법을 함께 제시합니다', description: '에이전트는 자연어 목표를 계획과 코드로 바꾸므로 무엇을 바꾸고, 어디까지 허용하며, 어떻게 완료를 증명할지 명확히 적습니다.', image: 'agy-prompting.png', steps: ['목표와 사용자가 경험할 완료 조건을 먼저 씁니다.', '수정 가능 파일 · 금지 영역 · 기술 제약을 구체적으로 명시합니다.', '마지막에 테스트 · 빌드 · 스크린샷 등 증명 방법을 요청합니다.'], recommendation: '명확한 작업명 / 범위 / 완료 기준을 반복 가능한 기본 템플릿으로 사용하세요.' },
+        { page: 18, category: '08 · ARTIFACTS', title: 'Artifacts는 에이전트의 계획과 결과를 사람이 검토하는 증거입니다', description: '구현 계획 · 작업 목록 · 코드 diff · 스크린샷 · 브라우저 녹화 · Walkthrough가 에이전트의 수행 과정과 결과를 증명합니다.', image: 'agy-artifacts.png', steps: ['코딩 전 Implementation Plan에서 범위와 순서를 확인합니다.', '진행 중 Task와 Code diff에 코멘트로 방향을 조정합니다.', '완료 후 Walkthrough · 스크린샷 · 테스트 결과를 재검증합니다.'], recommendation: '결과 메시지만 믿지 말고 Plan, Diff, Test 세 가지 증거를 확인하세요.' },
+        { page: 19, category: '09 · IDE EDITOR', title: 'IDE는 Tab 자동완성과 직접 편집을 에이전트 작업과 결합합니다', description: '코드를 직접 읽고 수정하는 전통 편집기와 Agent Panel의 여러 파일 수정 · 오류 해결 · 리팩터링을 한 화면에서 결합합니다.', image: 'agy-ide_editor.png', steps: ['작업할 파일을 열고 코드 구조와 diff 상태를 먼저 확인합니다.', '제어가 필요한 코드는 직접 수정하고 피드백을 즉시 반영합니다.', '여러 파일 변경은 Agent Panel에서 목표와 테스트를 요청합니다.'], recommendation: '짧고 예측 가능한 코드는 Tab, 여러 파일과 검증이 필요한 작업은 Agent를 사용하세요.' },
+        { page: 20, category: '10 · CONTEXT', title: '@와 /는 에이전트에게 필요한 맥락과 행동을 명시합니다', description: '@으로 파일 · 디렉터리 · 터미널 · MCP를 지정하고, /browser · /schedule 같은 명령으로 실행 행동을 명확히 지시합니다.', image: 'agy-context.png', steps: ['현재 파일을 열고 필요한 @파일명으로 맥락을 지정합니다.', '브라우저 확인은 /browser, 반복 작업은 /schedule을 사용합니다.', '사용 후 불필요한 컨텍스트와 연결 도구를 제거해 범위를 줄입니다.'], recommendation: '처음에는 관련 파일 1~3개만 지정하고 부족할 때 범위를 넓히세요.' },
+        { page: 21, category: '11 · BROWSER & TERMINAL', title: '브라우저와 터미널은 만들기보다 검증에 먼저 활용합니다', description: '에이전트는 터미널에서 빌드 · 테스트를 실행하고 Chrome 브라우저에서 UI를 확인해 만든 코드가 실제로 동작하는지 검증합니다.', image: 'agy-browser.png', steps: ['수정 전에 기존 테스트와 실행 명령을 확인합니다.', '변경 후 터미널 테스트와 /browser 사용자 흐름을 실행합니다.', '실패 로그 · 스크린샷 · Artifact를 남기고 원인을 수정합니다.'], recommendation: '구현 후 npm test와 핵심 화면 1개를 확인하는 검증 루틴을 프롬프트에 포함하세요.' },
+        { page: 22, category: '12 · CUSTOMIZE', title: 'Rules · Workflows · Skills는 반복되는 팀 방식을 재사용하게 합니다', description: 'Rules는 지속 지침, Workflows는 호출형 순서, Skills는 지식 · 스크립트 · 자원 묶음으로 반복 작업을 패키징합니다.', image: 'agy-customize.png', steps: ['코드 스타일 같은 상시 원칙은 Workspace Rules로 만듭니다.', '배포 · PR처럼 같은 순서는 Workflow로 저장하고 명령으로 실행합니다.', '특정 전문 절차는 agents/skills의 SKILL.md로 패키징합니다.'], recommendation: '대화에서 반복한 지침만 간단한 Rule이나 Workflow로 승격하세요.' },
+        { page: 23, category: '13 · MCP & PLUGINS', title: 'MCP와 플러그인은 외부 데이터와 안전한 도구를 연결합니다', description: 'MCP는 데이터베이스 · 로그 · GitHub 같은 외부 도구를 표준 방식으로 연결하고, 플러그인은 관련 MCP · Skills · 설정을 묶어 설치합니다.', image: 'agy-mcp_plugin.png', steps: ['Settings > Customizations에서 Installed MCP Servers를 엽니다.', 'MCP Store에서 필요한 서버만 추가하고 인증 범위를 확인합니다.', '프로젝트별로 도구를 허용하고 읽기 작업부터 테스트합니다.'], recommendation: '먼저 검색 · 로그 조회처럼 읽기 전용 연결부터 시작하고 쓰기 권한은 별도로 승인하세요.' },
+        { page: 24, category: '14 · SCHEDULE & PARALLEL', title: '예약과 병렬 에이전트는 검증된 반복 작업의 속도를 높입니다', description: '반복 또는 독립 작업은 에이전트로 실행하고, 서로 충돌하지 않는 작업은 Worktree에서 병렬로 처리합니다.', image: 'agy-schedule.png', steps: ['먼저 같은 프롬프트를 수동으로 실행해 결과를 검증합니다.', '/schedule에서 시간 · 주기 · 프로젝트 · 완료 조건을 지정합니다.', '병렬 작업은 충돌 없는 범위로 나누고 Worktree를 사용합니다.'], recommendation: '정기 테스트 · 의존성 점검 · 요약처럼 입력과 결과가 명확한 작업에 적용하세요.' },
+        { page: 25, category: '15 · SAFE WORKFLOW', title: '초보자의 표준 흐름은 범위 설정 → 계획 → 격리 실행 → 검증입니다', description: '에이전트에게 전부 맡기기보다 언제나 범위와 계획을 먼저 검토하고, 격리된 환경에서 실행한 뒤 증거를 확인합니다.', image: 'agy-workflow.png', steps: ['Git 상태와 테스트를 확인하고 작업 목표를 정리합니다.', 'Worktree와 계획을 승인한 뒤 구현 · 테스트 · 브라우저 검증을 실행합니다.', 'Diff와 Walkthrough를 검토하고 커밋 · 병합 여부를 사람이 결정합니다.'], recommendation: '첫 실습은 README 개선 → 테스트 실행 → diff 검토의 15분 과제로 진행하세요.' },
+
+        { page: 27, category: '01 · OVERVIEW', title: 'Cursor는 코드 편집기와 AI 에이전트를 한 작업 흐름으로 묶습니다', description: '코드 편집기의 자동완성 · 직접 편집 · 다중 파일 에이전트 · 터미널 · 브라우저 검증을 한 앱에서 수행합니다.', image: 'cursor-overview.png', steps: ['Cursor를 설치하고 계정으로 로그인합니다.', '작은 프로젝트 폴더를 열고 Agent에게 구조 설명을 요청합니다.', '작은 수정 후 diff와 실행 결과를 확인합니다.'], recommendation: 'Tab, Inline Edit, Agent 세 기능만 익히고 나머지는 필요할 때 추가하세요.' },
+        { page: 29, category: '02 · INTERFACE', title: '편집기 · Agent 패널 · 터미널 · 변경 검토가 핵심 작업 공간입니다', description: '왼쪽 파일 탐색기와 중앙 편집기, Agent 패널, 하단 터미널을 오가며 AI 제안과 실제 코드를 함께 확인합니다.', image: 'cursor-interface.png', steps: ['파일 탐색기로 현재 구조와 대상 파일을 먼저 봅니다.', 'Cmd/Ctrl+I로 Agent를 열고 목적에 맞는 모드를 선택합니다.', '변경 후 Review에서 파일별 diff를 읽고 수락 · 거절합니다.'], recommendation: 'Agent 패널을 항상 크게 두기보다 코드와 diff를 읽을 공간을 확보하세요.' },
+        { page: 30, category: '03 · TAB', title: 'Cursor Tab은 다음 코드와 다음 편집 위치를 빠르게 제안합니다', description: '현재 맥락과 주변 코드를 바탕으로 한 줄 또는 여러 줄 완성과 다음 편집 위치를 제안해 반복 입력을 줄입니다.', image: 'cursor-tab.png', steps: ['함수 이름 · 주석 · 반복 패턴을 입력하고 제안을 기다립니다.', '맞는 부분은 Tab으로 수락하고 틀린 제안은 Esc 또는 계속 입력합니다.', '연속 수정 제안은 다음 위치로 이동하며 필요한 부분만 수락합니다.'], recommendation: '보일러플레이트 · 테스트 케이스 · 반복 코드처럼 예측 가능한 작업에 가장 효과적입니다.' },
+        { page: 31, category: '04 · INLINE EDIT', title: 'Inline Edit은 선택한 코드 범위만 자연어로 빠르게 바꿉니다', description: '편집기에서 변경할 범위를 선택하고 Cmd/Ctrl+K로 요청하면 작은 리팩터링 · 주석 · 타입 변경을 빠르게 처리합니다.', image: 'cursor-inline_edit.png', steps: ['수정할 코드 블록을 정확히 선택합니다.', 'Cmd/Ctrl+K를 누르고 변화와 유지 조건을 짧게 입력합니다.', '제안 diff를 확인해 수락하거나 추가 지시로 다듬습니다.'], recommendation: '함수 하나의 이름 변경 · 에러 처리 · 타입 추가처럼 작고 명확한 수정에 사용하세요.' },
+        { page: 32, category: '05 · AGENT', title: 'Agent는 여러 파일을 찾아 수정하고 터미널까지 실행합니다', description: 'Instructions · Tools · Model을 조합해 프로젝트를 탐색하고 여러 파일을 수정한 뒤 테스트와 빌드까지 실행합니다.', image: 'cursor-agent.png', steps: ['Cmd/Ctrl+I로 Agent를 열고 목표와 성공 조건을 적습니다.', '관련 파일 · 이미지 · 로그가 명확하면 @으로 첨부합니다.', '도구 호출과 변경 내용을 검토하고 테스트 결과를 요구합니다.'], recommendation: '먼저 변경 전 계획을 요청하고 파일 단위 승인과 테스트를 확인하세요.' },
+        { page: 33, category: '06 · PLAN MODE', title: 'Plan Mode는 복잡한 변경을 코드보다 계획부터 검토하게 합니다', description: 'Agent가 질문 · 코드 조사 · 구현 계획을 먼저 만들고 사용자가 수정 · 승인한 뒤 Build를 실행하는 방식입니다.', image: 'cursor-plan.png', steps: ['Agent 입력창에서 Shift+Tab 또는 Plan / Ask / Agent 모드 중 Plan을 선택합니다.', '질문에 답하고 파일 · 데이터 · 예외 조건을 보완합니다.', '계획을 검토 · 수정한 뒤 Build를 눌러 실행합니다.'], recommendation: '화면 개편 · 상태 변경 · 마이그레이션처럼 복잡한 여러 파일 작업에 사용하세요.' },
+        { page: 34, category: '07 · CONTEXT', title: '컨텍스트는 많이 넣기보다 관련성과 최신성이 중요합니다', description: '@파일 · @폴더 · @코드베이스를 사용해 AI가 실제로 판단할 자료를 직접 지정할 수 있습니다.', image: 'cursor-context.png', steps: ['파일을 열고 있으면 @ 없이도 현재 파일을 맥락으로 사용합니다.', '모르면 관련 파일을 Agent가 검색하도록 요청합니다.', '생성물 · vendor · 대형 파일은 ignore 설정으로 검색 범위에서 제외합니다.'], recommendation: '모든 파일을 넣지 말고 관련 파일 1~3개와 완료 기준을 함께 주세요.' },
+        { page: 35, category: '08 · TERMINAL & BROWSER', title: '터미널과 브라우저로 생성한 코드가 실제로 동작하는지 확인합니다', description: 'Agent는 터미널로 빌드와 테스트를 실행하고, 브라우저에서 화면과 핵심 사용자 흐름을 직접 검증합니다.', image: 'cursor-terminal.png', steps: ['비용이 낮은 테스트 · 린트 · 빌드 명령부터 확인합니다.', '변경 후 터미널 테스트와 Run Mode를 실행합니다.', '내장 브라우저에서 핵심 사용자 흐름을 직접 검증합니다.'], recommendation: '구현 전·후에 고정된 테스트 명령과 확인할 화면을 프롬프트에 포함하세요.' },
+        { page: 36, category: '09 · REVIEW', title: '변경 검토는 파일별 diff와 테스트 증거를 기준으로 합니다', description: 'Agent가 만든 변경을 파일별로 읽고 예상 범위, 보안 · 데이터 영향, 테스트 결과를 확인한 뒤 수락하거나 되돌립니다.', image: 'cursor-diff.png', steps: ['변경 파일 목록에서 예상하지 않은 파일이 있는지 봅니다.', '보안 · 데이터 · 공개 API 변경을 우선 검토합니다.', '테스트 결과를 확인한 뒤 작은 단위로 커밋합니다.'], recommendation: 'AI 변경은 작은 범위와 명확한 테스트 증거를 기준으로 리뷰하세요.' },
+        { page: 37, category: '10 · RULES', title: 'Rules와 AGENTS.md는 프로젝트의 반복 지침을 일관되게 적용합니다', description: 'Project Rules는 .cursor/rules에 저장해 버전 관리하고, AGENTS.md는 간단한 Markdown 지침으로 사용할 수 있습니다.', image: 'cursor-rules.png', steps: ['팀의 코드 스타일 · 테스트 명령 · 금지 사항을 5~10줄로 정리합니다.', '프로젝트 규칙은 .cursor/rules 또는 AGENTS.md에 둡니다.', '대표 작업으로 적용 여부를 확인하고 불필요한 규칙을 제거합니다.'], recommendation: '장황한 코드 설명보다 검증 가능한 실행 명령과 금지 규칙부터 추가하세요.' },
+        { page: 38, category: '11 · MCP & PLUGINS', title: 'MCP와 플러그인은 Cursor를 외부 개발 도구와 연결합니다', description: 'MCP로 데이터베이스 · 문서 · API 같은 외부 시스템을 연결하고 Marketplace 플러그인으로 설정을 간편하게 추가합니다.', image: 'cursor-mcp.png', steps: ['Cursor Settings 또는 Marketplace에서 필요한 MCP · 플러그인을 찾습니다.', '서버 출처 · 인증 · 읽기/쓰기 권한을 확인해 설치합니다.', '읽기 전용 경로로 테스트한 뒤 필요한 권한만 사용합니다.'], recommendation: 'GitHub 이슈 조회나 문서 검색처럼 읽기 작업부터 연결하세요.' },
+        { page: 40, category: '12 · CLOUD AGENTS', title: 'Cloud Agents는 격리된 VM에서 여러 작업을 병렬로 처리합니다', description: '코드 PC가 꺼져도 클라우드 VM이 저장소를 복제하고 빌드 · 테스트 후 PR 결과를 돌려주는 방식입니다.', image: 'cursor-cloud_agent.png', steps: ['관리자가 GitHub · GitLab · Bitbucket · Azure DevOps를 연결합니다.', 'Cloud 환경과 저장소 · 브랜치 · 목표를 지정합니다.', '완료 PR의 diff · 테스트 · 환경 로그를 검토하고 병합합니다.'], recommendation: '로컬 환경과 테스트 · 비밀 키 · 환경 변수를 맞춘 뒤 병렬 작업에 사용하세요.' },
+        { page: 41, category: '13 · AUTOMATION & COST', title: '자동화와 모델 선택은 반복 가치와 사용량을 함께 관리합니다', description: 'Cloud Agents는 반복 작업을 실행하고, 모델 · Auto 모드 · 사용량 대시보드로 비용을 관리합니다.', image: 'cursor-automation.png', steps: ['자동화할 작업을 먼저 로컬에서 반복 실행해 결과를 검증합니다.', '트리거 · 작업 지침 · 완료 조건 · 실패 알림을 명확히 설정합니다.', 'Usage와 실행 기록을 정기적으로 확인해 모델 · 빈도를 조정합니다.'], recommendation: 'PR 요약 · 의존성 점검 · 정기 보고처럼 반복 가치가 높은 검증된 업무부터 자동화하세요.' },
+        { page: 42, category: '14 · PRIVACY & WORKFLOW', title: '초보자의 표준 흐름은 작은 요청 → 계획 → 검증 → 커밋입니다', description: 'Privacy Mode와 최소 권한을 설정하고 작은 범위의 계획 · 실행 · 검토 · 테스트만 반복해 보안과 안전을 함께 확보합니다.', image: 'cursor-privacy.png', steps: ['Settings에서 Privacy Mode와 데이터 정책을 확인합니다.', '작은 범위의 목표 · 제약 · 테스트를 Agent에 요청합니다.', 'diff · 테스트 · 민감정보를 확인한 뒤 사람이 커밋 · 병합합니다.'], recommendation: '첫 실습은 함수 설명 → 테스트 1개 추가 → 실행 → diff 검토의 짧은 흐름으로 진행하세요.' }
+      ];
+
+      function buildToolPreview(page) {
+        if (page.image) {
+          return `<figure class="feature-image-card" data-no-slide-nav>
+            <div class="feature-image-frame">
+              <img src="./G_A_C_image/${page.image}" alt="${page.title} 화면" loading="lazy">
+            </div>
+          </figure>`;
+        }
+
+        const cells = page.preview.map((label) => `<div class="tool-preview-cell">${label}</div>`).join('');
+        return `<figure class="feature-image-card" data-no-slide-nav>
+          <div class="feature-image-frame">
+            <div class="tool-preview">
+              <div class="tool-preview-bar">Cursor · ${page.category}</div>
+              <div class="tool-preview-cells" style="--preview-columns:${page.preview.length}">${cells}</div>
+            </div>
+          </div>
+        </figure>`;
+      }
+
+      const pagesWithoutRecommendation = new Set([11, 13, 27, 30, 33, 42]);
+
+      function rebuildToolSessions() {
+        toolSessionPages.forEach((page) => {
+          const slide = document.querySelector(`.slide-card[data-slide="${page.page}"]`);
+          if (!slide) return;
+
+          const header = slide.querySelector('.slide-header');
+          const body = slide.querySelector('.slide-body');
+          if (!header || !body) return;
+
+          header.innerHTML = `<div class="slide-category">${page.category}</div><h2 class="slide-title">${page.title}</h2>`;
+          body.innerHTML = `
+            <div class="tool-detail-layout">
+              <section class="tool-info-column">
+                <div class="content-box-title">기능 설명</div>
+                <p style="margin-bottom: 12px;">${page.description}</p>
+                <div class="content-box-title tool-usage-title">사용법</div>
+                <div class="step-list">
+                  ${page.steps.map((step, index) => `<div class="step-item"><span class="step-number">${index + 1}</span><div>${step}</div></div>`).join('')}
+                </div>
+              </section>
+              ${buildToolPreview(page)}
+            </div>
+            ${pagesWithoutRecommendation.has(page.page) ? '' : `<div class="recommendation-box tool-recommendation"><strong>추천</strong><span>${page.recommendation}</span></div>`}`;
+        });
+      }
+
+      function normalizeBulletParagraphs() {
+        document.querySelectorAll('.slide-card p').forEach((paragraph) => {
+          if (!/^\s*•/.test(paragraph.textContent || '')) return;
+
+          const items = paragraph.innerHTML
+            .split(/<br\s*\/?>/i)
+            .map((item) => item.replace(/^\s*•\s*/, '').trim())
+            .filter(Boolean);
+
+          paragraph.classList.add('semantic-bullet-list');
+          paragraph.innerHTML = '';
+          items.forEach((item) => {
+            const row = document.createElement('span');
+            row.className = 'semantic-bullet';
+            row.innerHTML = `<span class="semantic-bullet-text">${item}</span>`;
+            paragraph.appendChild(row);
+          });
+        });
+      }
+
+      function prepareSlides() {
+        slides.forEach((slide, index) => {
+          const originalPage = Number(slide.dataset.slide);
+          const slideNumber = index + 1;
+          const title = slideTitlesByOriginalPage[originalPage - 1] || `페이지 ${slideNumber}`;
+
+          slide.dataset.originalSlide = originalPage;
+          slide.dataset.slide = slideNumber;
+          slide.dataset.title = title;
+          slide.setAttribute('tabindex', '0');
+          slide.setAttribute('role', 'group');
+          slide.setAttribute('aria-label', `${slideNumber} / ${totalSlides} · ${title}`);
+if (slideNumber > 1 && slideNumber < totalSlides) {
+            const hint = document.createElement('div');
+            hint.className = 'card-next-hint';
+            hint.textContent = '카드를 클릭하면 다음 내용으로 이동합니다 ↓';
+            slide.appendChild(hint);
+          }
+        });
+      }
+
+      function createGroupHeader(text) {
+        const header = document.createElement('div');
+        header.className = 'session-group-title';
+        header.textContent = text;
+        agendaNav.appendChild(header);
+      }
+
+      function initSidebar() {
+        slides.forEach((slide, index) => {
+          const slideNumber = index + 1;
+          const originalPage = Number(slide.dataset.originalSlide);
+          if (groupLabels.has(originalPage)) createGroupHeader(groupLabels.get(originalPage));
+
+          const item = document.createElement('div');
+          item.className = `agenda-item ${slideNumber === 1 ? 'active' : ''}`;
+          item.dataset.slide = slideNumber;
+          item.title = slide.dataset.title;
+          item.innerHTML = `<span class="page-num">${String(slideNumber).padStart(2, '0')}</span><span>${slide.dataset.title}</span>`;
+          item.addEventListener('click', (event) => {
+            event.stopPropagation();
+            goToSlide(slideNumber);
+          });
+          agendaNav.appendChild(item);
+        });
+      }
+
+      function goToSlide(slideNumber) {
+        if (slideNumber < 1 || slideNumber > totalSlides) return;
+
+        slides.forEach((slide) => slide.classList.remove('active'));
+        const targetSlide = slides[slideNumber - 1];
+        targetSlide.classList.add('active');
+        const body = targetSlide.querySelector('.slide-body');
+        if (body) body.scrollTop = 0;
+        currentSlide = slideNumber;
+
+        const percent = Math.round((currentSlide / totalSlides) * 100);
+        progressBar.style.width = `${percent}%`;
+        progressPercent.textContent = `${percent}%`;
+        pageIndicator.textContent = `${String(currentSlide).padStart(2, '0')} / ${totalSlides}`;
+
+        document.querySelectorAll('.agenda-item').forEach((item) => {
+          const isActive = Number(item.dataset.slide) === currentSlide;
+          item.classList.toggle('active', isActive);
+          if (isActive) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        targetSlide.focus({ preventScroll: true });
+      }
+
+      mainStage.addEventListener('click', (event) => {
+        if (currentSlide === totalSlides) return;
+        if (event.target.closest('a, button, input, textarea, select, pre, code, [data-no-slide-nav]')) return;
+        if (window.getSelection()?.toString()) return;
+        goToSlide(currentSlide + 1);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        const tagName = document.activeElement?.tagName;
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tagName)) return;
+
+        if (event.key === 'ArrowRight' || event.key === ' ' || event.key === 'PageDown') {
+          event.preventDefault();
+          goToSlide(currentSlide + 1);
+        } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+          event.preventDefault();
+          goToSlide(currentSlide - 1);
+        }
+      });
+
+      rebuildToolSessions();
+      normalizeBulletParagraphs();
+      prepareSlides();
+      initSidebar();
+      goToSlide(1);
+    })();
+  </script>
+</body>
+</html>

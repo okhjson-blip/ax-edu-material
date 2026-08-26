@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AX: AI와 협업하는 미래 | Samsung Electronics AX Consulting</title>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --primary-light: #1e293b;
+      --accent: #2563eb;
+      --accent-cyan: #06b6d4;
+      --accent-hover: #1d4ed8;
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+      word-break: keep-all;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 280px;
+      background-color: var(--primary);
+      color: #ffffff;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      padding: 1.5rem 1rem;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar-header .brand {
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .sidebar-header h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+      color: #ffffff;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.65rem 0.85rem;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link .badge {
+      font-size: 0.7rem;
+      background: var(--accent);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 8px;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: 280px;
+      flex: 1;
+      padding: 2.5rem;
+      max-width: 1200px;
+    }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 3rem 2.5rem;
+      border-radius: var(--radius);
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "AX";
+      position: absolute;
+      right: -20px;
+      bottom: -40px;
+      font-size: 12rem;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.03);
+      pointer-events: none;
+    }
+
+    .hero-subtitle {
+      color: var(--accent-cyan);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 1rem;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: #cbd5e1;
+      max-width: 750px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+    }
+
+    /* Section Component */
+    .section {
+      margin-bottom: 3.5rem;
+      scroll-margin-top: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .section-num {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Cards & Layouts */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--primary);
+    }
+
+    .card-text {
+      font-size: 0.95rem;
+      color: #475569;
+    }
+
+    .keyword-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.1rem;
+      margin-bottom: 0;
+    }
+
+    .keyword-tile {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 1.05rem 1.15rem;
+      font-size: clamp(1rem, 1.15vw, 1.12rem);
+      line-height: 1.55;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    .keyword-tile strong {
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    .keyword-tile span {
+      display: block;
+      color: #334155;
+    }
+
+    @media (max-width: 900px) {
+      .keyword-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Comparison Table & Cards */
+    .table-container {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: var(--primary);
+      font-weight: 700;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: #334155;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    /* Custom Accent Boxes */
+    .box-highlight {
+      background: #f7fee7;
+      border-left: 4px solid #65a30d;
+      padding: 1.25rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .box-highlight h4 {
+      color: #1a2e05;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .box-dark {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+    }
+
+    .box-dark h4 {
+      color: var(--accent-cyan);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Steps & Process Flow */
+    .steps-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .step-box {
+      flex: 1;
+      min-width: 200px;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-top: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .step-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    .step-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Badge Pills */
+    .pill {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 12px;
+      margin-right: 0.3rem;
+      margin-bottom: 0.3rem;
+    }
+    .pill-blue { background: #dbeafe; color: #1e40af; }
+    .pill-green { background: #dcfce7; color: #166534; }
+    .pill-purple { background: #f3e8ff; color: #6b21a8; }
+    .pill-amber { background: #fef3c7; color: #92400e; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      border-top: 1px solid var(--border-color);
+      margin-top: 3rem;
+    }
+
+    /* Responsive Mobile Styles */
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+        padding: 1rem;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 1.25rem;
+      }
+      .hero-title {
+        font-size: 1.7rem;
+      }
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 15-inch laptop presentation layout */
+    :root {
+      --sidebar-width: clamp(240px, 18vw, 280px);
+      --content-gutter: clamp(1.5rem, 3vw, 3.5rem);
+      --slide-height: 82vh;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 1.5rem;
+    }
+
+    body {
+      display: block;
+      background:
+        radial-gradient(circle at 88% 8%, rgba(37, 99, 235, 0.08), transparent 26rem),
+        var(--bg-body);
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      padding: clamp(1.25rem, 2.5vh, 2rem) 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      margin-bottom: 1rem;
+      padding: 0.25rem 0.5rem 1.25rem;
+    }
+
+    .agenda-title {
+      margin: 0.35rem 0 0.75rem;
+      padding: 0 0.75rem;
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 1.25rem;
+    }
+
+    .back-home {
+      display: inline-block;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .back-home:hover {
+      color: #ffffff;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .nav-item {
+      margin-bottom: 0;
+    }
+
+    .nav-link {
+      min-height: 3rem;
+      padding: 0.7rem 0.75rem;
+      line-height: 1.35;
+    }
+
+    .main-content {
+      width: calc(100% - var(--sidebar-width));
+      max-width: none;
+      margin-left: var(--sidebar-width);
+      padding: var(--content-gutter);
+    }
+
+    .hero {
+      min-height: var(--slide-height);
+      padding: clamp(3rem, 7vw, 7rem);
+      margin-bottom: clamp(3rem, 8vh, 6rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 20px;
+    }
+
+    .hero-title {
+      max-width: 900px;
+      font-size: clamp(2.4rem, 4.5vw, 4.8rem);
+      letter-spacing: -0.035em;
+    }
+
+    .hero-desc {
+      max-width: 900px;
+      font-size: clamp(1rem, 1.4vw, 1.35rem);
+      line-height: 1.75;
+    }
+
+    .section {
+      margin-bottom: clamp(4rem, 10vh, 8rem);
+      scroll-margin-top: 1.5rem;
+    }
+
+    .section-header {
+      min-height: 5rem;
+      margin-bottom: clamp(1.5rem, 4vh, 3rem);
+      padding: 0 0 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.35rem, 2.2vw, 2.15rem);
+      line-height: 1.35;
+      letter-spacing: -0.025em;
+    }
+
+    .section-header.agenda-source {
+      display: none;
+    }
+
+    .card-agenda {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: clamp(1rem, 2vh, 1.5rem);
+      padding-bottom: clamp(0.75rem, 1.5vh, 1rem);
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+    }
+
+    .card-agenda .section-num {
+      flex: 0 0 auto;
+    }
+
+    .card-agenda .section-title {
+      min-width: 0;
+      margin: 0;
+      font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+      line-height: 1.3;
+      text-wrap: balance;
+      word-break: keep-all;
+    }
+
+    .box-dark .card-agenda {
+      border-bottom-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .box-dark .card-agenda .section-title {
+      color: #ffffff;
+    }
+
+    .value-board .card-agenda {
+      grid-column: 1 / -1;
+    }
+
+    .presentation-card {
+      position: relative;
+    }
+
+    .card-next-hint {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      min-height: 42px;
+      padding: 0 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.45rem;
+      color: var(--text-muted);
+      border-top: 1px solid #edf2f7;
+      background: rgba(248, 250, 252, 0.96);
+      font-size: clamp(0.78rem, 0.9vw, 0.9rem);
+      line-height: 1.4;
+      pointer-events: none;
+    }
+
+    .card-next-hint .down-arrow {
+      color: var(--accent);
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .box-dark .card-next-hint {
+      color: rgba(255, 255, 255, 0.74);
+      border-top-color: rgba(255, 255, 255, 0.14);
+      background: rgba(15, 23, 42, 0.92);
+    }
+
+    /* Top-level cards become full presentation panels. Nested grids stay compact. */
+    .section > .grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(2.5rem, 8vh, 6rem);
+      margin-bottom: clamp(2.5rem, 8vh, 6rem);
+    }
+
+    .section > .card,
+    .section > .grid > .card,
+    .section > .box-dark,
+    .section > div[style*="text-align:center"] {
+      min-height: var(--slide-height);
+      scroll-margin-block: 0;
+    }
+
+    .section > .card,
+    .section > .grid > .card {
+      padding: clamp(2.25rem, 4.5vw, 5rem);
+      margin-top: 0 !important;
+      margin-bottom: clamp(2.5rem, 8vh, 6rem) !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 20px;
+      box-shadow: 0 18px 50px -28px rgba(15, 23, 42, 0.38);
+      overflow: hidden;
+    }
+
+    .section > .card:hover,
+    .section > .grid > .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 24px 65px -30px rgba(15, 23, 42, 0.48);
+    }
+
+    .hero,
+    .section > .card,
+    .section > .grid > .card,
+    .section > .box-dark,
+    .section > div[style*="text-align:center"] {
+      cursor: pointer;
+    }
+
+    .section > .card .card-tag,
+    .section > .grid > .card .card-tag {
+      margin-bottom: clamp(0.6rem, 1.5vh, 1rem);
+      font-size: clamp(0.76rem, 0.9vw, 0.9rem);
+    }
+
+    .section > .card .card-title,
+    .section > .grid > .card .card-title {
+      margin-bottom: clamp(0.85rem, 2vh, 1.35rem);
+      font-size: clamp(1.4rem, 2.05vw, 1.9rem) !important;
+      line-height: 1.3;
+      letter-spacing: -0.025em;
+    }
+
+    .section > .card > .grid .card-title,
+    .section > .grid > .card > .grid .card-title {
+      font-size: clamp(1.12rem, 1.35vw, 1.28rem) !important;
+      margin-bottom: 0.45rem;
+    }
+
+    .section > .card .card-text,
+    .section > .grid > .card .card-text,
+    .section > .card li,
+    .section > .grid > .card li {
+      font-size: clamp(1.02rem, 1.2vw, 1.16rem) !important;
+      line-height: 1.7;
+    }
+
+    .section > .card .body-copy,
+    .section > .grid > .card .body-copy {
+      font-size: clamp(1.02rem, 1.2vw, 1.16rem);
+      line-height: 1.7;
+      color: #334155;
+    }
+
+    .as-is-box {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      background: #f1f5f9;
+      padding: 1rem 1.15rem;
+      border-radius: 10px;
+    }
+
+    .as-is-box .label {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .as-is-box .value {
+      display: block;
+      margin-top: 0.2rem;
+      font-size: clamp(1.15rem, 1.5vw, 1.32rem);
+      font-weight: 800;
+    }
+
+    .as-is-box .arrow {
+      font-size: 1.45rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .box-dark h4 {
+      font-size: clamp(1.2rem, 1.55vw, 1.4rem);
+      margin-bottom: 0.6rem;
+    }
+
+    .box-dark p {
+      font-size: clamp(1.02rem, 1.2vw, 1.14rem);
+      line-height: 1.7;
+      color: #cbd5e1;
+    }
+
+    .section > .card .grid,
+    .section > .grid > .card .grid {
+      gap: clamp(0.8rem, 1.4vw, 1.5rem);
+    }
+
+    .section > .card .steps-container,
+    .section > .grid > .card .steps-container {
+      gap: clamp(0.85rem, 1.5vw, 1.5rem);
+    }
+
+    .section > .card .step-box,
+    .section > .grid > .card .step-box {
+      min-height: 11rem;
+      padding: clamp(1.1rem, 1.8vw, 1.7rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .section > .card .step-title,
+    .section > .grid > .card .step-title {
+      font-size: clamp(1.08rem, 1.3vw, 1.28rem);
+    }
+
+    .section > .card .step-desc,
+    .section > .grid > .card .step-desc,
+    .section > .card table,
+    .section > .grid > .card table {
+      font-size: clamp(0.98rem, 1.12vw, 1.1rem);
+      line-height: 1.65;
+    }
+
+    .section > .card th,
+    .section > .card td,
+    .section > .grid > .card th,
+    .section > .grid > .card td {
+      padding: clamp(0.75rem, 1.5vh, 1.1rem) clamp(0.8rem, 1.4vw, 1.3rem);
+    }
+
+    .section > .box-dark {
+      padding: clamp(2.5rem, 5vw, 5rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 20px;
+    }
+
+    .section > .grid > .card.value-board {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      align-items: stretch;
+      gap: clamp(1.5rem, 3.5vw, 3rem);
+      padding: clamp(2.5rem, 5vw, 4.5rem) clamp(2rem, 4vw, 4rem);
+    }
+
+    .value-zone {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .value-zone .card-tag {
+      font-size: clamp(0.85rem, 1.1vw, 1rem) !important;
+      margin-bottom: 0.85rem;
+    }
+
+    .value-zone .card-title {
+      font-size: clamp(1.7rem, 2.8vw, 2.45rem) !important;
+      margin-bottom: 1rem !important;
+    }
+
+    .value-zone .card-text {
+      font-size: clamp(1.2rem, 1.85vw, 1.55rem) !important;
+      line-height: 1.85 !important;
+    }
+
+    .value-divider {
+      background: #cbd5e1;
+      width: 1px;
+    }
+
+    .outro-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: var(--slide-height);
+      padding: 2.5rem 2rem;
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      margin-top: 1.5rem;
+    }
+
+    .outro-card .quote {
+      max-width: 46rem;
+      font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.55;
+      margin-bottom: 1.25rem;
+    }
+
+    .outro-card .thanks {
+      color: var(--accent);
+      font-weight: 800;
+      font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+      letter-spacing: -0.03em;
+    }
+
+    .outro-card .credit {
+      margin-top: 0.85rem;
+      font-size: clamp(0.95rem, 1.15vw, 1.1rem);
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      .section > .grid > .card.value-board {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .value-divider {
+        width: 100%;
+        height: 1px;
+      }
+    }
+
+    @media (max-width: 1100px) and (min-width: 901px) {
+      :root {
+        --sidebar-width: 230px;
+        --content-gutter: 1.5rem;
+      }
+
+      .section > .card,
+      .section > .grid > .card {
+        padding: clamp(1.75rem, 3vw, 3rem);
+      }
+
+      .nav-link {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 900px) {
+      :root {
+        --slide-height: auto;
+      }
+
+      body {
+        display: flex;
+      }
+
+      .sidebar {
+        width: 100%;
+        position: relative;
+      }
+
+      .main-content {
+        width: 100%;
+        margin-left: 0;
+        padding: 1.25rem;
+      }
+
+      .hero,
+      .section > .card,
+      .section > .grid > .card,
+      .section > .box-dark,
+      .section > div[style*="text-align:center"] {
+        min-height: auto;
+      }
+
+      .section > .card,
+      .section > .grid > .card {
+        padding: 1.5rem;
+      }
+
+      .section > .card .steps-container,
+      .section > .grid > .card .steps-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">Samsung Electronics</div>
+      <h1>AX Consulting Basic Guide</h1>
+    </div>
+    <div class="agenda-title">Agenda</div>
+    <ul class="nav-list">
+      <li class="nav-item"><a href="#part1" class="nav-link"><span class="badge">01</span> AX 패러다임의 이해</a></li>
+      <li class="nav-item"><a href="#part2" class="nav-link"><span class="badge">02</span> AI 핵심 기술의 이해</a></li>
+      <li class="nav-item"><a href="#part3" class="nav-link"><span class="badge">03</span> AI 코딩 트렌드 & 역할</a></li>
+      <li class="nav-item"><a href="#part4" class="nav-link"><span class="badge">04</span> 사람과 AI의 협업 방법론</a></li>
+      <li class="nav-item"><a href="#part5" class="nav-link"><span class="badge">05</span> 조직 차원의 AX 추진 전략</a></li>
+      <li class="nav-item"><a href="#part6" class="nav-link"><span class="badge">06</span> 기업 도입 전략과 성과</a></li>
+      <li class="nav-item"><a href="#part7" class="nav-link"><span class="badge">07</span> 실행 로드맵 & 미래 전망</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a class="back-home" href="/" target="_top">목록으로</a>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="hero-subtitle">SAMSUNG ELECTRONICS AX CONSULTING | BASIC GUIDE</div>
+      <h1 class="hero-title">AX: AI와 협업하는 미래</h1>
+      <p class="hero-desc">AI를 쓰는 사람에서, AI와 일하는 사람으로</p>
+      <div class="hero-meta">
+        <span>개념 이해</span> • <span>실무 협업</span> • <span>조직 추진 전략</span> • <span>실행 로드맵</span>
+      </div>
+    </header>
+
+    <!-- PART 01 -->
+    <section id="part1" class="section">
+      <div class="section-header">
+        <span class="section-num">PART 01</span>
+        <h2 class="section-title">AX 패러다임의 이해 (Understanding the AX Paradigm Shift)</h2>
+      </div>
+
+      <!-- Definition & 3 Steps -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <span class="card-tag">01 · DEFINITION</span>
+        <h3 class="card-title">AX (AI Transformation)란 무엇인가</h3>
+        <p class="card-text" style="font-size: 1.05rem; margin-bottom: 1.25rem;">
+          <strong>AX (AI Transformation):</strong> 단순히 AI 프로그램을 하나 더 설치하는 것이 아니라, <strong>일하는 방식 자체에 AI를 자연스럽게 포함시키는 혁신</strong>
+        </p>
+
+        <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--primary);">일하는 방식의 3단계 진화 과정</h4>
+        <div class="steps-container">
+          <div class="step-box">
+            <div class="step-num">1</div>
+            <div class="step-title">수작업 시대</div>
+            <div class="step-desc">모든 업무를 사람이 직접 하나씩 처리하는 방식</div>
+          </div>
+          <div class="step-box">
+            <div class="step-num">2</div>
+            <div class="step-title">단순 AI 사용</div>
+            <div class="step-desc">기존 업무에 AI 도구를 부분적으로 추가해 보조 활용</div>
+          </div>
+          <div class="step-box" style="border-top-color: var(--accent-cyan); background: #f0fdf4;">
+            <div class="step-num" style="color: #16a34a;">3 ★ 목표</div>
+            <div class="step-title">AX (AI 내재화)</div>
+            <div class="step-desc">AI와 한 팀이 되어 일하는 방식을 전면 재설계하는 단계</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mindset Table -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <span class="card-tag">01 · MINDSET</span>
+        <h3 class="card-title">AI에 대한 흔한 오해와 실제 진실</h3>
+        <div class="table-container" style="margin-bottom: 0;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 50%; color: #ef4444;">✕ 흔한 오해</th>
+                <th style="width: 50%; color: #10b981;">✓ 실제 진실</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AI는 사람의 일자리를 전부 빼앗는 무서운 로봇이다.</td>
+                <td>AI는 내가 시키는 지시를 빠르게 돕는 <strong>‘똑똑한 비서’</strong>입니다.</td>
+              </tr>
+              <tr>
+                <td>AI는 알아서 알아채고 대답해주는 만능 기계다.</td>
+                <td><strong>내가 잘 지시할수록</strong> 훨씬 더 나은 결과를 만들어냅니다.</td>
+              </tr>
+              <tr>
+                <td>기술을 잘 모르면 AI를 절대로 쓸 수 없다.</td>
+                <td>어려운 코딩 없이 <strong>‘일상 언어(말)’</strong>로 충분히 쓸 수 있습니다.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Paradigm Shift & 4 Overview Features -->
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="card-tag">01 · PARADIGM SHIFT</span>
+          <h3 class="card-title">AX 패러다임 시프트</h3>
+          <p class="card-text" style="margin-bottom: 1rem;">
+            <strong>"AI를 쓰는 사람에서 AI와 일하는 사람으로의 근본적 전환"</strong><br>
+            기업 운영·전략에 AI 기술을 통합해 효율성 증대 및 신규 가치를 창출하는 혁신 전략입니다.
+          </p>
+          <div class="as-is-box">
+            <div style="text-align: center; flex: 1;">
+              <div class="label">AS-IS</div>
+              <strong class="value" style="color: #ef4444;">AI를 쓰는 사람</strong>
+            </div>
+            <div class="arrow">➔</div>
+            <div style="text-align: center; flex: 1;">
+              <div class="label">TO-BE</div>
+              <strong class="value" style="color: var(--accent);">AI와 일하는 사람</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">01 · OVERVIEW</span>
+          <h3 class="card-title">비즈니스 지형도를 바꾸는 AX 4대 특징</h3>
+          <ul style="padding-left: 1.2rem; font-size: 0.9rem; color: #334155;">
+            <li style="margin-bottom: 0.5rem;"><strong>01. AI, 비즈니스 지형도를 바꾸다:</strong> 지적 능력을 증강하는 파트너로 진화</li>
+            <li style="margin-bottom: 0.5rem;"><strong>02. 개발 패러다임·역할 변화:</strong> 코딩 기술력 → 아이디어 표현력 중심으로 이동</li>
+            <li style="margin-bottom: 0.5rem;"><strong>03. AX 추진 전략:</strong> Top-down × Bottom-up의 상호 보완적 결합</li>
+            <li style="margin-bottom: 0.5rem;"><strong>04. AI 활용의 진화 단계:</strong> AI-Aware에서 AI-Native까지 완전 내재화</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 02 -->
+    <section id="part2" class="section">
+      <div class="section-header">
+        <span class="section-num">PART 02</span>
+        <h2 class="section-title">AI를 움직이는 핵심 기술의 이해 (Core AI Technology)</h2>
+      </div>
+
+      <!-- Core Concept & Model Tiers -->
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="card-tag">02 · CORE CONCEPT</span>
+          <h3 class="card-title">인간의 뇌 vs 최첨단 AI : 파라미터와 시냅스</h3>
+          <p class="card-text" style="margin-bottom: 1rem;">
+            AI 파라미터는 인간 뇌의 시냅스와 유사한 가중치 역할을 수행합니다.
+          </p>
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <div style="flex:1; background:#f8fafc; padding:1rem; border-radius:8px; text-align:center; border:1px solid var(--border-color);">
+              <div style="font-size:0.8rem; color:var(--text-muted);">인간 대뇌피질 시냅스</div>
+              <div style="font-size:1.5rem; font-weight:800; color:var(--primary);">약 150T</div>
+            </div>
+            <div style="flex:1; background:#eff6ff; padding:1rem; border-radius:8px; text-align:center; border:1px solid #bfdbfe;">
+              <div style="font-size:0.8rem; color:var(--accent);">최첨단 AI 파라미터</div>
+              <div style="font-size:1.5rem; font-weight:800; color:var(--accent);">약 1.8T</div>
+            </div>
+          </div>
+          <p class="card-text" style="font-size: 0.85rem;">
+            ➔ 인간 뇌가 현존 최고 AI보다 <strong>최소 80배 이상 복잡하고 거대함</strong>.<br>
+            ※ 구조적 특징: 세포 80%는 소뇌에 있으나, 인지와 학습은 ‘대뇌피질’이 시냅스를 독식해 처리.
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">02 · HOW LLM WORKS</span>
+          <h3 class="card-title">LLM 문장 생성 원리 & Attention</h3>
+          <p class="card-text" style="font-size:0.85rem; margin-bottom:0.75rem;">
+            <strong>생성 6단계:</strong> 1. 입력 문장 ➔ 2. 토큰화 ➔ 3. 임베딩 ➔ 4. Transformer ➔ 5. Softmax ➔ 6. 토큰 선택
+          </p>
+          <div style="background:#f1f5f9; padding:0.75rem; border-radius:8px; font-size:0.85rem;">
+            <strong>Attention 메커니즘 (Query · Key · Value):</strong>
+            <ul style="padding-left:1.2rem; margin-top:0.3rem;">
+              <li><strong>Query (질문):</strong> "찾고자 하는 핵심 정보는 무엇인가?"</li>
+              <li><strong>Key (특징):</strong> "내가 가진 정보의 특징 레이블"</li>
+              <li><strong>Value (내용):</strong> "실제 전달되는 컨텍스트 의미 값"</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Tiers Table -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <span class="card-tag">02 · MODEL TIERS</span>
+        <h3 class="card-title">목적별 최신 AI 체급 및 파라미터 현황</h3>
+        <div class="table-container" style="margin-bottom:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>체급 분류</th>
+                <th>대표 모델</th>
+                <th>파라미터 수</th>
+                <th>특징 및 용도</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>초거대형 모델 (Trillions)</strong></td>
+                <td>OpenAI GPT-4</td>
+                <td>약 1.8T</td>
+                <td>최고 수준의 추론·문제 해결 능력, 기업용 최상위 플래그십</td>
+              </tr>
+              <tr>
+                <td><strong>중·대형 오픈소스 (100B+)</strong></td>
+                <td>Llama 3.1 405B / DeepSeek V3</td>
+                <td>405B / 671B</td>
+                <td>연구 및 자체 서버 구축용 상위 모델 (상용 AI에 필적)</td>
+              </tr>
+              <tr>
+                <td><strong>경량화 모델 SLM (Billions)</strong></td>
+                <td>Llama 3 8B / GPT-4o mini</td>
+                <td>8B 내외</td>
+                <td>가성비 및 응답 속도 극대화, 개인 PC·소규모 서비스용</td>
+              </tr>
+              <tr>
+                <td><strong>초소형/온디바이스 (Mobile)</strong></td>
+                <td>Google Gemini Nano</td>
+                <td>1.8B ~ 3.2B</td>
+                <td>인터넷 연결 없이 기기 내부에서 즉시 처리 (번역/요약 등)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Output Formats & Agentic AI -->
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="card-tag">02 · OUTPUT FORMATS</span>
+          <h3 class="card-title">AI로 즉시 생성 가능한 실무 결과물 포맷</h3>
+          <ul style="padding-left:1.2rem; font-size:0.9rem; color:#334155; margin-bottom:1rem;">
+            <li><strong>1. 문서/텍스트:</strong> 기획서, Markdown(.md), JSON(.json)</li>
+            <li><strong>2. 코드/데이터:</strong> Python 자동화, C/C++ 최적화 코드</li>
+            <li><strong>3. 멀티미디어:</strong> 일러스트·로고, 영상 클립, TTS 인간 음성</li>
+          </ul>
+          <div class="box-highlight" style="margin-bottom:0;">
+            <h4>💡 AI는 왜 PPTX보다 HTML을 잘 만들까?</h4>
+            <p style="font-size:0.85rem; color:#334155;">
+              • <strong>압도적 학습 데이터:</strong> 전 세계 수십억 개 웹 소스(HTML/CSS) 학습<br>
+              • <strong>반응형 유연성:</strong> 텍스트 크기에 맞춰 자동 정렬 (PPTX 고정좌표 한계 극복)<br>
+              • <strong>표현력:</strong> CSS 애니메이션과 그라데이션 구현 능력이 월등함
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">02 · AGENTIC AI</span>
+          <h3 class="card-title">차세대 AI 아키텍처 : 자율형 에이전트</h3>
+          <p class="card-text" style="margin-bottom: 1rem;">
+            단일 프로그램에서 다른 AI를 스스로 통제하는 자율형 에이전트로의 진화
+          </p>
+          <div style="background:#f8fafc; padding:0.85rem; border-radius:8px; border:1px solid var(--border-color); margin-bottom:0.75rem;">
+            <strong style="color:var(--primary);">Type A : Standalone Program</strong>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Developer AI ➔ Generates Code (단발성 생성 후 종료)</p>
+          </div>
+          <div style="background:#eff6ff; padding:0.85rem; border-radius:8px; border:1px solid #bfdbfe;">
+            <strong style="color:var(--accent);">Type B : Agentic Program (자율형)</strong>
+            <p style="font-size:0.85rem; color:#1e40af;">Developer AI ⇄ Calls Called AI During Runtime / Returns Results (실행 중 타 AI 지속 호출·통제)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Token Basics, Snowball, Pricing, Benchmark -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <span class="card-tag">02 · TOKEN & PRICING</span>
+        <h3 class="card-title">토큰(Token) 개념, 비용 구조 및 스노우볼 효과</h3>
+        <p class="card-text" style="margin-bottom: 1rem;">
+          • <strong>개념:</strong> AI가 언어를 이해하고 연산하는 최소 텍스트 조각 단위<br>
+          • <strong>한글 특징:</strong> 자모 결합 특성상 영어 대비 토큰 소모량이 <strong>2~3배 더 큼</strong><br>
+          • <strong>비용 구조:</strong> Input과 Output 모두 과금되며, AI가 생성하는 <strong>Output 토큰이 약 5배 더 비쌈</strong>
+        </p>
+
+        <h4 style="font-size:0.95rem; margin-top:1rem; margin-bottom:0.5rem;">대화 누적의 함정 : 토큰 스노우볼 효과 (예시)</h4>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>진행 단계</th>
+                <th>시스템 내부 전송 데이터 (과거 대화 누적)</th>
+                <th>턴당 소모</th>
+                <th>총 누적 비용</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1턴</strong></td>
+                <td>질문1(100) → 답변1(200)</td>
+                <td>300</td>
+                <td>300</td>
+              </tr>
+              <tr>
+                <td><strong>2턴</strong></td>
+                <td>[질문1+답변1] + 질문2(100) → 답변2(200)</td>
+                <td>600</td>
+                <td>900</td>
+              </tr>
+              <tr>
+                <td><strong>3턴</strong></td>
+                <td>[질문1+답변1+질문2+답변2] + 질문3(100) → 답변3(200)</td>
+                <td>900</td>
+                <td><strong>1,800</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:0.85rem; color:#ef4444; font-weight:600;">
+          ➔ 한 번에 질문했다면 900토큰으로 끝날 일을, 나누어 질문하여 과거 데이터 재전송으로 비용이 6배 폭증 (총 1,800 토큰 소모)
+        </p>
+      </div>
+
+      <!-- Platform Pricing & Benchmarks -->
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="card-tag">02 · PLATFORMS</span>
+          <h3 class="card-title">3대 AI 플랫폼 엔터프라이즈 요금제 비교</h3>
+          <div class="table-container" style="margin-bottom:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>플랫폼</th>
+                  <th>웹 브라우저 / 터미널</th>
+                  <th>핵심 요약</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Claude</strong></td>
+                  <td>종량제 (토큰 실시간 누적)</td>
+                  <td>쓴 만큼 비용 발생 / 대화방 청소 필수</td>
+                </tr>
+                <tr>
+                  <td><strong>ChatGPT</strong></td>
+                  <td>웹: 정액 무제한 / CLI: 고정 쿼터제</td>
+                  <td>웹은 무제한, CLI는 정해진 배터리</td>
+                </tr>
+                <tr>
+                  <td><strong>Gemini</strong></td>
+                  <td>타임 윈도우 리셋형 / API Quota</td>
+                  <td>비용 무과금이나 몰아 쓰면 쿨타임</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">02 · BENCHMARK 2026</span>
+          <h3 class="card-title">2026 AI 코딩 벤치마크 (SWE-Bench)</h3>
+          <ul style="list-style:none; font-size:0.9rem;">
+            <li style="padding:0.4rem 0; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;">
+              <span><strong>Claude Opus 4.5 / 4.6</strong></span>
+              <span class="pill pill-blue">83.3%</span>
+            </li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;">
+              <span><strong>GPT-5.2 (OpenAI)</strong></span>
+              <span class="pill pill-purple">81.3%</span>
+            </li>
+            <li style="padding:0.4rem 0; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;">
+              <span><strong>Kimi 3 (Moonshot AI)</strong></span>
+              <span class="pill pill-green">78.9%</span>
+            </li>
+            <li style="padding:0.4rem 0; display:flex; justify-content:space-between;">
+              <span><strong>Gemini 3 Pro (Google)</strong></span>
+              <span class="pill pill-amber">77.6%</span>
+            </li>
+          </ul>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.75rem;">
+            결론: Claude 계열 모델이 코드 품질과 자율 에이전트 완성도에서 두루 우수.
+          </p>
+        </div>
+      </div>
+
+      <!-- Practical Tips Box -->
+      <div class="card" style="margin-top:1.5rem; background:#f8fafc;">
+        <span class="card-tag">02 · PRACTICAL TIPS</span>
+        <h3 class="card-title">실무 맞춤형 토큰 절약 및 최적화 팁</h3>
+        <div class="grid grid-2" style="margin-bottom:0;">
+          <div>
+            <h4 style="font-size:0.9rem; color:var(--primary); margin-bottom:0.5rem;">🌐 일반 대화 (Web) 최적화</h4>
+            <ul style="font-size:0.85rem; color:#475569; padding-left:1rem;">
+              <li><strong>방 자주 파기:</strong> 대화 누적 시 토큰 폭증, Claude 필수 습관</li>
+              <li><strong>체급 낮추기:</strong> 단순 작업은 소형 모델 활용</li>
+              <li><strong>무제한 활용:</strong> ChatGPT 웹 환경은 아이디에이션에 아낌없이 사용</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="font-size:0.9rem; color:var(--primary); margin-bottom:0.5rem;">💻 터미널/CLI 에이전트 최적화</h4>
+            <ul style="font-size:0.85rem; color:#475569; padding-left:1rem;">
+              <li><strong>쿼터 아끼기:</strong> 핵심 코딩 작업에 집중 가동</li>
+              <li><strong>무시 파일 & 초기화:</strong> .gitignore 활용, 한 기능 완료 시 `/clear`</li>
+              <li><strong>4대 금기:</strong> 모델/생각/도구/설정 중간 변경 절대 금지 (캐시 파괴)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 03 -->
+    <section id="part3" class="section">
+      <div class="section-header">
+        <span class="section-num">PART 03</span>
+        <h2 class="section-title">AI 코딩 트렌드와 역할 변화 (Coding Trends & Developer Role)</h2>
+      </div>
+
+      <!-- 3 Trends -->
+      <div class="grid grid-3">
+        <div class="card">
+          <span class="card-tag">TREND 01</span>
+          <h3 class="card-title">멀티모델 기반 코딩</h3>
+          <p class="card-text">
+            ChatGPT, Gemini, Claude 중 상황에 맞게 최적 모델을 선택·조합하는 역량이 핵심 경쟁력
+          </p>
+          <div class="body-copy" style="margin-top:0.75rem; color:var(--text-muted);">
+            • ChatGPT: 범용 추론<br>• Gemini: 멀티모달 & 생태계<br>• Claude: 코드 품질 & 장문
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">TREND 02</span>
+          <h3 class="card-title">Vibe Coding (바이브 코딩)</h3>
+          <p class="card-text">
+            2025년 Andrej Karpathy가 제안. 코딩 지식 없이도 자연어로 원하는 바를 설명하면 AI가 설계·구현 대행
+          </p>
+          <div class="body-copy" style="margin-top:0.75rem; background:#eff6ff; padding:0.7rem; border-radius:6px; text-align:center; color:var(--accent);">
+            자연어 설명 ➔ AI 설계/구현 ➔ 완성된 앱
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">TREND 03</span>
+          <h3 class="card-title">AI 에이전트의 진화</h3>
+          <p class="card-text">
+            단순 보조 도구에서 스스로 <strong>추론(Reasoning) ➔ 계획(Planning) ➔ 실행(Execution)</strong>을 수행하는 자율 주체로 확대
+          </p>
+        </div>
+      </div>
+
+      <!-- Paradigm & Role Redefinition -->
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="card-tag">03 · PARADIGM SHIFT</span>
+          <h3 class="card-title">개발 패러다임의 변화</h3>
+          <p class="card-text" style="margin-bottom:1rem;">
+            무게중심의 이동: <strong>"코딩 기술력" ➔ "아이디어의 가치 · 표현력"</strong>
+          </p>
+          <div class="body-copy">
+            • AI가 반복적이고 지루한 구현 작업을 대행<br>
+            • 사람은 아키텍처 설계, 복잡한 문제 해결, UX 최적화 등 고차원적 역할에 집중
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">03 · ROLE REDEFINITION</span>
+          <h3 class="card-title">개발자(실무자) 역할의 재정의</h3>
+          <div class="body-copy" style="display:flex; flex-direction:column; gap:0.55rem;">
+            <div style="background:#f1f5f9; padding:0.7rem 0.85rem; border-radius:8px;">
+              <strong>1. AI 오케스트레이터:</strong> 다수의 AI 도구·모델을 지휘
+            </div>
+            <div style="background:#f1f5f9; padding:0.7rem 0.85rem; border-radius:8px;">
+              <strong>2. 품질 큐레이터:</strong> 결과물의 완성도와 신뢰성 검증·개선
+            </div>
+            <div style="background:#f1f5f9; padding:0.7rem 0.85rem; border-radius:8px;">
+              <strong>3. 설계 전문가:</strong> 시스템 구조와 아키텍처 설계에 집중
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1-Person Unicorn -->
+      <div class="box-dark" style="margin-top:1rem;">
+        <h4>🚀 ‘1인 유니콘’ 시대의 도래</h4>
+        <p>
+          AI의 강력한 지원으로 단 한 명의 개발자/실무자도 아이디어 구상에서 시장 출시까지 대규모 서비스를 신속하게 구축할 수 있는 환경이 조성되었습니다. (1인 = 유니콘 기업 가능)
+        </p>
+      </div>
+    </section>
+
+    <!-- PART 04 -->
+    <section id="part4" class="section">
+      <div class="section-header">
+        <span class="section-num">PART 04</span>
+        <h2 class="section-title">사람과 AI의 협업 방법론 (Human-AI Collaboration)</h2>
+      </div>
+
+      <!-- Role Split & Dual Brain -->
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="card-tag">04 · ROLE SPLIT</span>
+          <h3 class="card-title">사람과 AI의 명확한 역할 분담</h3>
+          <div style="margin-bottom:0.75rem;">
+            <strong style="color:var(--accent);">★ 사람이 해야 하는 일 (검증 & 결정)</strong>
+            <ul style="font-size:0.85rem; color:#334155; padding-left:1.2rem;">
+              <li>올바른 목표와 질문(프롬프트) 던지기</li>
+              <li>작성 내용 오류 꼼꼼히 확인하기 (팩트체크)</li>
+              <li>최종 의사결정 및 결과에 책임지기</li>
+            </ul>
+          </div>
+          <div>
+            <strong style="color:#059669;">⚡ AI가 잘하는 일 (초안 만들기)</strong>
+            <ul style="font-size:0.85rem; color:#334155; padding-left:1.2rem;">
+              <li>수백 페이지 자료에서 필요한 부분 신속 탐색</li>
+              <li>보고서, 메일, 코드 초안 1분 내 작성</li>
+              <li>수치 데이터 깔끔하게 정리 및 요약</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">04 · PARTNERSHIP</span>
+          <h3 class="card-title">듀얼브레인(Co-Intelligence) 파트너십</h3>
+          <p class="card-text" style="margin-bottom:1rem;">
+            현대판 <strong>'켄타우로스' 결합</strong>: 인간의 직관과 기계의 데이터 처리 능력이 결합된 형태 (대체가 아닌 지능 증강)
+          </p>
+
+          <div class="body-copy" style="background:#f8fafc; padding:0.85rem 1rem; border-radius:8px; border:1px solid var(--border-color);">
+            • <strong>인간 지능 (Human):</strong> 직관, 문제 정의, 윤리적 검토, Human in the Loop<br>
+            • <strong>인공 지능 (AI):</strong> 방대한 패턴 인식, 고속 연산, 초안 및 코드 자동 생성
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflow & Key Competencies -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <span class="card-tag">04 · WORKFLOW</span>
+        <h3 class="card-title">실무에서 바로 쓰는 AI 협업 3단계 워크플로우</h3>
+        <div class="steps-container" style="margin-bottom:0;">
+          <div class="step-box">
+            <div class="step-num">1</div>
+            <div class="step-title">Context (배경 주기)</div>
+            <div class="step-desc">회사 설명, 규칙, 사내 컨벤션, 참고 자료(예: CLAUDE.md) 제공</div>
+          </div>
+          <div class="step-box">
+            <div class="step-num">2</div>
+            <div class="step-title">Task (명확한 지시)</div>
+            <div class="step-desc">구체적 서식, 원하는 결과를 지정하여 주문 (CLI/MCP 도구 활용)</div>
+          </div>
+          <div class="step-box">
+            <div class="step-num">3</div>
+            <div class="step-title">Validation (사람 검토)</div>
+            <div class="step-desc">AI 1차 검증 + 사람의 최종 검토 및 마무리 (Prevent + Detect)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Competencies & Habits -->
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="card-tag">04 · COMPETENCIES</span>
+          <h3 class="card-title">AI 시대의 3대 핵심 역량</h3>
+          <ul style="font-size:0.875rem; color:#334155; padding-left:1.2rem;">
+            <li style="margin-bottom:0.4rem;"><strong>1. 프롬프트 역량:</strong> AI에 올바르게 질문을 설계하는 능력</li>
+            <li style="margin-bottom:0.4rem;"><strong>2. 비판적 분석력:</strong> AI 결과물 진위 검토 및 윤리적 판단력</li>
+            <li><strong>3. 지속적 학습력:</strong> 빠른 기술 변화에 맞춰 끊임없이 실험하는 역량</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">04 · HABITS</span>
+          <h3 class="card-title">실무자의 3가지 기본 습관</h3>
+          <ul style="font-size:0.875rem; color:#334155; padding-left:1.2rem;">
+            <li style="margin-bottom:0.4rem;"><strong>1. 질문력:</strong> 모호함 대신 역할과 구체 상황을 설명하는 습관</li>
+            <li style="margin-bottom:0.4rem;"><strong>2. 비판적 시각:</strong> 환각(Hallucination) 가능성을 염두에 두고 점검</li>
+            <li><strong>3. 작은 실험:</strong> 거창한 프로젝트보다 오늘 할 작은 일부터 AI와 실행</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 05 -->
+    <section id="part5" class="section">
+      <div class="section-header">
+        <span class="section-num">PART 05</span>
+        <h2 class="section-title">조직 차원의 AX 추진 전략 (Organization-wide Strategy)</h2>
+      </div>
+
+      <!-- Top-down vs Bottom-up -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <span class="card-tag">05 · STRATEGY</span>
+        <h3 class="card-title">Top-down × Bottom-up 상호 보완 추진 전략</h3>
+        <div class="grid grid-2" style="margin-bottom:0;">
+          <div style="background:#f8fafc; padding:1.25rem; border-radius:8px; border:1px solid var(--border-color);">
+            <h4 style="color:var(--primary); font-size:1rem; margin-bottom:0.5rem;">🏛️ TOP-DOWN (전사 리더십 주도)</h4>
+            <ul style="font-size:0.85rem; color:#475569; padding-left:1rem;">
+              <li><strong>목표:</strong> 전사적 AX 추진 속도 극대화 & 비용 절감/매출 증대</li>
+              <li><strong>특징:</strong> 의사결정 신속성, 높은 비즈니스 임팩트, 명확한 방향성 공유</li>
+            </ul>
+          </div>
+          <div style="background:#eff6ff; padding:1.25rem; border-radius:8px; border:1px solid #bfdbfe;">
+            <h4 style="color:var(--accent); font-size:1rem; margin-bottom:0.5rem;">🌱 BOTTOM-UP (현장 주도 혁신)</h4>
+            <ul style="font-size:0.85rem; color:#1e40af; padding-left:1rem;">
+              <li><strong>목표:</strong> 현장 문제 해결, 간접 비용 절감 & AI 내재화 문화 확산</li>
+              <li><strong>특징:</strong> 자유로운 실험, 노하우 확산, 사용자 저항 완화 및 수용성 제고</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leadership Role -->
+      <div class="box-highlight">
+        <h4>👑 경영진과 조직장의 역할</h4>
+        <p style="font-size:0.9rem; color:#334155;">
+          "직원들이 실패를 두려워하지 않고 AI를 자유롭게 써보며, 성공한 작은 경험을 부서에 퍼뜨릴 수 있도록 격려하는 문화 조성이 가장 중요합니다."<br>
+          <strong>순환 과정:</strong> 개인의 작은 실험 ➔ 성공 사례 공유 ("시간 절약했어요!") ➔ 조직 전체 업무 생산성 폭발
+        </p>
+      </div>
+
+      <!-- Maturity Model & Closing Gap -->
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="card-tag">05 · MATURITY MODEL</span>
+          <h3 class="card-title">AI 활용 4단계 진화 모델</h3>
+          <div style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.85rem;">
+            <div style="padding:0.5rem; background:#f1f5f9; border-radius:6px;"><strong>1. AI-Aware (AI 인지):</strong> 존재는 인지하나 거의 미사용</div>
+            <div style="padding:0.5rem; background:#e0f2fe; border-radius:6px;"><strong>2. AI-Enabled (AI 활용):</strong> 도구를 부분 활용해 도움 받음</div>
+            <div style="padding:0.5rem; background:#bae6fd; border-radius:6px;"><strong>3. AI-Maximalist (AI 극대화):</strong> 의존도 높음, 필수재화</div>
+            <div style="padding:0.5rem; background:#2563eb; color:#fff; border-radius:6px;"><strong>4. AI-Native (AI 내재화):</strong> 업무 전반에 완전히 통합</div>
+          </div>
+          <p style="font-size:0.88rem; color:#ef4444; margin-top:0.5rem; font-weight:600;">
+            ※ 최대 격차 구간: AI-Enabled ➔ AI-Maximalist ➔ AI-Native 전환 시점
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="card-tag">05 · CLOSING THE GAP</span>
+          <h3 class="card-title">AI-Native로 가기 위한 환경 재설계</h3>
+          <ul style="font-size:0.875rem; color:#334155; padding-left:1.2rem;">
+            <li style="margin-bottom:0.5rem;"><strong>업무 프로세스 재설계:</strong> 기존 업무 흐름을 AI 활용 전제로 근본 재설계</li>
+            <li style="margin-bottom:0.5rem;"><strong>AI 우선 (AI-First) 워크플로우:</strong> 모든 업무 시작 시 AI 가능성을 기본값 검토</li>
+            <li><strong>조직 문화·평가 정비:</strong> AI 활용을 장려하고 성과로 인정하는 평가 체계</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Organizational OS -->
+      <div class="card" style="margin-top:1.5rem;">
+        <span class="card-tag">05 · ORGANIZATIONAL OS</span>
+        <h3 class="card-title">조직 운영체제(OS)로서의 AX</h3>
+        <p class="card-text" style="font-size:0.9rem;">
+          • <strong>단편적 도입 지양:</strong> 기존 마차에 증기기관만 얹는 '증기 마차'식 단순 솔루션 추가는 한계 존재<br>
+          • <strong>경영의 원점 재설계:</strong> '자율주행차'를 디자인하듯 전사 데이터와 의사결정 중심에 AI 배치<br>
+          • <strong>데이터 플라이휠:</strong> 제품 개선 ➔ 사용자 유입 ➔ 데이터 축적 ➔ AI 모델 고도화 선순환
+        </p>
+      </div>
+    </section>
+
+    <!-- PART 06 -->
+    <section id="part6" class="section">
+      <div class="section-header">
+        <span class="section-num">PART 06</span>
+        <h2 class="section-title">기업 도입 전략과 성과 (Enterprise Adoption & Outcomes)</h2>
+      </div>
+
+      <!-- 4 Value Areas (merged 1+2, 3+4) -->
+      <div class="grid grid-2" style="margin-bottom:1.5rem;">
+        <div class="card value-board">
+          <div class="value-zone">
+            <span class="card-tag">VALUE 01</span>
+            <h3 class="card-title">업무 혁신</h3>
+            <p class="card-text">
+              • 보고서·회의록 자동 생성<br>
+              • CS 챗봇 자동 응대<br>
+              • 비개발자 코드 생성
+            </p>
+          </div>
+          <div class="value-divider" aria-hidden="true"></div>
+          <div class="value-zone">
+            <span class="card-tag">VALUE 02</span>
+            <h3 class="card-title">비용/리스크 최적화</h3>
+            <p class="card-text">
+              • 반복 수작업 절감<br>
+              • 이상 거래 및 규제 감지<br>
+              • 재고 및 설비 예지 보수
+            </p>
+          </div>
+        </div>
+        <div class="card value-board">
+          <div class="value-zone">
+            <span class="card-tag">VALUE 03</span>
+            <h3 class="card-title">매출 &amp; 고객 가치</h3>
+            <p class="card-text">
+              • 맞춤형 상품 추천<br>
+              • 타겟 마케팅 &amp; 동적 가격<br>
+              • 고객 이탈 예측
+            </p>
+          </div>
+          <div class="value-divider" aria-hidden="true"></div>
+          <div class="value-zone">
+            <span class="card-tag">VALUE 04</span>
+            <h3 class="card-title">데이터 &amp; 조직 전환</h3>
+            <p class="card-text">
+              • 데이터 자산화 및 수평 통합<br>
+              • 데이터 기반 의사결정<br>
+              • 인간+AI 조직 평탄화
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Failure vs Success Factors -->
+      <div class="grid grid-2">
+        <div class="card" style="border-top:4px solid #ef4444;">
+          <span class="card-tag" style="color:#ef4444;">FAIL PATTERNS</span>
+          <h3 class="card-title">대표적 AI 도입 실패 패턴</h3>
+          <ul style="font-size:0.85rem; color:#475569; padding-left:1rem;">
+            <li style="margin-bottom:0.3rem;"><strong>PoC 성행 후 확산 실패:</strong> 파일럿 성공 후 전사 연결 미흡</li>
+            <li style="margin-bottom:0.3rem;"><strong>불만족스러운 툴 도입:</strong> 실제 프로세스와 미연결</li>
+            <li style="margin-bottom:0.3rem;"><strong>ROI 측정 실패:</strong> 수치적 정량 효과 증명 불능</li>
+            <li><strong>보안 및 환각 문제:</strong> Hallucination 및 규제 이슈로 중단</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-top:4px solid #10b981;">
+          <span class="card-tag" style="color:#10b981;">SUCCESS STRATEGY</span>
+          <h3 class="card-title">3가지 핵심 성공 실행 전략</h3>
+          <ul style="font-size:0.85rem; color:#334155; padding-left:1rem;">
+            <li style="margin-bottom:0.3rem;"><strong>1. 데이터 기반 구축 최적화:</strong> 표준화, 품질 개선, 보안</li>
+            <li style="margin-bottom:0.3rem;"><strong>2. 조직 및 업무 프로세스 재편:</strong> AI 전제 프로세스 재편</li>
+            <li><strong>3. 가치 중심의 단계적 확장:</strong> 고효과 Use Case 선점 & ROI 확증</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3-Phase Roadmap -->
+      <div class="card" style="margin-top:1.5rem;">
+        <span class="card-tag">06 · ROADMAP</span>
+        <h3 class="card-title">생성형 AI 실행 로드맵 (3 Phase)</h3>
+        <div class="steps-container" style="margin-bottom:0;">
+          <div class="step-box">
+            <div class="step-num" style="font-size:1.1rem;">PHASE 1</div>
+            <div class="step-title">QUICK-WIN (단기)</div>
+            <div class="step-desc">
+              • 반복 수작업 자동화 소형 과제 발굴<br>
+              • 내부 데이터 정제 및 보안 가이드<br>
+              • SaaS/API 빠른 생산성 검증
+            </div>
+          </div>
+          <div class="step-box">
+            <div class="step-num" style="font-size:1.1rem;">PHASE 2</div>
+            <div class="step-title">REDESIGN (중기)</div>
+            <div class="step-desc">
+              • 부서별 특화 에이전트 도입 확대<br>
+              • AI 중심 업무 프로세스 재설계<br>
+              • 정량적 ROI 평가 체계 정착
+            </div>
+          </div>
+          <div class="step-box">
+            <div class="step-num" style="font-size:1.1rem;">PHASE 3</div>
+            <div class="step-title">TRANSFORMATION (장기)</div>
+            <div class="step-desc">
+              • 전사 AX Hub 플랫폼 구축<br>
+              • 자율 AI 에이전트 워크플로우 완성<br>
+              • 지속 가능한 데이터 파이프라인
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 07 -->
+    <section id="part7" class="section">
+      <div class="section-header">
+        <span class="section-num">PART 07</span>
+        <h2 class="section-title">실행 로드맵과 미래 전망 (Future Outlook & Key Takeaways)</h2>
+      </div>
+
+      <!-- 5 Keywords -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <span class="card-tag">07 · FUTURE OUTLOOK</span>
+        <h3 class="card-title">생성형 AI 5대 핵심 키워드</h3>
+        <div class="keyword-grid">
+          <div class="keyword-tile">
+            <strong>1. AGI &amp; 초지능</strong>
+            <span>2027년 AGI 도래 가능성<br>및 특이점(Singularity) 진입</span>
+          </div>
+          <div class="keyword-tile">
+            <strong>2. AI 안전성 &amp; 통제</strong>
+            <span>통제력 상실 방지 및<br>실존적 리스크 대응</span>
+          </div>
+          <div class="keyword-tile">
+            <strong>3. 노동 시장 변동</strong>
+            <span>고용 구조 재편 및<br>업무 의미의 재정의</span>
+          </div>
+          <div class="keyword-tile">
+            <strong>4. 휴머노이드 로봇</strong>
+            <span>Physical AI로의 진화</span>
+          </div>
+          <div class="keyword-tile">
+            <strong>5. 시뮬레이션 우주론</strong>
+            <span>가상 현실 지속성 및<br>환경 시뮬레이션</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 Barriers to ASI -->
+      <div class="card" style="margin-bottom:0.75rem;">
+        <span class="card-tag">07 · ROAD TO ASI</span>
+        <h3 class="card-title">ASI(인공초지능) 도달을 위한 6대 핵심 장벽</h3>
+        <div class="grid grid-2 body-copy" style="margin-bottom:0;">
+          <div><strong>01. 데이터 장벽:</strong> 품질, 다양성 및 고품질 학습 데이터 고갈</div>
+          <div><strong>02. 추론/일반화 장벽:</strong> 복잡 추론 및 맥락 이해 한계</div>
+          <div><strong>03. 지식 표현 장벽:</strong> 세계모델(World Model) 불완전성</div>
+          <div><strong>04. 안전성/신뢰성 장벽:</strong> 환각 억제, Alignment 및 통제</div>
+          <div><strong>05. 확장성/자원 장벽:</strong> 막대한 연산 자원 및 전력 공급 한계</div>
+          <div><strong>06. 사회·윤리·제도 장벽:</strong> 법적 제도, 거버넌스 구축</div>
+        </div>
+      </div>
+
+      <!-- Key Takeaways Summary -->
+      <div class="box-dark">
+        <h3 style="color:var(--accent-cyan); font-size:clamp(1.2rem, 1.6vw, 1.4rem); margin-bottom:1rem;">📌 Key Takeaways Summary</h3>
+        <ol style="padding-left:1.2rem; font-size:clamp(1.02rem, 1.2vw, 1.14rem); line-height:1.75; color:#f1f5f9;">
+          <li><strong>AX의 본질:</strong> AI를 쓰는 사람 → AI와 일하는 사람으로의 근본적 전환</li>
+          <li><strong>실무자 역할:</strong> 코더 → AI 오케스트레이터 · 품질 큐레이터 · 설계 전문가로 진화</li>
+          <li><strong>AX 추진 전략:</strong> Top-down(전사 리더십)과 Bottom-up(현장 주도)의 상호 보완적 결합 必</li>
+          <li><strong>개인 역량:</strong> 프롬프트 역량 · 비판적 분석력 · 지속적 학습력 확보</li>
+          <li><strong>성공 핵심:</strong> 비용(토큰) 관리와 정량적 ROI 검증</li>
+          <li><strong>최종 목표:</strong> AI-Native — 환경 재설계를 통한 완전한 내재화</li>
+        </ol>
+      </div>
+
+      <!-- Outro Banner -->
+      <div class="outro-card">
+        <p class="quote">
+          "올바른 기대, 전략적 활용, 그리고 지속적인 검증이 AI 활용 성공의 핵심입니다."
+        </p>
+        <div class="thanks">Thank You</div>
+        <div class="credit">AX: AI와 협업하는 미래 | Samsung Electronics AX Consulting</div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© Samsung Electronics AX Consulting. All rights reserved.</p>
+    </footer>
+
+  </main>
+
+  <script>
+    (function () {
+      document.querySelectorAll(".section").forEach(function (section) {
+        const agenda = section.querySelector(":scope > .section-header");
+        if (!agenda) return;
+
+        const cards = section.querySelectorAll(
+          ":scope > .card, :scope > .grid > .card, :scope > .box-dark, :scope > .outro-card"
+        );
+
+        const firstCard = cards[0];
+        if (firstCard) {
+          const cardAgenda = document.createElement("div");
+          cardAgenda.className = "card-agenda";
+          cardAgenda.appendChild(agenda.querySelector(".section-num").cloneNode(true));
+          cardAgenda.appendChild(agenda.querySelector(".section-title").cloneNode(true));
+          firstCard.prepend(cardAgenda);
+        }
+
+        agenda.classList.add("agenda-source");
+      });
+
+      const slides = Array.from(document.querySelectorAll(
+        ".hero, .section > .card, .section > .grid > .card, .section > .box-dark, .section > .outro-card"
+      ));
+
+      const bodySlides = slides.filter(function (slide) {
+        return !slide.classList.contains("hero");
+      });
+
+      bodySlides.forEach(function (slide, index) {
+        slide.classList.add("presentation-card");
+        if (index === bodySlides.length - 1) return;
+
+        const hint = document.createElement("div");
+        hint.className = "card-next-hint";
+        hint.setAttribute("aria-hidden", "true");
+        hint.innerHTML = '<span>카드를 클릭하면 다음 내용으로 이동합니다</span><span class="down-arrow">↓</span>';
+        slide.appendChild(hint);
+      });
+
+      slides.forEach(function (slide, index) {
+        slide.addEventListener("click", function (event) {
+          if (event.target.closest("a, button, input, textarea, select")) return;
+          const next = slides[index + 1];
+          if (!next) return;
+          next.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>
