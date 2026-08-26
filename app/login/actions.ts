@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
-  ACCESS_COOKIE,
+  SITE_COOKIE,
   createSessionToken,
   verifySitePassword,
 } from "@/lib/auth";
@@ -12,10 +12,12 @@ export async function loginAction(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const next = String(formData.get("next") ?? "/");
   if (!verifySitePassword(password)) {
-    redirect("/login?error=1");
+    const q = new URLSearchParams({ error: "1" });
+    if (next && next !== "/") q.set("next", next);
+    redirect(`/login?${q.toString()}`);
   }
   const jar = await cookies();
-  jar.set(ACCESS_COOKIE, createSessionToken(), {
+  jar.set(SITE_COOKIE, createSessionToken(), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

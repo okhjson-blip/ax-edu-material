@@ -1,29 +1,26 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-export const ACCESS_COOKIE = "edu_access";
+export const SITE_COOKIE = "edu_access";
 
-/** Site gate password. Override with SITE_PASSWORD on Vercel if needed. */
-export const SITE_PASSWORD = process.env.SITE_PASSWORD || "ax2026h2";
+/** 사이트 접속 비밀번호 (환경변수 SITE_PASSWORD로 덮어쓸 수 있음) */
+const DEFAULT_SITE_PASSWORD = "ax2026h2";
+
+function sitePassword() {
+  return process.env.SITE_PASSWORD || DEFAULT_SITE_PASSWORD;
+}
 
 function secret() {
-  return process.env.SESSION_SECRET || SITE_PASSWORD;
+  return process.env.SESSION_SECRET || sitePassword();
 }
 
 export function createSessionToken() {
   const key = secret();
-  if (!key) {
-    throw new Error("SITE_PASSWORD 환경 변수가 필요합니다.");
-  }
-  return createHmac("sha256", key).update("site-access-ok").digest("hex");
+  return createHmac("sha256", key).update("site-ok").digest("hex");
 }
 
 export function isValidSessionToken(token: string | undefined) {
   if (!token) return false;
-  const key = secret();
-  if (!key) return false;
-  const expected = createHmac("sha256", key)
-    .update("site-access-ok")
-    .digest("hex");
+  const expected = createHmac("sha256", secret()).update("site-ok").digest("hex");
   const a = Buffer.from(token);
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
@@ -31,7 +28,7 @@ export function isValidSessionToken(token: string | undefined) {
 }
 
 export function verifySitePassword(password: string) {
-  const expected = SITE_PASSWORD;
+  const expected = sitePassword();
   const a = Buffer.from(password);
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
