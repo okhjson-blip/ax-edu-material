@@ -1,9 +1,5 @@
 import { notFound } from "next/navigation";
-import {
-  getCategory,
-  prepareCategoryHtml,
-  readCategoryHtml,
-} from "@/lib/content";
+import { getCategory } from "@/lib/content";
 import { requireSiteAccess } from "@/lib/require-site-access";
 
 export const dynamic = "force-dynamic";
@@ -33,12 +29,11 @@ export default async function CategoryPage({
     notFound();
   }
 
-  const html = prepareCategoryHtml(await readCategoryHtml(slug));
-
+  // Real document URL (not srcDoc) so <base> / absolute asset paths resolve reliably.
   return (
     <iframe
       title={category.title}
-      srcDoc={html}
+      src={`/c/${slug}/raw`}
       className="block h-screen w-full border-0 bg-white"
     />
   );

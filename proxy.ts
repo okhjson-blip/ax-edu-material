@@ -7,8 +7,9 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get(SITE_COOKIE)?.value;
   const ok = isValidSessionToken(token);
 
-  if (pathname === "/login") {
-    if (ok) {
+  // Public auth endpoints
+  if (pathname === "/login" || pathname === "/api/login") {
+    if (pathname === "/login" && ok) {
       return NextResponse.redirect(new URL("/", request.url));
     }
     return NextResponse.next();

@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { loginAction } from "@/app/login/actions";
 import { hasSiteAccess } from "@/lib/require-site-access";
 
 export const metadata = { title: "접속 확인" };
@@ -28,7 +27,7 @@ export default async function LoginPage({
           비밀번호가 올바르지 않습니다.
         </p>
       ) : null}
-      <form action={loginAction} className="mt-6 space-y-4">
+      <form action="/api/login" method="post" className="mt-6 space-y-4">
         <input type="hidden" name="next" value={next || "/"} />
         <label className="block text-sm font-medium">
           비밀번호
@@ -37,6 +36,7 @@ export default async function LoginPage({
             name="password"
             required
             autoFocus
+            autoComplete="current-password"
             className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
           />
         </label>

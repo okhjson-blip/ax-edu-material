@@ -204,8 +204,13 @@
       { file: "page-12.jpg", title: "Build vs. Buy", alt: "거시 경제적 파급력 1: 소프트웨어 구매에서 자체 구축으로" }
     ];
 
-    // Relative to this HTML so file:// works; site injects <base href="/contents/">.
-    const IMAGE_DIR = "global_AI_trend_image/";
+    // file:// → sibling folder; site/srcDoc → absolute under public/contents/
+    const IMAGE_DIR = (function () {
+      try {
+        if (location.protocol === "file:") return "global_AI_trend_image/";
+      } catch (e) {}
+      return "/contents/global_AI_trend_image/";
+    })();
     const imageEl = document.getElementById("slide-image");
     const toc = document.getElementById("toc");
     const progressText = document.getElementById("progress-text");
