@@ -8,7 +8,19 @@ import {
 function cookieSecure(request: Request) {
   if (process.env.COOKIE_SECURE === "0") return false;
   if (process.env.COOKIE_SECURE === "1") return true;
+
+  const host = request.headers.get("host") ?? "";
+  const hostname = host.split(":")[0]?.toLowerCase() ?? "";
+  if (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1"
+  ) {
+    return false;
+  }
+
   if (process.env.VERCEL === "1") return true;
+
   const proto =
     request.headers.get("x-forwarded-proto") ??
     request.headers.get("x-forwarded-protocol") ??
