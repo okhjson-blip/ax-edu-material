@@ -20,14 +20,16 @@ if (!existsSync(sourceRoot)) {
   process.exit(0);
 }
 
-/** Auto-discover image asset folders under contents/ (e.g. G_A_C_image). */
+/** Auto-discover asset folders under contents/ (e.g. G_A_C_image, rag_chatbot_assets). */
 const imageDirs = readdirSync(sourceRoot, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && /_image$/i.test(entry.name))
+  .filter(
+    (entry) => entry.isDirectory() && /(_image|_assets)$/i.test(entry.name),
+  )
   .map((entry) => entry.name)
   .sort();
 
 if (imageDirs.length === 0) {
-  console.warn("no *_image directories under contents/");
+  console.warn("no *_image / *_assets directories under contents/");
   process.exit(0);
 }
 

@@ -57,6 +57,14 @@
       "showCaption": true
     },
     {
+      "slug": "rag-chatbot",
+      "title": "RAG 챗봇 구축 입문",
+      "description": "Streamlit · ChromaDB로 만드는 실습형 RAG",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/rag_chatbot.html",
+      "showCaption": true
+    },
+    {
       "slug": "case-study-2026h1",
       "title": "Case Study - 2026H1",
       "description": "",
