@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import {
+  categorySlugFromRequest,
   getCategory,
   prepareCategoryHtml,
   readCategoryHtml,
@@ -8,10 +9,11 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = await params;
+  const { slug: paramSlug } = await params;
+  const slug = categorySlugFromRequest(request, paramSlug, "raw");
   const category = await getCategory(slug);
   if (!category) {
     notFound();

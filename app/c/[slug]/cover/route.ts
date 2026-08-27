@@ -1,5 +1,9 @@
 import { notFound } from "next/navigation";
-import { getCategory, publicCoverUrl } from "@/lib/content";
+import {
+  categorySlugFromRequest,
+  getCategory,
+  publicCoverUrl,
+} from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -7,7 +11,8 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const { slug } = await params;
+  const { slug: paramSlug } = await params;
+  const slug = categorySlugFromRequest(request, paramSlug, "cover");
   const category = await getCategory(slug);
   if (!category) {
     notFound();

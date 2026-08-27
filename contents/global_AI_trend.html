@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 2026: 단순 지원에서 <br>자율형 오케스트레이션으로</title>
+  <style>
+    :root {
+      --sidebar-width: 300px;
+      --text: #e2e8f0;
+      --muted: rgba(255, 255, 255, 0.72);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: #0b1220;
+      color: var(--text);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+
+    body {
+      display: flex;
+    }
+
+    aside {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: #0f172a;
+      color: #fff;
+    }
+
+    .brand {
+      padding: 22px 22px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .brand .kicker {
+      margin-bottom: 6px;
+      color: #43c9ff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      line-height: 1.35;
+      letter-spacing: -0.04em;
+    }
+
+    .progress {
+      padding: 12px 22px 10px;
+    }
+
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .track {
+      height: 5px;
+      overflow: hidden;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.13);
+    }
+
+    .bar {
+      width: 8.3%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #43c9ff, #fff);
+      transition: width 0.25s ease;
+    }
+
+    nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 12px 12px;
+      scrollbar-width: thin;
+    }
+
+    nav button {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 8px;
+      width: 100%;
+      margin: 2px 0;
+      padding: 8px 10px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13.5px;
+      line-height: 1.35;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    nav button:hover { color: #fff; background: rgba(255, 255, 255, 0.07); }
+
+    nav button.active {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.1);
+      background: linear-gradient(90deg, #0064d2, #0879dc);
+    }
+
+    .toc-no {
+      padding-top: 1px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      opacity: 0.8;
+    }
+
+    .home {
+      margin: auto 16px 18px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background:
+        radial-gradient(circle at 88% 8%, rgb(0 169 224 / 0.12), transparent 26rem),
+        #07111f;
+    }
+
+    .stage {
+      width: min(100%, calc((100vh - 48px) * 1.79));
+      aspect-ratio: 1400 / 780;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: #020617;
+      box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+      cursor: pointer;
+    }
+
+    .stage img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #020617;
+    }
+
+    @media (max-width: 900px) {
+      body { flex-direction: column; }
+      aside { width: 100%; height: auto; max-height: 38vh; }
+      nav { max-height: 22vh; }
+      main { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <div class="brand">
+      <div class="kicker">GLOBAL AI TREND</div>
+      <h1>AI 2026: 단순 지원에서 자율형 오케스트레이션으로</h1>
+    </div>
+    <div class="progress">
+      <div class="progress-row"><span>진행률</span><span id="progress-text">01 / 12</span></div>
+      <div class="track"><div class="bar" id="progress-bar"></div></div>
+    </div>
+    <nav id="toc" aria-label="슬라이드 목록"></nav>
+    <a class="home" href="/" target="_top">목록으로</a>
+  </aside>
+
+  <main>
+    <div class="stage" id="stage" role="img" aria-label="슬라이드 이미지" title="클릭하면 다음 슬라이드로 이동합니다">
+      <img id="slide-image" alt="">
+    </div>
+  </main>
+
+  <script>
+    const slides = [
+      { file: "page-01.jpg", title: "AI 2026 표지", alt: "AI 2026: 단순 지원에서 자율형 오케스트레이션으로" },
+      { file: "page-02.jpg", title: "AI 폭발적 성장", alt: "AI 폭발적 성장: 개인의 일상적 도구가 된 인공지능" },
+      { file: "page-03.jpg", title: "전문화의 곡선", alt: "전문화의 곡선: 범용적 사용에서 특화된 업무로의 진화" },
+      { file: "page-04.jpg", title: "활용의 폭과 가치", alt: "활용의 폭이 곧 가치의 기하급수적 성장" },
+      { file: "page-05.jpg", title: "2026 AI 패러독스", alt: "2026 AI 패러독스 (The ROI Gap)" },
+      { file: "page-06.jpg", title: "AI-First 전환", alt: "패러다임의 전환: 점진적 도입에서 AI-First 오케스트레이션으로" },
+      { file: "page-07.jpg", title: "AI 진화 5단계", alt: "AI 진화의 5단계 계단: 대화에서 자율 실행으로" },
+      { file: "page-08.jpg", title: "엔터프라이즈 스케일링", alt: "엔터프라이즈 스케일링: 거대 기업들의 선제적 에이전트 도입" },
+      { file: "page-09.jpg", title: "자율형 조달 청사진", alt: "산업 심층 분석: 자율형 조달 청사진" },
+      { file: "page-10.jpg", title: "Agentic Workflow", alt: "Agentic Workflow in Action: 인간과 AI의 완벽한 릴레이" },
+      { file: "page-11.jpg", title: "프로세스 재설계 ROI", alt: "프로세스 재설계가 가져오는 압도적 ROI" },
+      { file: "page-12.jpg", title: "Build vs. Buy", alt: "거시 경제적 파급력 1: 소프트웨어 구매에서 자체 구축으로" }
+    ];
+
+    const imageEl = document.getElementById("slide-image");
+    const toc = document.getElementById("toc");
+    const progressText = document.getElementById("progress-text");
+    const progressBar = document.getElementById("progress-bar");
+    const stage = document.getElementById("stage");
+    let index = 0;
+
+    slides.forEach(function (slide, i) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.innerHTML = '<span class="toc-no">' + String(i + 1).padStart(2, "0") + "</span><span>" + slide.title + "</span>";
+      btn.addEventListener("click", function () { show(i); });
+      toc.appendChild(btn);
+    });
+
+    const buttons = toc.querySelectorAll("button");
+
+    function show(i) {
+      index = Math.max(0, Math.min(slides.length - 1, i));
+      const slide = slides[index];
+      imageEl.alt = slide.alt;
+      imageEl.src = "/contents/global_AI_trend_image/" + slide.file;
+      buttons.forEach(function (btn, n) { btn.classList.toggle("active", n === index); });
+      buttons[index].scrollIntoView({ block: "nearest" });
+      progressText.textContent = String(index + 1).padStart(2, "0") + " / " + slides.length;
+      progressBar.style.width = ((index + 1) / slides.length * 100) + "%";
+      document.title = slide.alt + " | Global AI Trend";
+    }
+
+    stage.addEventListener("click", function () {
+      if (index < slides.length - 1) show(index + 1);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.target.closest("input, textarea")) return;
+      if ((e.key === "ArrowDown" || e.key === "ArrowRight" || e.key === "PageDown") && index < slides.length - 1) {
+        e.preventDefault();
+        show(index + 1);
+      }
+      if ((e.key === "ArrowUp" || e.key === "ArrowLeft" || e.key === "PageUp") && index > 0) {
+        e.preventDefault();
+        show(index - 1);
+      }
+      if (e.key === "Home") { e.preventDefault(); show(0); }
+      if (e.key === "End") { e.preventDefault(); show(slides.length - 1); }
+    });
+
+    show(0);
+  </script>
+</body>
+</html>

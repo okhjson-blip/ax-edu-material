@@ -1,5 +1,9 @@
 import { notFound } from "next/navigation";
-import { getCategory } from "@/lib/content";
+import {
+  getCategory,
+  prepareCategoryHtml,
+  readCategoryHtml,
+} from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -27,10 +31,12 @@ export default async function CategoryPage({
     notFound();
   }
 
+  const html = prepareCategoryHtml(await readCategoryHtml(slug));
+
   return (
     <iframe
       title={category.title}
-      src={`/c/${slug}/raw`}
+      srcDoc={html}
       className="block h-screen w-full border-0 bg-white"
     />
   );

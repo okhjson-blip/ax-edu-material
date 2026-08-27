@@ -49,6 +49,14 @@
       "showCaption": true
     },
     {
+      "slug": "global-ai-trend",
+      "title": "Global AI Trend",
+      "description": "AI 2026: 단순 지원에서 자율형 오케스트레이션으로",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/global_AI_trend.html",
+      "showCaption": true
+    },
+    {
       "slug": "case-study-2026h1",
       "title": "Case Study - 2026H1",
       "description": "",

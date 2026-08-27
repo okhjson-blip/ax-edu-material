@@ -17,6 +17,22 @@ export async function getCategory(slug: string) {
   return categories.find((item) => item.slug === slug) ?? null;
 }
 
+/** Nested `/c/[slug]/raw|cover` handlers: prefer params, fall back to the URL. */
+export function categorySlugFromRequest(
+  request: Request,
+  slug: string | string[] | undefined,
+  leaf: "raw" | "cover",
+) {
+  const fromParams = Array.isArray(slug) ? slug[0] : slug;
+  if (fromParams) return fromParams;
+
+  const parts = new URL(request.url).pathname.split("/").filter(Boolean);
+  if (parts[0] === "c" && parts[2] === leaf && parts[1]) {
+    return parts[1];
+  }
+  return "";
+}
+
 export function categoryDir(slug: string) {
   return path.join(CATEGORIES_ROOT, slug);
 }
