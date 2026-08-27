@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 2026: 단순 지원에서 <br>자율형 오케스트레이션으로</title>
+  <title>AI 2026: 단순 지원에서 자율형 오케스트레이션으로</title>
   <style>
     :root {
       --sidebar-width: 300px;
@@ -172,7 +172,7 @@
   <aside>
     <div class="brand">
       <div class="kicker">GLOBAL AI TREND</div>
-      <h1>AI 2026: 단순 지원에서 자율형 오케스트레이션으로</h1>
+      <h1>AI 2026: 단순 지원에서<br>자율형 오케스트레이션으로</h1>
     </div>
     <div class="progress">
       <div class="progress-row"><span>진행률</span><span id="progress-text">01 / 12</span></div>
@@ -204,6 +204,8 @@
       { file: "page-12.jpg", title: "Build vs. Buy", alt: "거시 경제적 파급력 1: 소프트웨어 구매에서 자체 구축으로" }
     ];
 
+    // Relative to this HTML so file:// works; site injects <base href="/contents/">.
+    const IMAGE_DIR = "global_AI_trend_image/";
     const imageEl = document.getElementById("slide-image");
     const toc = document.getElementById("toc");
     const progressText = document.getElementById("progress-text");
@@ -225,7 +227,7 @@
       index = Math.max(0, Math.min(slides.length - 1, i));
       const slide = slides[index];
       imageEl.alt = slide.alt;
-      imageEl.src = "/contents/global_AI_trend_image/" + slide.file;
+      imageEl.src = IMAGE_DIR + slide.file;
       buttons.forEach(function (btn, n) { btn.classList.toggle("active", n === index); });
       buttons[index].scrollIntoView({ block: "nearest" });
       progressText.textContent = String(index + 1).padStart(2, "0") + " / " + slides.length;
