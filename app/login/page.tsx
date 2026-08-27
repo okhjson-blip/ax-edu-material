@@ -1,12 +1,19 @@
+import { redirect } from "next/navigation";
 import { loginAction } from "@/app/login/actions";
+import { hasSiteAccess } from "@/lib/require-site-access";
 
 export const metadata = { title: "접속 확인" };
+export const dynamic = "force-dynamic";
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; next?: string }>;
 }) {
+  if (await hasSiteAccess()) {
+    redirect("/");
+  }
+
   const { error, next } = await searchParams;
 
   return (

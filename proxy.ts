@@ -4,29 +4,36 @@ import { SITE_COOKIE, isValidSessionToken } from "@/lib/auth";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const token = request.cookies.get(SITE_COOKIE)?.value;
+  const ok = isValidSessionToken(token);
 
   if (pathname === "/login") {
+    if (ok) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
     return NextResponse.next();
   }
 
-  const token = request.cookies.get(SITE_COOKIE)?.value;
-  if (!isValidSessionToken(token)) {
+  if (!ok) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.search = "";
     if (pathname !== "/") {
       url.searchParams.set("next", pathname);
     }
-    return NextResponse.redirect(url);
+    const res = NextResponse.redirect(url);
+    res.headers.set("Cache-Control", "private, no-store");
+    return res;
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+  res.headers.set("Cache-Control", "private, no-store");
+  return res;
 }
 
 export const config = {
   matcher: [
-    /*
-     * 정적 자산·이미지·favicon 제외, 그 외 모든 경로에 접속 인증 적용
-     */
+    "/",
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

@@ -4,6 +4,7 @@ import {
   prepareCategoryHtml,
   readCategoryHtml,
 } from "@/lib/content";
+import { requireSiteAccess } from "@/lib/require-site-access";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export default async function CategoryPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  await requireSiteAccess();
   const { slug } = await params;
   const category = await getCategory(slug);
   if (!category) {

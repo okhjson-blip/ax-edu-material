@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { publicCoverUrl, readRegistry } from "@/lib/content";
+import { requireSiteAccess } from "@/lib/require-site-access";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  await requireSiteAccess();
   const { categories } = await readRegistry();
 
   return (
