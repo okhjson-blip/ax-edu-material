@@ -24,10 +24,7 @@ export default async function LoginPage({
         >
           AX
         </div>
-        <div className="leading-tight">
-          <p className="text-[13px] font-medium text-slate-500">AX Hub</p>
-          <p className="text-[13px] text-slate-400">Consulting OS</p>
-        </div>
+        <p className="text-[15px] font-medium text-slate-500">Education</p>
       </div>
 
       <h1 className="mt-8 text-[28px] font-bold tracking-tight text-slate-900">
