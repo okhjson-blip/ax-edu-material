@@ -1297,65 +1297,112 @@
         </p>
       </div>
 
-      <!-- Platform Pricing & Benchmarks -->
-      <div class="grid grid-2">
-        <div class="card">
-          <span class="card-tag">02 · PLATFORMS</span>
-          <h3 class="card-title">3대 AI 플랫폼 엔터프라이즈 요금제 비교</h3>
-          <div class="table-container" style="margin-bottom:0;">
+      <!-- Platform Pricing -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <span class="card-tag">02 · PLATFORMS</span>
+        <h3 class="card-title">3대 AI 플랫폼 엔터프라이즈 요금제 비교</h3>
+        <div class="table-container" style="margin-bottom:0;">
             <table>
               <thead>
                 <tr>
                   <th>플랫폼</th>
-                  <th>웹 브라우저 / 터미널</th>
+                  <th>기본 요금</th>
+                  <th>웹 / 워크스페이스</th>
+                  <th>CLI / API</th>
                   <th>핵심 요약</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Claude</strong></td>
-                  <td>종량제 (토큰 실시간 누적)</td>
-                  <td>쓴 만큼 비용 발생 / 대화방 청소 필수</td>
+                  <td><strong>Claude</strong><br>(Anthropic)</td>
+                  <td>사용자당 정액제<br>(월/연 계약)</td>
+                  <td>확장 쿼터제 (500K)<br>대화 누적 시 토큰 주의</td>
+                  <td>종량제 (토큰 과금)<br>CLI 연동 시 실시간 소진</td>
+                  <td>웹은 정액 한도,<br>CLI는 사용량 과금</td>
                 </tr>
                 <tr>
-                  <td><strong>ChatGPT</strong></td>
-                  <td>웹: 정액 무제한 / CLI: 고정 쿼터제</td>
-                  <td>웹은 무제한, CLI는 정해진 배터리</td>
+                  <td><strong>ChatGPT</strong><br>(OpenAI)</td>
+                  <td>사용자당 정액제<br>(연간 계약)</td>
+                  <td>고속 무제한 사용<br>엔터프라이즈 학습 제외</td>
+                  <td>API 종량제 또는 고정 쿼터<br>CLI는 크레딧·TPM 관리</td>
+                  <td>웹은 무제한,<br>CLI는 쿼터 관리</td>
                 </tr>
                 <tr>
-                  <td><strong>Gemini</strong></td>
-                  <td>타임 윈도우 리셋형 / API Quota</td>
-                  <td>비용 무과금이나 몰아 쓰면 쿨타임</td>
+                  <td><strong>Gemini</strong><br>(Google)</td>
+                  <td>월정액 Add-on<br>/ Vertex 계약</td>
+                  <td>주기 리셋 쿼터제<br>몰아 쓰면 쿨타임</td>
+                  <td>Vertex/API 종량제<br>대용량은 토큰 과금</td>
+                  <td>오피스는 롤링 쿼터,<br>개발은 클라우드 종량</td>
                 </tr>
               </tbody>
             </table>
-          </div>
         </div>
+      </div>
 
-        <div class="card">
-          <span class="card-tag">02 · BENCHMARK 2026</span>
-          <h3 class="card-title">2026 AI 코딩 벤치마크 (SWE-Bench)</h3>
-          <ul style="list-style:none; font-size:0.9rem;">
-            <li style="padding:0.4rem 0; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;">
-              <span><strong>Claude Opus 4.5 / 4.6</strong></span>
-              <span class="pill pill-blue">83.3%</span>
-            </li>
-            <li style="padding:0.4rem 0; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;">
-              <span><strong>GPT-5.2 (OpenAI)</strong></span>
-              <span class="pill pill-purple">81.3%</span>
-            </li>
-            <li style="padding:0.4rem 0; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;">
-              <span><strong>Kimi 3 (Moonshot AI)</strong></span>
-              <span class="pill pill-green">78.9%</span>
-            </li>
-            <li style="padding:0.4rem 0; display:flex; justify-content:space-between;">
-              <span><strong>Gemini 3 Pro (Google)</strong></span>
-              <span class="pill pill-amber">77.6%</span>
-            </li>
-          </ul>
-          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.75rem;">
-            결론: Claude 계열 모델이 코드 품질과 자율 에이전트 완성도에서 두루 우수.
-          </p>
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <span class="card-tag">02 · BENCHMARK 2026</span>
+        <h3 class="card-title">2026 주요 AI 플래그십 모델 비교</h3>
+        <div class="table-container" style="margin-bottom:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>개발사</th>
+                <th>대표 모델</th>
+                <th>주요 강점</th>
+                <th>GPQA<br>(추론)</th>
+                <th>SWE-bench<br>(코딩)</th>
+                <th>API 요금<br>(입/출, 1M)</th>
+                <th>소비자 요금</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>OpenAI</strong></td>
+                <td>GPT-5.6 Sol / o3</td>
+                <td>복합 추론·범용 멀티모달</td>
+                <td>87.70%</td>
+                <td>71.70%</td>
+                <td>$5 / $30</td>
+                <td>Plus $20, Pro $100~</td>
+              </tr>
+              <tr>
+                <td><strong>Anthropic</strong></td>
+                <td>Opus 5 / Sonnet 5</td>
+                <td>코딩·장문 분석 최강</td>
+                <td>84.80%</td>
+                <td>70.30%</td>
+                <td>$5 / $25</td>
+                <td>Pro $20, Max $100~</td>
+              </tr>
+              <tr>
+                <td><strong>Google</strong></td>
+                <td>Gemini 3.1 Pro</td>
+                <td>100만+ 컨텍스트, 도구 연동</td>
+                <td>86.40%</td>
+                <td>~65.0%</td>
+                <td>$2 / $12</td>
+                <td>AI Pro $19.99</td>
+              </tr>
+              <tr>
+                <td><strong>Moonshot AI</strong></td>
+                <td>Kimi K3 / K2.6</td>
+                <td>초장문·에이전틱, 고효율 MoE</td>
+                <td>72.00%</td>
+                <td>58.40%</td>
+                <td>$0.60~2.55 / $2.50~12.75</td>
+                <td>웹 무료 (종량제)</td>
+              </tr>
+              <tr>
+                <td><strong>DeepSeek</strong></td>
+                <td>V4 Pro / R1</td>
+                <td>가격 파괴, 수학/추론 특화</td>
+                <td>71.50%</td>
+                <td>49.20%</td>
+                <td>$0.43 / $0.87</td>
+                <td>웹 무료 (종량제)</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
