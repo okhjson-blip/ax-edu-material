@@ -25,7 +25,11 @@ export async function GET(
   if (!category) {
     notFound();
   }
-  const html = prepareCategoryHtml(await readCategoryHtml(slug));
+  const source = await readCategoryHtml(slug);
+  if (!source) {
+    notFound();
+  }
+  const html = prepareCategoryHtml(source);
   return new Response(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",

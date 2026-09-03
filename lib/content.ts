@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import type { Registry } from "@/lib/types";
+import { isValidSlug, type Registry } from "@/lib/types";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 const REGISTRY_PATH = path.join(CONTENT_ROOT, "registry.json");
@@ -13,6 +13,7 @@ export async function readRegistry(): Promise<Registry> {
 }
 
 export async function getCategory(slug: string) {
+  if (!isValidSlug(slug)) return null;
   const { categories } = await readRegistry();
   return categories.find((item) => item.slug === slug) ?? null;
 }
@@ -72,20 +73,16 @@ export function prepareCategoryHtml(html: string) {
 
 export async function readCategoryHtml(slug: string) {
   const category = await getCategory(slug);
-  if (!category) {
-    throw new Error(`카테고리를 찾을 수 없습니다: ${slug}`);
-  }
+  if (!category) return null;
 
-  if (category.htmlFile) {
-    // Keep path statically scoped under contents/ for Vercel/Turbopack tracing.
-    const file = path.join(
-      process.cwd(),
-      "contents",
-      path.basename(category.htmlFile),
-    );
-    return fs.readFile(file, "utf8");
-  }
+  const file = category.htmlFile
+    ? // Keep path statically scoped under contents/ for Vercel/Turbopack tracing.
+      path.join(process.cwd(), "contents", path.basename(category.htmlFile))
+    : path.join(categoryDir(slug), "index.html");
 
-  const file = path.join(categoryDir(slug), "index.html");
-  return fs.readFile(file, "utf8");
+  try {
+    return await fs.readFile(file, "utf8");
+  } catch {
+    return null;
+  }
 }

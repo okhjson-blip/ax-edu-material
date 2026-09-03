@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local scratch / PPT inspect dumps — do not ship to Vercel
+.tmp-*
+contents/.tmp-*/
