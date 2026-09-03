@@ -234,10 +234,30 @@ ul{list-style:none;margin:0;padding:0;}
   flex:1;min-height:0;height:100%;gap:8px;grid-auto-rows:1fr;
 }
 .slide-card.is-compact .step-item{
-  padding:8px 14px;min-height:0;align-items:center;
+  padding:8px 14px;min-height:0;align-items:stretch;
 }
+.slide-card.is-compact .step-item.is-inline{justify-content:center;}
 .slide-card.is-compact .note-box{padding:10px 14px;}
 .slide-card.is-compact .slide-footer{margin-top:12px;padding-top:10px;}
+
+/* Sparse slides: stretch inner cards and loosen line-height toward ~50% of the stage */
+.slide-card.is-sparse .step-desc,
+.slide-card.is-sparse .ci-desc,
+.slide-card.is-sparse .lead-line,
+.slide-card.is-sparse .section-preview-item,
+.slide-card.is-sparse .closing-lead{
+  line-height:1.85;
+}
+.slide-card.is-sparse .step-content{gap:8px;justify-content:flex-start;}
+.slide-card.is-sparse .steps-grid,
+.slide-card.is-sparse .compare-grid,
+.slide-card.is-sparse .mythfact-grid{
+  align-items:stretch;
+}
+.slide-card.is-sparse .compare-col-body{gap:14px;justify-content:center;flex:1;}
+.slide-card.is-sparse .quote-box{
+  display:flex;align-items:center;justify-content:center;
+}
 
 .stage-arrow{
   position:absolute;top:50%;transform:translateY(-50%);
@@ -282,7 +302,7 @@ ul{list-style:none;margin:0;padding:0;}
 /* ---------- steps / cards grid ---------- */
 .steps-grid{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:14px;}
 .step-item{
-  display:flex;gap:12px;align-items:stretch;
+  display:flex;flex-direction:column;gap:10px;align-items:stretch;
   background:var(--gray-050);border:1px solid var(--border);border-radius:10px;padding:16px;
 }
 .step-item.is-accent{background:#F5FAEC;border-color:var(--green);}
@@ -293,6 +313,11 @@ ul{list-style:none;margin:0;padding:0;}
 }
 .step-num.is-tag{border-radius:6px;width:auto;padding:4px 9px;font-size:9.5pt;white-space:nowrap;align-self:flex-start;}
 .step-item.is-accent .step-num{background:var(--green);}
+.step-head{display:flex;align-items:flex-start;gap:12px;}
+.step-head .step-num{margin-top:1px;}
+.step-head-text{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;}
+.step-item.is-inline .step-head{align-items:center;}
+.step-item.is-inline .step-desc{margin:0;}
 .step-content{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1;}
 .step-title{font-size:12.5pt;font-weight:700;color:var(--blue-dark);line-height:1.4;}
 .step-title.is-tight{letter-spacing:-0.06em;white-space:nowrap;}
@@ -320,6 +345,43 @@ ul{list-style:none;margin:0;padding:0;}
 .step-item.is-stack .step-desc{margin:0;}
 .step-item.is-stack .step-desc ul{margin:0;}
 .step-item.is-stack .step-footer-tag{width:100%;text-align:center;margin-top:8px;}
+.step-item:not(.is-stack) > .step-desc,
+.step-item:not(.is-stack) > .step-badge,
+.step-item:not(.is-stack) > .step-note,
+.step-item:not(.is-stack) > .step-footer-tag{
+  margin-left:40px;
+}
+.steps-grid.is-md .step-title{font-size:13.5pt;}
+.steps-grid.is-md .step-sub2{font-size:10pt;}
+.steps-grid.is-md .step-desc{font-size:13.5pt;}
+.steps-grid.is-xl .step-item{padding:22px 20px;gap:12px;}
+.steps-grid.is-xl .step-head{gap:16px;}
+.steps-grid.is-xl .step-head-text{gap:6px;}
+.steps-grid.is-xl .step-num{width:42px;height:42px;font-size:16.5pt;}
+.steps-grid.is-xl .step-title{font-size:18.75pt;}
+.steps-grid.is-xl .step-sub2{font-size:14.25pt;}
+.steps-grid.is-xl .step-desc{font-size:16.2pt;}
+.steps-grid.is-xl .step-item:not(.is-stack) > .step-desc,
+.steps-grid.is-xl .step-item:not(.is-stack) > .step-badge,
+.steps-grid.is-xl .step-item:not(.is-stack) > .step-note,
+.steps-grid.is-xl .step-item:not(.is-stack) > .step-footer-tag{
+  margin-left:58px;
+}
+.steps-grid.is-center .step-item{align-items:center;justify-content:center;text-align:center;}
+.steps-grid.is-center .step-head{justify-content:center;align-items:flex-start;width:auto;max-width:100%;}
+.steps-grid.is-center .step-head-text{flex:0 1 auto;align-items:flex-start;text-align:left;}
+.steps-grid.is-center .step-title{text-align:left;width:auto;}
+.steps-grid.is-center .step-sub2{text-align:left;}
+.steps-grid.is-center .step-item:not(.is-stack) > .step-desc{
+  margin-left:0;text-align:center;
+}
+.steps-grid.is-center .step-head:not(:has(.step-num)){
+  width:100%;
+}
+.steps-grid.is-center .step-head:not(:has(.step-num)) .step-head-text,
+.steps-grid.is-center .step-head:not(:has(.step-num)) .step-title{
+  width:100%;text-align:center;align-items:center;
+}
 
 /* ---------- table ---------- */
 .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;}
@@ -372,11 +434,22 @@ table.data-table tr:nth-child(even) td{background:var(--gray-050);}
 
 /* ---------- flow (process) ---------- */
 .flow-row{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;justify-content:center;row-gap:10px;}
-.flow-step{flex:1;min-width:130px;background:var(--gray-050);border:1px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;}
-.flow-title{font-weight:700;color:var(--blue-dark);font-size:11pt;}
+.flow-step{
+  flex:1;min-width:130px;background:var(--gray-050);border:1px solid var(--border);border-radius:10px;
+  padding:14px 10px;text-align:center;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+}
+.flow-title{font-weight:700;color:var(--blue-dark);font-size:11pt;line-height:1.45;}
 .flow-desc{font-size:9.8pt;color:var(--gray-600);margin-top:4px;line-height:1.5;}
 .flow-arrow{display:flex;align-items:center;justify-content:center;padding:0 8px;color:var(--blue);font-size:15pt;font-weight:700;}
 .flow-footnote{margin-top:12px;}
+.flow-row.is-md .flow-title{font-size:13.5pt;}
+.flow-row.is-lg .flow-step{padding:16px 12px;}
+.flow-row.is-lg .flow-title{font-size:13.2pt;}
+.flow-row.is-lg .flow-desc{font-size:11.76pt;}
+.flow-row.is-xl .flow-step{padding:18px 14px;}
+.flow-row.is-xl .flow-title{font-size:16.5pt;}
+.flow-row.is-xl .flow-desc{font-size:14.7pt;}
 
 /* Multi-row flow (equal-size grid cells, arrows only between nodes on the same row) */
 .flow-grid{
@@ -604,7 +677,7 @@ var SLIDES = [
     {title:'Softmax', desc:'다음 단어 확률 계산'},
     {title:'토큰 선택', desc:'최적 단어 연속 생성'}
   ]},
-  {type:'steps', heading:'Attention 메커니즘 : Query · Key · Value', headingTone:'green', cols:3, items:[
+  {type:'steps', heading:'Attention 메커니즘 : Query · Key · Value', headingTone:'green', cols:3, center:true, items:[
     {title:'Query (질문)', desc:'“내가 찾고자 하는 핵심 정보는 무엇인가?” (관련 정보 탐색 질문)'},
     {title:'Key (특징)', desc:['“내가 가진 정보의 특징은 무엇인가?”','(검색 기준 레이블)'], bulletless:true},
     {title:'Value (내용)', desc:['“실제 전달할 의미 값은 무엇인가?”','(최종 전달되는 컨텍스트)'], bulletless:true}
@@ -666,7 +739,8 @@ var SLIDES = [
     ['1턴','질문1(100) → 답변1(200)','300','300'],
     ['2턴','[질문1+답변1] + 질문2(100) → 답변2(200)','600','900'],
     ['3턴','[질문1+답변1+질문2+답변2] + 질문3(100) → 답변3(200)','900','1,800']
-  ], footnote:'최종 결과 : 한 번에 질문했다면 900토큰으로 끝날 일을, 나누어 질문하여 과거 데이터 재전송으로 비용이 6배 폭증 (총 1,800 토큰)'}
+  ]},
+  {type:'note', tone:'green', text:'최종 결과 : 한 번에 질문했다면 900토큰으로 끝날 일을, 나누어 질문하여 과거 데이터 재전송으로 비용이 6배 폭증 (총 1,800 토큰)'}
  ], tag:'토큰 스노우볼 효과'},
 
 /* 16 */
@@ -757,7 +831,7 @@ var SLIDES = [
        '사용자가 원하는 바를 쉬운 언어로 설명 → AI가 설계·구현을 대행',
        '코딩 경험이 없어도 앱을 만들 수 있는 환경 조성'],
  blocks:[
-  {type:'flow', stages:[
+  {type:'flow', md:true, stages:[
     {title:'자연어로 원하는 바 설명'},
     {title:'AI가 설계·구현 자동 수행'},
     {title:'완성된 앱 / 서비스'}
@@ -770,10 +844,10 @@ var SLIDES = [
        '사용자 요청을 바탕으로 다음 단계를 스스로 수행',
        'AI 에이전트, 단순 보조 도구에서 자율 수행 주체로 역할 확대'],
  blocks:[
-  {type:'steps', cols:3, items:[
-    {num:'1', title:'추론', desc:'Reasoning'},
-    {num:'2', title:'계획 수립', desc:'Planning'},
-    {num:'3', title:'실행', desc:'Execution'}
+  {type:'steps', cols:3, md:true, center:true, items:[
+    {num:'1', title:'추론', sub2:'Reasoning'},
+    {num:'2', title:'계획 수립', sub2:'Planning'},
+    {num:'3', title:'실행', sub2:'Execution'}
   ]}
  ], tag:'AI 에이전트의 진화'},
 
@@ -914,7 +988,7 @@ var SLIDES = [
 {layout:'content', eyebrow:'05 · LEADERSHIP', title:'경영진과 조직장의 역할 : 자유로운 실험 문화 조성',
  lead:['직원들이 실패를 두려워하지 않고 AI를 자유롭게 써보며, 성공한 작은 경험을 부서에 퍼뜨릴 수 있도록 격려하는 문화가 가장 중요'],
  blocks:[
-  {type:'flow', stages:[
+  {type:'flow', lg:true, stages:[
     {title:'개인의 작은 실험', desc:'부서원이 일상 업무에서 AI 활용'},
     {title:'성공 사례 공유', desc:'“이 방식으로 시간 절약했어요!” 발표'},
     {title:'전사 AX 달성', desc:'조직 전체의 업무 생산성 폭발'}
@@ -930,7 +1004,7 @@ var SLIDES = [
     {num:'3', title:'AI-Maximalist', sub2:'AI 극대화', desc:'AI 없이는 업무 진행이 어려운, AI 의존도가 높은 단계'},
     {num:'4', title:'AI-Native', sub2:'AI 내재화', desc:'AI가 사고와 분리되지 않고 업무 전반에 완전히 통합된 단계'}
   ]},
-  {type:'note', text:'최대 격차 구간 : AI-Enabled → AI-Maximalist → AI-Native 전환 구간에서 가장 큰 격차 발생'}
+  {type:'note', tone:'green', text:'최대 격차 구간 : AI-Enabled → AI-Maximalist → AI-Native 전환 구간에서 가장 큰 격차 발생'}
  ], tag:'AI 활용 4단계 진화'},
 
 /* 39 */
@@ -1032,7 +1106,7 @@ var SLIDES = [
  ], tag:'ASI 도달 6대 장벽'},
 
 /* 48 */
-{layout:'content', eyebrow:'SUMMARY', title:'Key Takeaways',
+{layout:'content', compact:true, eyebrow:'SUMMARY', title:'Key Takeaways',
  blocks:[
   {type:'steps', cols:1, boldDesc:true, items:[
     {num:'1', desc:'AX = AI를 쓰는 사람 → AI와 일하는 사람으로의 근본적 전환'},
@@ -1126,15 +1200,14 @@ function renderStepsBlock(b){
     }
     var footerHtml = it.footer ? '<div class="step-footer-tag">'+esc(it.footer)+'</div>' : '';
     var toneCls = it.tone === 'accent' ? ' is-accent' : '';
+    var inner = '<div class="step-head">'+numHtml+'<div class="step-head-text">'+titleHtml+sub2Html+(it.title||it.sub2?'':descHtml)+'</div></div>'+
+      (it.title||it.sub2?descHtml:'')+badgeHtml+noteHtml+footerHtml;
     if(b.flatBullets){
-      return '<div class="step-item is-stack'+toneCls+'">'+
-        '<div class="step-head">'+numHtml+'<div class="step-head-text">'+titleHtml+sub2Html+'</div></div>'+
-        descHtml+badgeHtml+noteHtml+footerHtml+'</div>';
+      return '<div class="step-item is-stack'+toneCls+'">'+inner+'</div>';
     }
-    return '<div class="step-item'+toneCls+'">'+numHtml+
-      '<div class="step-content">'+titleHtml+sub2Html+descHtml+badgeHtml+noteHtml+footerHtml+'</div></div>';
+    return '<div class="step-item'+(it.title||it.sub2?'':' is-inline')+toneCls+'">'+inner+'</div>';
   }).join('');
-  return '<div class="steps-grid" style="--cols:'+cols+'">'+itemsHtml+'</div>';
+  return '<div class="steps-grid'+(b.xl?' is-xl':b.md?' is-md':'')+(b.center?' is-center':'')+'" style="--cols:'+cols+'">'+itemsHtml+'</div>';
 }
 
 function renderTableBlock(b){
@@ -1197,7 +1270,7 @@ function renderFlowBlock(b){
     return node;
   }).join('');
   var footnote = b.footnote ? '<div class="table-footnote flow-footnote">'+esc(b.footnote)+'</div>' : '';
-  return '<div class="flow-row">'+stepsHtml+'</div>'+footnote;
+  return '<div class="flow-row'+(b.xl?' is-xl':b.lg?' is-lg':b.md?' is-md':'')+'">'+stepsHtml+'</div>'+footnote;
 }
 
 function renderFlowGridBlock(b){
@@ -1377,6 +1450,90 @@ function render(){
   updateProgress();
   updateNavActive();
   updateHint();
+  requestAnimationFrame(function(){
+    balanceSparseSlide(dom.slideViewport.querySelector('.slide-card'));
+  });
+}
+
+function gapPx(el){
+  var cs = getComputedStyle(el);
+  return parseFloat(cs.rowGap || cs.gap) || 0;
+}
+
+function childrenHeight(el){
+  var h = 0;
+  var n = el.children.length;
+  for(var i=0;i<n;i++){ h += el.children[i].offsetHeight; }
+  if(n > 1) h += gapPx(el) * (n - 1);
+  return h;
+}
+
+function naturalContentHeight(card){
+  var special = card.querySelector('.cover-layout, .section-layout, .closing-layout');
+  if(special) return childrenHeight(special);
+  var h = 0;
+  for(var i=0;i<card.children.length;i++){
+    var el = card.children[i];
+    if(el.classList.contains('slide-footer')) continue;
+    var mt = parseFloat(getComputedStyle(el).marginTop) || 0;
+    if(el.classList.contains('slide-body')){
+      h += childrenHeight(el) + mt;
+    } else {
+      h += el.offsetHeight + mt;
+    }
+  }
+  return h;
+}
+
+function clearSparseInline(card){
+  var marked = card.querySelectorAll('[data-sparse-min]');
+  for(var i=0;i<marked.length;i++){
+    marked[i].style.minHeight = '';
+    marked[i].style.gap = '';
+    marked[i].style.justifyContent = '';
+    marked[i].removeAttribute('data-sparse-min');
+  }
+  card.classList.remove('is-sparse');
+}
+
+function balanceSparseSlide(card){
+  if(!card || card.classList.contains('is-compact')) return;
+  clearSparseInline(card);
+  var H = card.clientHeight;
+  if(!H) return;
+  var footer = card.querySelector('.slide-footer');
+  var footerH = 0;
+  if(footer){
+    footerH = footer.offsetHeight + (parseFloat(getComputedStyle(footer).marginTop) || 0);
+  }
+  var target = Math.min(Math.round(H * 0.5), H - footerH - 8);
+  var natural = naturalContentHeight(card);
+  if(natural >= target - 4) return;
+
+  card.classList.add('is-sparse');
+  var afterLine = naturalContentHeight(card);
+  if(afterLine >= target - 4) return;
+
+  var extra = target - afterLine;
+  var special = card.querySelector('.cover-layout, .section-layout, .closing-layout');
+  if(special){
+    var slots = Math.max(1, special.children.length - 1);
+    special.style.gap = (gapPx(special) + extra / slots) + 'px';
+    special.setAttribute('data-sparse-min', '1');
+    return;
+  }
+
+  var body = card.querySelector('.slide-body');
+  if(!body) return;
+  var stretch = body.querySelector('.steps-grid, .compare-grid, .mythfact-grid, .flow-grid, .flow-row, .statgrid-row, .barlist, .table-wrap, .transition-row, .archflow-list, .quote-box, .note-box');
+  if(!stretch) stretch = body.querySelector('.block');
+  if(stretch){
+    stretch.style.minHeight = Math.round(stretch.offsetHeight + extra) + 'px';
+    stretch.setAttribute('data-sparse-min', '1');
+  } else {
+    body.style.minHeight = Math.round(childrenHeight(body) + extra) + 'px';
+    body.setAttribute('data-sparse-min', '1');
+  }
 }
 
 function goTo(n){
@@ -1448,6 +1605,15 @@ function bindEvents(){
     } else if(e.key === 'End'){
       e.preventDefault(); goTo(TOTAL);
     }
+  });
+
+  var resizeTimer = 0;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      var card = dom.slideViewport.querySelector('.slide-card');
+      balanceSparseSlide(card);
+    }, 120);
   });
 }
 
