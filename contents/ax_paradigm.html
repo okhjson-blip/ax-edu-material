@@ -57,12 +57,20 @@ ul{list-style:none;margin:0;padding:0;}
 
 /* ---------- Sidebar (agenda) : fixed 280px (~18%) ---------- */
 #sidebar{
+  --sb-bg:#0f172a;
+  --sb-text:#f8fafc;
+  --sb-muted:rgba(255,255,255,0.62);
+  --sb-faint:rgba(255,255,255,0.38);
+  --sb-hover:rgba(255,255,255,0.08);
+  --sb-surface:rgba(255,255,255,0.06);
+  --sb-line:rgba(255,255,255,0.12);
   flex:0 0 var(--sidebar-w);
   width:var(--sidebar-w);
   max-width:30%;
   height:100%;
-  background:var(--white);
-  border-right:1px solid var(--border);
+  background:var(--sb-bg);
+  color:var(--sb-text);
+  border-right:1px solid var(--sb-line);
   display:flex;
   flex-direction:column;
   padding:22px 18px;
@@ -75,29 +83,29 @@ ul{list-style:none;margin:0;padding:0;}
   display:flex;align-items:center;justify-content:center;
 }
 .brand-text{display:flex;flex-direction:column;line-height:1.35;}
-.brand-text strong{font-size:11.5pt;color:var(--blue-dark);letter-spacing:.01em;}
-.brand-text span{font-size:9.5pt;color:var(--gray-500);}
+.brand-text strong{font-size:11.5pt;color:var(--sb-text);letter-spacing:.01em;}
+.brand-text span{font-size:9.5pt;color:var(--sb-muted);}
 
 .progress-panel{
-  background:var(--gray-050);
-  border:1px solid var(--border);
+  background:var(--sb-surface);
+  border:1px solid var(--sb-line);
   border-radius:10px;
   padding:14px 14px 12px;
   margin-bottom:20px;
 }
 .progress-top{
   display:flex;justify-content:space-between;align-items:baseline;
-  font-size:10pt;color:var(--gray-600);margin-bottom:8px;
+  font-size:10pt;color:var(--sb-muted);margin-bottom:8px;
 }
-#progressPercent{font-size:13pt;font-weight:800;color:var(--blue);}
+#progressPercent{font-size:13pt;font-weight:800;color:var(--sb-text);}
 .progress-track{
-  width:100%;height:8px;background:var(--gray-100);border-radius:5px;overflow:hidden;
+  width:100%;height:8px;background:rgba(255,255,255,0.12);border-radius:5px;overflow:hidden;
 }
 .progress-fill{
   height:100%;width:0%;background:var(--green);
   border-radius:5px;transition:width .25s ease;
 }
-.progress-count{margin-top:8px;font-size:9.5pt;color:var(--gray-500);}
+.progress-count{margin-top:8px;font-size:9.5pt;color:var(--sb-faint);}
 
 .sidebar-nav{
   flex:1;display:flex;flex-direction:column;gap:4px;overflow-y:auto;
@@ -106,49 +114,49 @@ ul{list-style:none;margin:0;padding:0;}
   display:flex;align-items:center;gap:10px;
   width:100%;text-align:left;
   background:transparent;border:1px solid transparent;border-radius:9px;
-  padding:9px 10px;cursor:pointer;color:var(--gray-700);
+  padding:9px 10px;cursor:pointer;color:var(--sb-muted);
 }
-.nav-item:hover{background:var(--gray-050);}
+.nav-item:hover{background:var(--sb-hover);color:var(--sb-text);}
 .nav-no{
   flex:0 0 auto;width:22px;height:22px;border-radius:6px;
-  background:var(--gray-100);color:var(--blue);font-weight:700;font-size:9.5pt;
+  background:rgba(255,255,255,0.12);color:var(--sb-text);font-weight:700;font-size:9.5pt;
   display:flex;align-items:center;justify-content:center;
 }
 .nav-label{font-size:10.5pt;line-height:1.4;}
-.nav-item.is-active{background:var(--blue);border-color:var(--blue);}
+.nav-item.is-active{background:var(--blue);border-color:var(--blue);color:#fff;}
 .nav-item.is-active .nav-label{color:#fff;font-weight:700;}
 .nav-item.is-active .nav-no{background:var(--green);color:#fff;}
-.nav-item.is-edge{color:var(--gray-500);font-size:10pt;}
-.nav-item.is-edge.is-active{background:var(--blue-dark);}
+.nav-item.is-edge{color:var(--sb-faint);font-size:10pt;}
+.nav-item.is-edge.is-active{background:var(--blue-dark);color:#fff;}
 .nav-item:focus-visible,.stage-arrow:focus-visible{outline:3px solid var(--green);outline-offset:2px;}
 
 .sidebar-home-list{
   flex:0 0 auto;
   margin-top:10px;
   padding-top:10px;
-  border-top:1px solid var(--border);
+  border-top:1px solid var(--sb-line);
 }
 .sidebar-home{
   display:flex;align-items:center;gap:10px;
   width:100%;
   padding:9px 10px;
   border-radius:9px;
-  color:var(--blue-dark);
+  color:var(--sb-text);
   font-size:10.5pt;
   font-weight:700;
   text-decoration:none;
 }
-.sidebar-home:hover{background:var(--gray-050);}
+.sidebar-home:hover{background:var(--sb-hover);}
 .sidebar-home:focus-visible{outline:3px solid var(--green);outline-offset:2px;}
 .sidebar-home .nav-no{
   background:transparent;
-  color:var(--blue);
+  color:var(--sb-text);
   font-size:12pt;
 }
 
 .sidebar-footer{
-  margin-top:14px;padding-top:14px;border-top:1px solid var(--border);
-  font-size:9pt;color:var(--gray-400);line-height:1.5;
+  margin-top:14px;padding-top:14px;border-top:1px solid var(--sb-line);
+  font-size:9pt;color:var(--sb-faint);line-height:1.5;
 }
 
 /* ---------- Main stage ---------- */
@@ -199,8 +207,8 @@ ul{list-style:none;margin:0;padding:0;}
   .cover-title{font-size:27pt;}
   .section-titleKr{font-size:22pt;margin-top:5px;}
   .section-previews{margin-top:12px;gap:7px;}
-  .closing-lead{font-size:32pt;}
-  .closing-title{font-size:29pt;}
+  .closing-lead{font-size:18pt;}
+  .closing-title{font-size:13pt;}
 }
 @media (max-height:700px){
   .slide-title{font-size:16.5pt;}
@@ -211,9 +219,25 @@ ul{list-style:none;margin:0;padding:0;}
   .stat-value{font-size:20pt;}
   .cover-title{font-size:22pt;}
   .section-titleKr{font-size:18pt;}
-  .closing-lead{font-size:26pt;}
-  .closing-title{font-size:24pt;}
+  .closing-lead{font-size:16pt;}
+  .closing-title{font-size:12pt;}
 }
+
+.slide-card.is-compact{overflow:hidden;}
+.slide-card.is-compact .slide-body{
+  flex:1;min-height:0;gap:10px;margin-top:14px;
+}
+.slide-card.is-compact .slide-body .block:first-child{
+  flex:1;min-height:0;display:flex;flex-direction:column;
+}
+.slide-card.is-compact .steps-grid{
+  flex:1;min-height:0;height:100%;gap:8px;grid-auto-rows:1fr;
+}
+.slide-card.is-compact .step-item{
+  padding:8px 14px;min-height:0;align-items:center;
+}
+.slide-card.is-compact .note-box{padding:10px 14px;}
+.slide-card.is-compact .slide-footer{margin-top:12px;padding-top:10px;}
 
 .stage-arrow{
   position:absolute;top:50%;transform:translateY(-50%);
@@ -273,6 +297,7 @@ ul{list-style:none;margin:0;padding:0;}
 .step-title{font-size:12.5pt;font-weight:700;color:var(--blue-dark);line-height:1.4;}
 .step-sub2{font-size:9.5pt;color:var(--gray-500);font-weight:600;}
 .step-desc{font-size:10.8pt;color:var(--gray-700);line-height:1.6;}
+.step-desc.is-bold{font-weight:700;color:var(--gray-800);}
 .step-desc ul{margin:2px 0 0 0;padding:0;display:flex;flex-direction:column;gap:3px;}
 .step-desc ul li{padding-left:13px;position:relative;}
 .step-desc ul li::before{content:'';position:absolute;left:0;top:8px;width:4px;height:4px;border-radius:50%;background:var(--blue);}
@@ -288,6 +313,11 @@ ul{list-style:none;margin:0;padding:0;}
 }
 .step-note-inner{width:100%;}
 .step-footer-tag{font-size:9.5pt;font-weight:700;color:var(--blue);margin-top:2px;}
+.step-item.is-stack{flex-direction:column;gap:10px;}
+.step-item.is-stack .step-head{display:flex;align-items:flex-start;gap:10px;}
+.step-item.is-stack .step-head-text{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.step-item.is-stack .step-desc{margin:0;}
+.step-item.is-stack .step-desc ul{margin:0;}
 
 /* ---------- table ---------- */
 .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;}
@@ -314,6 +344,7 @@ table.data-table tr:nth-child(even) td{background:var(--gray-050);}
 .compare-item-titled::before{display:none;}
 .ci-title{font-weight:700;color:var(--blue-dark);font-size:10.8pt;margin-bottom:2px;}
 .ci-desc{font-size:10.5pt;color:var(--gray-700);line-height:1.6;}
+.compare-item .ci-inline-title{font-weight:700;color:var(--blue-dark);}
 .bullets-list{display:flex;flex-direction:column;gap:9px;}
 
 /* ---------- myth / fact ---------- */
@@ -346,16 +377,23 @@ table.data-table tr:nth-child(even) td{background:var(--gray-050);}
 .flow-footnote{margin-top:12px;}
 
 /* Multi-row flow (equal-size grid cells, arrows only between nodes on the same row) */
-.flow-grid{display:grid;grid-template-columns:repeat(var(--flowcols,3),1fr);gap:26px 14px;}
+.flow-grid{
+  display:grid;
+  grid-template-columns:repeat(var(--flowcols,3),minmax(0,176px));
+  justify-content:center;
+  column-gap:44px;
+  row-gap:26px;
+}
 .flow-grid-step{
   position:relative;background:var(--gray-050);border:1px solid var(--border);border-radius:10px;
-  padding:14px 10px;text-align:center;min-height:80px;
+  padding:14px 12px;text-align:center;min-height:80px;
   display:flex;flex-direction:column;justify-content:center;
 }
 .flow-grid-step .flow-title{font-weight:700;color:var(--blue-dark);font-size:11pt;}
 .flow-grid-step .flow-desc{font-size:9.8pt;color:var(--gray-600);margin-top:4px;line-height:1.5;}
 .flow-grid-step:not(:last-child)::after{
-  content:'→';position:absolute;top:50%;right:-20px;transform:translateY(-50%);
+  content:'→';position:absolute;top:50%;right:-44px;width:44px;
+  transform:translateY(-50%);text-align:center;
   color:var(--blue);font-size:15pt;font-weight:700;
 }
 .flow-grid[data-cols="3"] .flow-grid-step:nth-child(3n)::after{content:none;}
@@ -412,8 +450,8 @@ table.data-table tr:nth-child(even) td{background:var(--gray-050);}
 .section-preview-item .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex:0 0 auto;margin-top:8px;}
 
 .closing-layout{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;}
-.closing-lead{font-size:40pt;font-weight:800;color:var(--blue-dark);line-height:1.5;max-width:900px;}
-.closing-title{font-size:36pt;font-weight:800;color:var(--blue-dark);}
+.closing-lead{font-size:22pt;font-weight:700;color:var(--blue-dark);line-height:1.6;max-width:900px;}
+.closing-title{font-size:14pt;font-weight:600;color:var(--gray-500);}
 .closing-footer{margin-top:14px;font-size:10.3pt;color:var(--blue);font-weight:700;}
 
 /* =========================================================
@@ -424,17 +462,19 @@ table.data-table tr:nth-child(even) td{background:var(--gray-050);}
 }
 @media (max-width:760px){
   #app{flex-direction:column;height:auto;min-height:100vh;}
-  #sidebar{width:100%;max-width:100%;flex:0 0 auto;height:auto;border-right:none;border-bottom:1px solid var(--border);flex-direction:column;}
+  #sidebar{width:100%;max-width:100%;flex:0 0 auto;height:auto;border-right:none;border-bottom:1px solid var(--sb-line);flex-direction:column;}
   .sidebar-nav{flex-direction:row;overflow-x:auto;gap:6px;}
   .nav-item{flex:0 0 auto;white-space:nowrap;}
   .sidebar-home-list{margin-top:8px;padding-top:8px;}
   #stage{padding:20px 44px;height:70vh;}
   .slide-card{padding:26px 20px 20px;}
   .steps-grid,.compare-grid,.mythfact-grid{grid-template-columns:1fr !important;}
+  .flow-grid{grid-template-columns:repeat(var(--flowcols,3),minmax(0,1fr));column-gap:22px;}
+  .flow-grid-step:not(:last-child)::after{right:-22px;width:22px;font-size:13pt;}
   .cover-title{font-size:24pt;}
   .section-titleKr{font-size:20pt;}
-  .closing-lead{font-size:26pt;}
-  .closing-title{font-size:20pt;}
+  .closing-lead{font-size:16pt;}
+  .closing-title{font-size:12pt;}
 }
 </style>
 </head>
@@ -564,8 +604,8 @@ var SLIDES = [
   ]},
   {type:'steps', heading:'Attention 메커니즘 : Query · Key · Value', headingTone:'green', cols:3, items:[
     {title:'Query (질문)', desc:'“내가 찾고자 하는 핵심 정보는 무엇인가?” (관련 정보 탐색 질문)'},
-    {title:'Key (특징)', desc:'“내가 가진 정보의 특징은 무엇인가?”<br> (검색 기준 레이블)'},
-    {title:'Value (내용)', desc:'“실제 전달할 의미 값은 무엇인가?” <br> (최종 전달되는 컨텍스트)'}
+    {title:'Key (특징)', desc:['“내가 가진 정보의 특징은 무엇인가?”','(검색 기준 레이블)'], bulletless:true},
+    {title:'Value (내용)', desc:['“실제 전달할 의미 값은 무엇인가?”','(최종 전달되는 컨텍스트)'], bulletless:true}
   ]}
  ], tag:'LLM 동작 원리'},
 
@@ -651,7 +691,7 @@ var SLIDES = [
  blocks:[
   {type:'barlist', heading:'프론티어 AI 모델 성능 (SWE-Bench)', items:[
     {label:'Claude Opus 4.5 / 4.6', value:80.8},
-    {label:'GPT-5.2 (OpenAI)', value:80.0},
+    {label:'GPT-5.3 (OpenAI)', value:80.0},
     {label:'Kimi 3 (Moonshot AI)', value:76.8},
     {label:'Gemini 3 Pro (Google)', value:76.2}
   ]},
@@ -659,7 +699,7 @@ var SLIDES = [
     {title:'GPT-5.3 Codex Agent', desc:'복잡한 업무 자동화 및 워크플로우 최적화 강점'},
     {title:'Claude Code (Opus 4.5 Agent)', desc:'자율 빌드, 디버깅 파이프라인 및 완성도 높은 코드 생성'}
   ]},
-  {type:'note', text:'종합 결론 : Claude 계열 모델이 코드 품질과 자율 에이전트 완성도에서 두루 높은 성능을 보이며, 목적에 맞는 모델·에이전트 조합 전략이 중요'}
+  {type:'note', tone:'green', text:'종합 결론 : Claude 계열 모델이 코드 품질과 자율 에이전트 완성도에서 두루 높은 성능을 보이며, 목적에 맞는 모델·에이전트 조합 전략이 중요'}
  ], tag:'2026 AI 코딩 벤치마크'},
 
 /* 18 */
@@ -964,7 +1004,7 @@ var SLIDES = [
  brand:'AX Consulting Basic Guide'},
 
 /* 46 */
-{layout:'content', eyebrow:'07 · FUTURE OUTLOOK', title:'생성형 AI 핵심 키워드 및 우선순위',
+{layout:'content', compact:true, eyebrow:'07 · FUTURE OUTLOOK', title:'생성형 AI 핵심 키워드 및 우선순위',
  blocks:[
   {type:'steps', cols:1, items:[
     {num:'1', title:'AGI & 초지능', desc:'2027년 AGI 도래 가능성 및 특이점(Singularity) 진입 전망'},
@@ -992,7 +1032,7 @@ var SLIDES = [
 /* 48 */
 {layout:'content', eyebrow:'SUMMARY', title:'Key Takeaways',
  blocks:[
-  {type:'steps', cols:1, items:[
+  {type:'steps', cols:1, boldDesc:true, items:[
     {num:'1', desc:'AX = AI를 쓰는 사람 → AI와 일하는 사람으로의 근본적 전환'},
     {num:'2', desc:'실무자(개발자) 역할 : 코더 → AI 오케스트레이터 · 품질 큐레이터 · 설계 전문가로 진화'},
     {num:'3', desc:'AX 추진 전략 : Top-down(전사 리더십)과 Bottom-up(현장 주도)의 상호 보완적 결합 必'},
@@ -1004,7 +1044,7 @@ var SLIDES = [
 
 /* 49 : CLOSING */
 {layout:'closing',
- lead:'올바른 기대, 전략적 활용, 그리고 지속적인 검증이 AI 활용 성공의 핵심입니다.',
+ lead:['올바른 기대, 전략적 활용, 그리고 지속적인 검증이','AI 활용 성공의 핵심입니다.'],
  big:'Thank You',
  footer:'AX: AI와 협업하는 미래  |  Samsung Electronics AX Consulting'}
 
@@ -1071,7 +1111,7 @@ function renderStepsBlock(b){
     }
     var titleHtml = it.title ? '<div class="step-title">'+esc(it.title)+'</div>' : '';
     var sub2Html = it.sub2 ? '<div class="step-sub2">'+esc(it.sub2)+'</div>' : '';
-    var descHtml = it.desc ? '<div class="step-desc'+(b.flatBullets?' no-hang':'')+'">'+joinDesc(it.desc, it.bulletless)+'</div>' : '';
+    var descHtml = it.desc ? '<div class="step-desc'+(b.flatBullets?' no-hang':'')+(b.boldDesc?' is-bold':'')+'">'+joinDesc(it.desc, it.bulletless)+'</div>' : '';
     var badgeHtml = it.badge ? '<div class="step-badge">'+esc(it.badge)+'</div>' : '';
     var noteHtml = '';
     if(it.sub){
@@ -1081,6 +1121,11 @@ function renderStepsBlock(b){
     }
     var footerHtml = it.footer ? '<div class="step-footer-tag">'+esc(it.footer)+'</div>' : '';
     var toneCls = it.tone === 'accent' ? ' is-accent' : '';
+    if(b.flatBullets){
+      return '<div class="step-item is-stack'+toneCls+'">'+
+        '<div class="step-head">'+numHtml+'<div class="step-head-text">'+titleHtml+sub2Html+'</div></div>'+
+        descHtml+badgeHtml+noteHtml+footerHtml+'</div>';
+    }
     return '<div class="step-item'+toneCls+'">'+numHtml+
       '<div class="step-content">'+titleHtml+sub2Html+descHtml+badgeHtml+noteHtml+footerHtml+'</div></div>';
   }).join('');
@@ -1106,6 +1151,10 @@ function renderCompareBlock(b){
     var items = col.items.map(function(i){
       if(typeof i === 'object'){
         return '<div class="compare-item compare-item-titled"><div class="ci-title">'+esc(i.title)+'</div><div class="ci-desc">'+esc(i.desc)+'</div></div>';
+      }
+      var parts = String(i).match(/^(.+?)\s:\s([\s\S]+)$/);
+      if(parts){
+        return '<div class="compare-item"><span class="ci-inline-title">'+esc(parts[1])+'</span> : '+esc(parts[2])+'</div>';
       }
       return '<div class="compare-item">'+esc(i)+'</div>';
     }).join('');
@@ -1176,7 +1225,7 @@ function renderBarlistBlock(b){
   var itemsHtml = b.items.map(function(i){
     return '<div class="bar-row"><div class="bar-label">'+esc(i.label)+'</div>'+
       '<div class="bar-track"><div class="bar-fill" style="width:'+i.value+'%"></div></div>'+
-      '<div class="bar-value">'+i.value+'%</div></div>';
+      '<div class="bar-value">'+Number(i.value).toFixed(1)+'%</div></div>';
   }).join('');
   return '<div class="barlist">'+itemsHtml+'</div>';
 }
@@ -1262,7 +1311,7 @@ function sectionTemplate(slide, num){
 
 function closingTemplate(slide){
   return '<div class="closing-layout">'+
-    '<div class="closing-lead">'+esc(slide.lead)+'</div>'+
+    '<div class="closing-lead">'+joinDesc(slide.lead, true)+'</div>'+
     '<div class="closing-title">'+esc(slide.big)+'</div>'+
     '<div class="closing-footer">'+esc(slide.footer)+'</div>'+
     '</div>';
@@ -1314,7 +1363,7 @@ function updateHint(){
 
 function render(){
   var slide = SLIDES[current - 1];
-  dom.slideViewport.innerHTML = '<div class="slide-card">' + slideTemplate(slide, current) + '</div>';
+  dom.slideViewport.innerHTML = '<div class="slide-card'+(slide.compact?' is-compact':'')+'">' + slideTemplate(slide, current) + '</div>';
   var card = dom.slideViewport.querySelector('.slide-card');
   if(card){ card.scrollTop = 0; }
   updateProgress();
