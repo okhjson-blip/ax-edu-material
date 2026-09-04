@@ -51,7 +51,7 @@
     {
       "slug": "global-ai-trend",
       "title": "Global AI Trend",
-      "description": "AI 2026: 단순 지원에서 자율형 오케스트레이션으로",
+      "description": "AI 2026: 단순 지원에서\n자율형 오케스트레이션으로",
       "cover": "cover.jpg",
       "htmlFile": "contents/global_AI_trend.html",
       "showCaption": true
@@ -70,6 +70,14 @@
       "description": "",
       "cover": "cover.jpg",
       "htmlFile": "contents/case_26h1.html",
+      "showCaption": true
+    },
+    {
+      "slug": "skills-superpowers-grillme",
+      "title": "Skills Guide",
+      "description": "IDEA → SPEC → PLAN ·\n아이디어에서 구현까지",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/skills_superpowers_grillme.html",
       "showCaption": true
     }
   ]

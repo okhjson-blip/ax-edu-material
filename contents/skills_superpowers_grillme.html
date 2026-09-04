@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDEA → SPEC → PLAN | Superpowers &amp; Grill-me 스킬 가이드</title>
+<style>
+/* ==========================================================================
+   1. RESET & TOKENS
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+:root{
+  /* --- brand palette (spec 고정값) --- */
+  --c-white:      #FFFFFF;
+  --c-sidebar:    #0A1E5C;   /* 딥네이비 */
+  --c-royal:      #034EA2;   /* 삼성 로열 블루 */
+  --c-darkblue:   #002B66;   /* 다크 블루 */
+  --c-accent:     #78BE20;   /* 포인트 연두 */
+
+  /* --- 파생 텍스트/보더 색상 --- */
+  --c-ink:        #16233F;   /* 본문 기본 텍스트 */
+  --c-muted:      #5C6B85;   /* 보조 텍스트 */
+  --c-line:       #E2E7F1;   /* 얇은 구분선 */
+  --c-surface-2:  #F4F6FB;   /* 카드 내부 서브 배경 */
+  --c-sidebar-2:  #142A6E;   /* 사이드바 서브 배경(호버 등) */
+  --c-sidebar-txt:#B9C4E6;   /* 사이드바 보조 텍스트 */
+
+  /* --- 타이포 스케일 (pt 기준, 본문 14pt) --- */
+  --fs-body:      14pt;
+  --fs-small:     12pt;
+  --fs-tiny:      11pt;   /* 진행율 표기 전용 */
+  --fs-h3:        15pt;
+  --fs-subtitle:  15.5pt;
+  --fs-title:     25pt;
+  --fs-eyebrow:   11pt;
+  --fs-hero-sub:  17pt;
+  --fs-hero:      38pt;
+  --fs-stat:      33pt;
+
+  --font-base: "Malgun Gothic", "Apple SD Gothic Neo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+
+  --sidebar-w: 280px;
+  --radius: 10px;
+  --shadow-card: 0 1px 2px rgba(10,30,92,0.06), 0 8px 24px rgba(10,30,92,0.08);
+}
+
+body{
+  font-family: var(--font-base);
+  font-size: var(--fs-body);
+  color: var(--c-ink);
+  line-height: 1.65;
+  background: var(--c-white);
+  word-break: keep-all;         /* 한국어 의미 단위 줄바꿈 */
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* '·' 글머리표 줄바꿈 시 반자(0.5em) 들여쓰기 적용 */
+.indent-hang{
+  padding-left: 0.5em;
+  text-indent: -0.5em;
+}
+
+/* ==========================================================================
+   2. APP LAYOUT (Flexbox 2-Column)
+   ========================================================================== */
+.app{
+  display: flex;
+  height: 100vh;
+  min-height: 560px;
+  background: var(--c-white);
+  overflow: hidden;
+}
+
+/* --------------------------- SIDEBAR (좌측 아젠다) --------------------------- */
+.sidebar{
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  max-width: 30%;
+  background: var(--c-sidebar);
+  color: var(--c-sidebar-txt);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header{
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  flex: 0 0 auto;
+}
+.sidebar-header .brand-mark{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-small);
+  letter-spacing: 0.02em;
+  color: var(--c-accent);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.sidebar-header .brand-mark::before{
+  content:"";
+  width: 8px; height: 8px;
+  border-radius: 2px;
+  background: var(--c-accent);
+  display: inline-block;
+}
+.sidebar-header h1{
+  font-size: 16.5pt;
+  line-height: 1.4;
+  color: var(--c-white);
+  font-weight: 700;
+}
+.sidebar-header p{
+  margin-top: 6px;
+  font-size: var(--fs-small);
+  color: var(--c-sidebar-txt);
+}
+
+/* --- 진행율 바 --- */
+.progress-block{
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  flex: 0 0 auto;
+}
+.progress-meta{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: var(--fs-tiny);
+  color: var(--c-sidebar-txt);
+  margin-bottom: 8px;
+}
+.progress-meta .progress-pct{
+  font-size: var(--fs-tiny);
+  font-weight: 700;
+  color: var(--c-white);
+}
+.progress-meta .progress-count{
+  font-size: var(--fs-tiny);
+  color: var(--c-sidebar-txt);
+  font-variant-numeric: tabular-nums;
+}
+.progress-track{
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.14);
+  overflow: hidden;
+}
+.progress-fill{
+  height: 100%;
+  width: 0%;
+  background: var(--c-accent);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+/* --- 아젠다 리스트 --- */
+.agenda{
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 10px 12px 12px;
+}
+.agenda::-webkit-scrollbar{ width: 6px; }
+.agenda::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.18); border-radius: 999px; }
+
+.agenda-item{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  color: var(--c-sidebar-txt);
+  font-family: inherit;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  padding: 9px 10px 9px 12px;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.agenda-item:hover{
+  background: var(--c-sidebar-2);
+  color: var(--c-white);
+}
+.agenda-item .agenda-num{
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 10.5pt;
+  color: rgba(255,255,255,0.45);
+  min-width: 1.4em;
+}
+.agenda-item.is-active{
+  background: var(--c-sidebar-2);
+  border-left-color: var(--c-accent);
+  color: var(--c-white);
+  font-weight: 700;
+}
+.agenda-item.is-active .agenda-num{ color: var(--c-accent); }
+
+.sidebar-home{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 13px 22px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  color: var(--c-sidebar-txt);
+  font-size: var(--fs-small);
+  font-weight: 400;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sidebar-home:hover,
+.sidebar-home:focus-visible{
+  color: var(--c-white);
+  background: var(--c-sidebar-2);
+  outline: none;
+}
+.sidebar-home::before{
+  content: "←";
+  color: var(--c-accent);
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* --------------------------- MAIN STAGE --------------------------- */
+.main-stage{
+  flex: 1 1 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  background: var(--c-white);
+  padding: 16px 16px 10px;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+}
+
+.slide-viewport{
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  position: relative;
+}
+
+.slide{
+  display: none;
+  width: 100%;
+  height: 100%;
+  background: var(--c-white);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 34px 42px;
+  overflow-y: auto;
+  flex-direction: column;
+}
+.slide.is-active{ display: flex; }
+
+.slide-head{
+  flex: 0 0 auto;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--c-line);
+}
+.tag-eyebrow{
+  display: inline-block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--c-royal);
+  background: rgba(3,78,162,0.08);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.slide-title{
+  font-size: var(--fs-title);
+  font-weight: 800;
+  color: var(--c-darkblue);
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+.slide-sub{
+  font-size: var(--fs-subtitle);
+  color: var(--c-muted);
+}
+
+.slide-body{ flex: 1 1 auto; }
+
+/* 하단 클릭 안내 */
+.stage-hint{
+  flex: 0 0 auto;
+  margin-top: 14px;
+  font-size: var(--fs-tiny);
+  color: var(--c-muted);
+  text-align: center;
+}
+.stage-hint kbd{
+  font-family: var(--font-mono);
+  font-size: 10pt;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--c-ink);
+}
+
+/* ==========================================================================
+   3. SLIDE COMPONENTS
+   ========================================================================== */
+
+/* --- 표지(Slide 1) 전용 --- */
+.hero-slide .slide-body{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+  gap: 18px;
+}
+.hero-kicker{
+  font-size: var(--fs-eyebrow);
+  color: var(--c-royal);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.hero-title{
+  font-size: var(--fs-hero);
+  font-weight: 800;
+  color: var(--c-darkblue);
+  line-height: 1.2;
+}
+.hero-sub{
+  font-size: var(--fs-hero-sub);
+  color: var(--c-ink);
+  font-weight: 600;
+}
+.hero-desc{
+  font-size: var(--fs-body);
+  color: var(--c-muted);
+  max-width: 62ch;
+}
+.hero-desc strong{ color: var(--c-royal); font-weight: 700; }
+
+.flow-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.flow-node{
+  font-size: var(--fs-small);
+  font-weight: 700;
+  color: var(--c-white);
+  background: var(--c-royal);
+  padding: 9px 16px;
+  border-radius: 8px;
+  letter-spacing: 0.02em;
+}
+.flow-node.is-grill{ background: var(--c-accent); color: var(--c-darkblue); }
+.flow-node.is-plan{ background: var(--c-darkblue); }
+.flow-arrow{ color: var(--c-muted); font-size: var(--fs-h3); }
+
+/* --- 4단계 카드 그리드 (Slide 2, 6) --- */
+.step-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.step-card{
+  position: relative;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  background: var(--c-surface-2);
+}
+.step-card .step-no{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--c-royal);
+  color: var(--c-white);
+  font-size: var(--fs-small);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  margin-bottom: 10px;
+}
+.step-head-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.step-head-row .step-no{ margin-bottom: 0; flex: 0 0 auto; }
+.step-head-row h3{ margin-bottom: 0; }
+.step-card h3{
+  font-size: var(--fs-h3);
+  color: var(--c-darkblue);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.step-card p{
+  font-size: var(--fs-small);
+  color: var(--c-muted);
+}
+.step-card .tool-tag{
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  margin-bottom: 0;
+}
+
+.split-note{
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  border-top: 1px dashed var(--c-line);
+}
+.split-note p{
+  font-size: var(--fs-small);
+  color: var(--c-muted);
+  flex: 1 1 260px;
+}
+
+/* --- 도구 태그 --- */
+.tool-tag{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5pt;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  color: var(--c-white);
+  background: var(--c-royal);
+  white-space: nowrap;
+}
+.tool-tag[data-tool="writing-plans"]{ background: var(--c-darkblue); }
+.tool-tag[data-tool="grill-me"]{ background: var(--c-accent); color: var(--c-darkblue); }
+
+/* --- 표 (Slide 3, 12) --- */
+.data-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+}
+.data-table thead th{
+  text-align: left;
+  font-size: var(--fs-tiny);
+  color: var(--c-white);
+  background: var(--c-royal);
+  padding: 10px 14px;
+  font-weight: 700;
+}
+.data-table thead th:first-child{ border-radius: 6px 0 0 0; }
+.data-table thead th:last-child{ border-radius: 0 6px 0 0; }
+.data-table tbody td{
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--c-line);
+  color: var(--c-ink);
+  vertical-align: top;
+}
+.data-table tbody tr:nth-child(odd){ background: var(--c-surface-2); }
+
+/* --- 핵심 원칙 / 주의 박스 --- */
+.callout-box{
+  margin-top: 18px;
+  border-left: 4px solid var(--c-accent);
+  background: rgba(120,190,32,0.08);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+}
+.callout-box .callout-label{
+  font-size: var(--fs-tiny);
+  font-weight: 700;
+  color: var(--c-darkblue);
+  margin-bottom: 6px;
+  display: block;
+}
+.callout-box p{
+  font-size: var(--fs-small);
+  color: var(--c-ink);
+}
+.callout-box.is-warning{
+  border-left-color: var(--c-royal);
+  background: rgba(3,78,162,0.06);
+}
+
+/* --- 2단 컬럼 (Slide 4, 13) --- */
+.dual-col{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.dual-col .col-card{
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.dual-col .col-card h3{
+  font-size: var(--fs-h3);
+  color: var(--c-darkblue);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.dual-col .col-card .col-caption{
+  font-size: var(--fs-small);
+  color: var(--c-royal);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.dual-col .col-card ul{ list-style: none; }
+.dual-col .col-card li{
+  display: flex;
+  font-size: var(--fs-small);
+  color: var(--c-ink);
+  margin-bottom: 9px;
+}
+.dual-col .col-card li::before{
+  content: "·";
+  color: var(--c-accent);
+  font-weight: 900;
+  flex: 0 0 auto;
+  margin-right: 6px;
+}
+
+/* --- 사용법 / 예시 프롬프트 블록 --- */
+.usage-line{
+  font-size: var(--fs-body);
+  color: var(--c-ink);
+  margin-bottom: 14px;
+}
+.usage-line strong{ color: var(--c-royal); }
+
+.quote-block{
+  font-family: var(--font-mono);
+  font-size: 11.5pt;
+  line-height: 1.75;
+  color: var(--c-white);
+  background: var(--c-darkblue);
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+.quote-block .ln{ display: block; }
+.quote-block .ln + .ln{ margin-top: 2px; }
+
+/* --- 4요소 리스트 (Slide 5) --- */
+.factor-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 18px 0;
+}
+.factor-item{
+  text-align: center;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  padding: 14px 10px;
+  background: var(--c-surface-2);
+}
+.factor-item .factor-mark{
+  font-size: 19pt;
+  color: var(--c-royal);
+  font-weight: 800;
+  display: block;
+  margin-bottom: 6px;
+}
+.factor-item span.factor-label{
+  font-size: var(--fs-small);
+  color: var(--c-ink);
+}
+
+.tip-line{
+  margin-top: 14px;
+  font-size: var(--fs-small);
+  color: var(--c-muted);
+}
+.tip-line strong{ color: var(--c-accent); font-weight: 700; }
+
+/* --- 프로필/작성자 라인 (Slide 7) --- */
+.author-line{
+  font-size: var(--fs-small);
+  color: var(--c-muted);
+  margin-bottom: 14px;
+}
+.author-line strong{ color: var(--c-royal); }
+
+.feature-list{ list-style: none; margin-bottom: 4px; }
+.feature-list li{
+  font-size: var(--fs-body);
+  color: var(--c-ink);
+  padding: 8px 0 8px 1.3em;
+  text-indent: -1.3em;
+  border-bottom: 1px solid var(--c-line);
+}
+.feature-list li:last-child{ border-bottom: none; }
+.feature-list li::before{
+  content: "▸";
+  color: var(--c-royal);
+  margin-right: 8px;
+}
+
+.stat-row{
+  display: flex;
+  gap: 28px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--c-line);
+}
+.stat-item .stat-num{
+  font-size: var(--fs-stat);
+  font-weight: 800;
+  color: var(--c-darkblue);
+  font-variant-numeric: tabular-nums;
+}
+.stat-item .stat-num em{
+  font-style: normal;
+  color: var(--c-accent);
+}
+.stat-item .stat-label{
+  font-size: var(--fs-tiny);
+  color: var(--c-muted);
+  margin-top: 2px;
+}
+
+/* --- 통합 워크플로우 흐름도 (Slide 8) --- */
+.pipeline{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 20px 0 22px;
+}
+.pipeline .pl-node{
+  font-size: var(--fs-small);
+  font-weight: 700;
+  color: var(--c-ink);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+.pipeline .pl-tool{
+  font-family: var(--font-mono);
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--c-white);
+  background: var(--c-royal);
+  padding: 8px 13px;
+  border-radius: 999px;
+}
+.pipeline .pl-tool.is-grill{ background: var(--c-accent); color: var(--c-darkblue); }
+.pipeline .pl-tool.is-plan{ background: var(--c-darkblue); }
+.pipeline .pl-arrow{ color: var(--c-muted); }
+
+.lead-para{
+  font-size: var(--fs-body);
+  color: var(--c-ink);
+  max-width: 68ch;
+}
+.lead-para strong{ color: var(--c-royal); font-weight: 700; }
+
+/* --- 설치/저장위치/트리거 섹션 (Slide 9, 10, 14) --- */
+.info-section{ margin-bottom: 20px; }
+.info-section:last-child{ margin-bottom: 0; }
+.info-section h3{
+  font-size: var(--fs-h3);
+  color: var(--c-darkblue);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.code-block{
+  font-family: var(--font-mono);
+  font-size: 11.5pt;
+  color: var(--c-darkblue);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  border-left: 3px solid var(--c-royal);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+  line-height: 1.8;
+  overflow-x: auto;
+}
+.code-block .ln{ display: block; white-space: pre; }
+.code-block .code-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.code-block .code-row + .code-row{ margin-top: 4px; }
+.code-block .code-row .ln{ display: inline; }
+.copy-btn{
+  flex: 0 0 auto;
+  font-family: var(--font-base);
+  font-size: 10pt;
+  font-weight: 700;
+  color: var(--c-royal);
+  background: var(--c-white);
+  border: 1px solid var(--c-royal);
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.copy-btn:hover{ background: var(--c-royal); color: var(--c-white); }
+.copy-btn.is-copied{
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-darkblue);
+}
+
+.trigger-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.trigger-grid .trigger-col h4{
+  font-size: var(--fs-small);
+  font-weight: 700;
+  color: var(--c-royal);
+  margin-bottom: 8px;
+}
+.trigger-grid .trigger-col p,
+.trigger-grid .trigger-col .code-block{
+  font-size: var(--fs-small);
+  margin-bottom: 6px;
+}
+
+/* 8~9페이지: 카드 안 세로 스크롤이 생기지 않도록 간격 축소 */
+.slide.is-dense{
+  padding: 22px 36px;
+  overflow-y: hidden;
+}
+.slide.is-dense .slide-head{
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+.slide.is-dense .tag-eyebrow{ margin-bottom: 6px; }
+.slide.is-dense .slide-title{
+  font-size: 21pt;
+  line-height: 1.3;
+  margin-bottom: 0;
+}
+.slide.is-dense .info-section{ margin-bottom: 12px; }
+.slide.is-dense .info-section h3{ margin-bottom: 6px; }
+.slide.is-dense .code-block{
+  padding: 7px 12px;
+  line-height: 1.5;
+}
+.slide.is-dense .code-block .ln{ white-space: pre-wrap; }
+.slide.is-dense .code-block .code-row + .code-row{ margin-top: 2px; }
+.slide.is-dense .trigger-grid{ gap: 10px; }
+.slide.is-dense .trigger-grid .trigger-col h4{ margin-bottom: 5px; }
+.slide.is-dense .trigger-grid .trigger-col .code-block{ margin-bottom: 4px; }
+.slide.is-dense .feature-list li{
+  padding: 5px 0 5px 1.3em;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+
+/* --- 사용 예시 / BEFORE·AFTER (Slide 11) --- */
+.prompt-list{ display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.prompt-list .prompt-item{
+  font-family: var(--font-mono);
+  font-size: 11.5pt;
+  color: var(--c-ink);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.prompt-list .prompt-item::before{
+  content: "\201C";
+  color: var(--c-royal);
+  font-weight: 800;
+  margin-right: 4px;
+}
+.prompt-list .prompt-item::after{
+  content: "\201D";
+  color: var(--c-royal);
+  font-weight: 800;
+  margin-left: 2px;
+}
+
+.compare-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.compare-card{
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  border: 1px solid var(--c-line);
+}
+.compare-card.is-before{ background: var(--c-surface-2); }
+.compare-card.is-after{ background: rgba(120,190,32,0.08); border-color: rgba(120,190,32,0.35); }
+.compare-card .compare-label{
+  font-size: var(--fs-small);
+  font-weight: 800;
+  margin-bottom: 10px;
+  display: block;
+}
+.compare-card.is-before .compare-label{ color: var(--c-muted); }
+.compare-card.is-after .compare-label{ color: var(--c-darkblue); }
+.compare-card ul{ list-style: none; }
+.compare-card li{
+  font-size: var(--fs-small);
+  color: var(--c-ink);
+  margin-bottom: 8px;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+.compare-card.is-before li::before{ content: "－"; color: var(--c-muted); margin-right: 6px; }
+.compare-card.is-after li::before{ content: "＋"; color: var(--c-accent); margin-right: 6px; font-weight: 800; }
+
+/* --- 마무리 문구 --- */
+.closing-line{
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--c-line);
+  font-size: var(--fs-small);
+  color: var(--c-muted);
+  text-align: center;
+}
+.closing-line strong{ color: var(--c-royal); }
+
+/* --- Codex 안내 노트 --- */
+.note-line{
+  font-size: var(--fs-small);
+  color: var(--c-muted);
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: var(--c-surface-2);
+  border-radius: 8px;
+}
+
+/* ==========================================================================
+   4. RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1180px){
+  .step-grid, .dual-col, .compare-grid, .trigger-grid{ grid-template-columns: 1fr; }
+  .factor-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px){
+  .app{ flex-direction: column; height: auto; min-height: 100vh; }
+  .sidebar{ flex: 0 0 auto; width: 100%; max-width: 100%; max-height: 40vh; }
+  .agenda{ max-height: 26vh; }
+  .main-stage{ padding: 20px; height: auto; min-height: 60vh; }
+  .slide{ padding: 24px 20px; }
+}
+
+@media (max-width: 560px){
+  :root{
+    --fs-hero: 26pt; --fs-title: 19pt; --fs-body: 12.5pt; --fs-small: 11.5pt;
+    --fs-h3: 13.5pt; --fs-subtitle: 13pt; --fs-stat: 24pt;
+  }
+  .factor-grid{ grid-template-columns: repeat(2, 1fr); }
+  .stat-row{ flex-direction: column; gap: 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ============================= SIDEBAR ============================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-mark">SKILLS GUIDE</div>
+      <h1>Brainstorming &amp; Grill-me &amp; Writing-plans</h1>
+      <p>아이디어 → 스펙 → 검증 → 계획</p>
+    </div>
+
+    <div class="progress-block">
+      <div class="progress-meta">
+        <span class="progress-pct" id="progressPct">7%</span>
+        <span class="progress-count" id="progressCount">01 / 14</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <nav class="agenda" id="agenda">
+      <button class="agenda-item" data-index="0"><span class="agenda-num"></span><span>표지</span></button>
+      <button class="agenda-item" data-index="1"><span class="agenda-num">01</span><span>한눈에 보기</span></button>
+      <button class="agenda-item" data-index="2"><span class="agenda-num">02</span><span>Quick Start</span></button>
+      <button class="agenda-item" data-index="3"><span class="agenda-num">03</span><span>Superpowers 개요</span></button>
+      <button class="agenda-item" data-index="4"><span class="agenda-num">04</span><span>Brainstorming 개요</span></button>
+      <button class="agenda-item" data-index="5"><span class="agenda-num">05</span><span>Writing-plans 개요</span></button>
+      <button class="agenda-item" data-index="6"><span class="agenda-num">06</span><span>Grill-me 개요</span></button>
+      <button class="agenda-item" data-index="7"><span class="agenda-num">07</span><span>통합 워크플로우</span></button>
+      <button class="agenda-item" data-index="8"><span class="agenda-num">08</span><span>Claude · Superpowers</span></button>
+      <button class="agenda-item" data-index="9"><span class="agenda-num">09</span><span>Claude · Grill-me</span></button>
+      <button class="agenda-item" data-index="10"><span class="agenda-num">10</span><span>Grill-me 사용 예시</span></button>
+      <button class="agenda-item" data-index="11"><span class="agenda-num">11</span><span>Claude 설치 명령어 모음</span></button>
+      <button class="agenda-item" data-index="12"><span class="agenda-num">12</span><span>Codex · Superpowers</span></button>
+      <button class="agenda-item" data-index="13"><span class="agenda-num">13</span><span>Codex · Grill-me</span></button>
+    </nav>
+    <a class="sidebar-home" href="/" target="_top" aria-label="교육 자료 홈화면으로 이동">목록으로</a>
+  </aside>
+
+  <!-- ============================= MAIN STAGE ============================= -->
+  <main class="main-stage" id="mainStage">
+    <div class="slide-viewport" id="slideViewport">
+
+      <!-- Slide 1 : 표지 -->
+      <section class="slide hero-slide is-active" data-index="0">
+        <div class="slide-body">
+          <span class="hero-kicker">Skills · 2026</span>
+          <h1 class="hero-title">IDEA → SPEC → PLAN</h1>
+          <p class="hero-sub">아이디어에서 구현까지</p>
+          <p class="hero-desc">
+            <strong>Superpowers</strong>(brainstorming · writing-plans) &amp; <strong>Grill-me</strong> 스킬 가이드 —
+            막연한 아이디어를 검증된 실행 계획으로 바꾸는 스킬 워크플로우입니다.
+          </p>
+          <div class="flow-row">
+            <span class="flow-node">IDEA</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">SPEC</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node is-grill">GRILL</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node is-plan">PLAN</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 2 : 한눈에 보기 -->
+      <section class="slide" data-index="1">
+        <header class="slide-head">
+          <span class="tag-eyebrow">OVERVIEW</span>
+          <h2 class="slide-title">한눈에 보기</h2>
+          <p class="slide-sub">두 스킬은 '정리'와 '검증'을 나눠 맡습니다</p>
+        </header>
+        <div class="slide-body">
+          <div class="step-grid">
+            <div class="step-card">
+              <div class="step-head-row"><span class="step-no">01</span><h3>아이디어</h3></div>
+              <span class="tool-tag" data-tool="brainstorming">Superpowers</span>
+              <p>문제 · 사용자 · 제약</p>
+            </div>
+            <div class="step-card">
+              <div class="step-head-row"><span class="step-no">02</span><h3>스펙</h3></div>
+              <span class="tool-tag" data-tool="brainstorming">Superpowers</span>
+              <p>목표 · 대안 · 설계</p>
+            </div>
+            <div class="step-card">
+              <div class="step-head-row"><span class="step-no">03</span><h3>압박 검증</h3></div>
+              <span class="tool-tag" data-tool="grill-me">Grill-me</span>
+              <p>가정 · 리스크</p>
+            </div>
+            <div class="step-card">
+              <div class="step-head-row"><span class="step-no">04</span><h3>구현 계획</h3></div>
+              <span class="tool-tag" data-tool="brainstorming">Superpowers</span>
+              <p>작업 · 테스트 · 완료</p>
+            </div>
+          </div>
+          <div class="split-note">
+            <p>먼저 설계하고, 그다음 반대 질문으로 빈칸을 드러냅니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 3 : QUICK START -->
+      <section class="slide" data-index="2">
+        <header class="slide-head">
+          <span class="tag-eyebrow">QUICK START</span>
+          <h2 class="slide-title">개인 기획에 쓰는 가장 짧은 루틴</h2>
+        </header>
+        <div class="slide-body">
+          <table class="data-table">
+            <thead>
+              <tr><th>단계</th><th>도구</th><th>내가 할 일</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>입력</td><td><span class="tool-tag" data-tool="brainstorming">brainstorming</span></td><td>아이디어 · 목적 · 대상 · 제약을 전달</td></tr>
+              <tr><td>정리</td><td><span class="tool-tag" data-tool="brainstorming">brainstorming</span></td><td>대안 비교 후 스펙 초안 작성</td></tr>
+              <tr><td>검증</td><td><span class="tool-tag" data-tool="grill-me">grill-me</span></td><td>스펙을 붙여 넣고 질문에 답함</td></tr>
+              <tr><td>실행</td><td><span class="tool-tag" data-tool="writing-plans">writing-plans</span></td><td>확정 스펙을 구현 계획으로 변환</td></tr>
+            </tbody>
+          </table>
+          <div class="callout-box">
+            <span class="callout-label">핵심 원칙</span>
+            <p class="indent-hang">· 설계 전에 구현하지 말고, 확정 전에는 반대 질문을 한 번 더 통과시키세요.</p>
+            <p class="indent-hang">· 외부 스킬은 설치 전 SKILL.md와 파일 · 외부 연결 권한을 확인하세요.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 4 : SUPERPOWERS 개요 -->
+      <section class="slide" data-index="3">
+        <header class="slide-head">
+          <span class="tag-eyebrow">SUPERPOWERS</span>
+          <h2 class="slide-title">brainstorming + writing-plans</h2>
+          <p class="slide-sub">obra/superpowers · 아이디어를 실행 가능한 계획으로 연결하는 2단계 핵심 스킬</p>
+        </header>
+        <div class="slide-body">
+          <div class="dual-col">
+            <div class="col-card">
+              <h3>brainstorming</h3>
+              <p class="col-caption">아이디어 → 설계 문서</p>
+              <ul>
+                <li>막연한 아이디어를 대화로 다듬어 승인된 스펙 문서로 전환</li>
+                <li>질문(1개씩) → 접근법 2~3개 제안 → 섹션별 디자인 제시</li>
+                <li>복잡한 요청은 하위 프로젝트로 먼저 분해</li>
+                <li>승인 전까지 구현 스킬 호출을 막는 하드 게이트 적용</li>
+              </ul>
+            </div>
+            <div class="col-card">
+              <h3>writing-plans</h3>
+              <p class="col-caption">설계 문서 → 실행 계획</p>
+              <ul>
+                <li>승인된 스펙을 2~5분 단위의 작은 작업으로 분해</li>
+                <li>각 작업에 파일 경로 · 실제 코드 · 테스트 방법까지 명시</li>
+                <li>컨텍스트 없는 엔지니어도 실행 가능하다고 가정하고 작성</li>
+                <li>완료 후 subagent 실행 또는 배치 실행으로 이어짐</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 5 : BRAINSTORMING 개요 -->
+      <section class="slide" data-index="4">
+        <header class="slide-head">
+          <span class="tag-eyebrow">SUPERPOWERS</span>
+          <h2 class="slide-title">brainstorming은 모호한 아이디어를 합의 가능한 스펙으로 바꿉니다</h2>
+        </header>
+        <div class="slide-body">
+          <p class="usage-line"><strong>사용법</strong> — 아이디어와 원하는 결과를 말하고, 질문 → 대안 → 추천안 → 스펙 순서로 진행합니다.</p>
+          <div class="quote-block">
+            <span class="ln">이 서비스 아이디어를 설계 단계로 구체화해줘.</span>
+            <span class="ln">목표, 대상 사용자, 제약, 성공 기준을 먼저 질문하고,</span>
+            <span class="ln">서로 다른 사업 방향 3개를 비교한 뒤</span>
+            <span class="ln">추천안을 스펙 문서로 작성해줘.</span>
+            <span class="ln">아이디어: 1인 가구를 위한 AI 식단 · 장보기 앱</span>
+          </div>
+          <div class="factor-grid">
+            <div class="factor-item"><span class="factor-mark">①</span><span class="factor-label">해결하려는 문제</span></div>
+            <div class="factor-item"><span class="factor-mark">②</span><span class="factor-label">대상 사용자</span></div>
+            <div class="factor-item"><span class="factor-mark">③</span><span class="factor-label">제약 조건</span></div>
+            <div class="factor-item"><span class="factor-mark">④</span><span class="factor-label">성공 기준</span></div>
+          </div>
+          <p class="tip-line">팁 — <strong>'기능을 만들어줘'</strong>보다 <strong>'스펙을 만들기 전에 질문해줘'</strong>가 적합합니다.</p>
+        </div>
+      </section>
+
+      <!-- Slide 6 : WRITING-PLANS 개요 -->
+      <section class="slide" data-index="5">
+        <header class="slide-head">
+          <span class="tag-eyebrow">SUPERPOWERS</span>
+          <h2 class="slide-title">writing-plans는 스펙이 승인된 뒤에만 구현 계획으로 내려갑니다</h2>
+        </header>
+        <div class="slide-body">
+          <div class="step-grid">
+            <div class="step-card">
+              <div class="step-head-row"><span class="step-no">01</span><h3>스펙 확인</h3></div>
+              <p>범위와 제약을 다시 읽습니다.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-head-row"><span class="step-no">02</span><h3>구조 확정</h3></div>
+              <p>만들거나 바꿀 파일과 책임을 정합니다.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-head-row"><span class="step-no">03</span><h3>작업 분해</h3></div>
+              <p>테스트 가능한 작은 단위로 나눕니다.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-head-row"><span class="step-no">04</span><h3>검증 설계</h3></div>
+              <p>각 작업의 테스트 · 완료 기준을 명시합니다.</p>
+            </div>
+          </div>
+          <div class="callout-box is-warning">
+            <span class="callout-label">예시 요청</span>
+            <p>"승인된 아래 스펙을 구현 계획으로 바꿔줘. 파일, 작업, 테스트, 완료 기준을 포함해줘."</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 7 : GRILL-ME 개요 -->
+      <section class="slide" data-index="6">
+        <header class="slide-head">
+          <span class="tag-eyebrow">GRILL-ME</span>
+          <h2 class="slide-title">grill-me — 계획을 집요하게 검증하기</h2>
+        </header>
+        <div class="slide-body">
+          <p class="author-line">제작자 <strong>Matt Pocock</strong> · mattpocock/skills</p>
+          <ul class="feature-list">
+            <li>이미 존재하는 계획 · 스펙의 모든 측면을 인터뷰 형식으로 파고듦</li>
+            <li>설계 트리의 각 분기를 따라가며 결정 간 의존성을 하나씩 해결</li>
+            <li>질문마다 추천 답변을 함께 제시해 대화가 멈추지 않고 진행됨</li>
+            <li>코드베이스를 읽어서 답할 수 있는 질문은 직접 확인 후 넘어감</li>
+          </ul>
+          <div class="callout-box is-warning">
+            <span class="callout-label">주의</span>
+            <p>'X를 만들고 싶다' 수준의 막연한 아이디어에는 부적합합니다. 실행 전에 글로 된 스펙이나 설명이 먼저 준비되어야 합니다.</p>
+          </div>
+          <div class="stat-row">
+            <div class="stat-item">
+              <div class="stat-num">156.2<em>K</em></div>
+              <div class="stat-label">설치 수</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">87.3<em>K</em></div>
+              <div class="stat-label">GitHub 스타</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 8 : 통합 워크플로우 -->
+      <section class="slide" data-index="7">
+        <header class="slide-head">
+          <span class="tag-eyebrow">INTEGRATION</span>
+          <h2 class="slide-title">통합 워크플로우</h2>
+          <p class="slide-sub">막연한 아이디어에서 실행까지, 세 스킬의 연결</p>
+        </header>
+        <div class="slide-body">
+          <div class="pipeline">
+            <span class="pl-node">막연한 아이디어</span>
+            <span class="pl-arrow">→</span>
+            <span class="pl-tool">brainstorming</span>
+            <span class="pl-arrow">→</span>
+            <span class="pl-node">스펙 문서</span>
+            <span class="pl-arrow">→</span>
+            <span class="pl-tool is-grill">grill-me</span>
+            <span class="pl-arrow">→</span>
+            <span class="pl-node">검증된 스펙</span>
+            <span class="pl-arrow">→</span>
+            <span class="pl-tool is-plan">writing-plans</span>
+            <span class="pl-arrow">→</span>
+            <span class="pl-node">실행 계획 → 구현</span>
+          </div>
+          <p class="lead-para">
+            <strong>brainstorming</strong>이 아이디어를 스펙으로 만들고, <strong>grill-me</strong>가 그 스펙의 가정과 의존성을
+            압박 질문으로 검증한 뒤, <strong>writing-plans</strong>가 검증된 스펙을 2~5분 단위 실행 계획으로 쪼갭니다.
+          </p>
+        </div>
+      </section>
+
+      <!-- Slide 9 : Claude / SUPERPOWERS -->
+      <section class="slide is-dense" data-index="8">
+        <header class="slide-head">
+          <span class="tag-eyebrow">CLAUDE</span>
+          <h2 class="slide-title">Claude에서 Brainstorming 및 Writing-plans 사용하는 방법</h2>
+        </header>
+        <div class="slide-body">
+          <div class="info-section">
+            <h3>설치</h3>
+            <div class="code-block">
+              <div class="code-row"><span class="ln">npx skills add obra/superpowers</span><button type="button" class="copy-btn" data-copy="npx skills add obra/superpowers">복사</button></div>
+              <div class="code-row"><span class="ln">npx skills add obra/superpowers --skill brainstorming</span><button type="button" class="copy-btn" data-copy="npx skills add obra/superpowers --skill brainstorming">복사</button></div>
+              <div class="code-row"><span class="ln">npx skills add obra/superpowers --skill writing-plans</span><button type="button" class="copy-btn" data-copy="npx skills add obra/superpowers --skill writing-plans">복사</button></div>
+            </div>
+          </div>
+          <div class="info-section">
+            <h3>저장 위치</h3>
+            <div class="code-block">
+              <span class="ln">docs/superpowers/specs/YYYY-MM-DD-&lt;주제&gt;-design.md</span>
+              <span class="ln">docs/superpowers/plans/YYYY-MM-DD-&lt;기능명&gt;.md</span>
+            </div>
+          </div>
+          <div class="info-section">
+            <h3>트리거 방식</h3>
+            <div class="trigger-grid">
+              <div class="trigger-col">
+                <h4>자동 트리거</h4>
+                <p class="indent-hang">· "Let's build X" 같은 발화 → brainstorming 자동 실행</p>
+                <p class="indent-hang">· 디자인 승인 후 writing-plans로 자동 전환 제안</p>
+              </div>
+              <div class="trigger-col">
+                <h4>슬래시 커맨드</h4>
+                <div class="code-block"><span class="ln">/brainstorm "노트 앱에 실시간 협업 기능 추가"</span></div>
+                <div class="code-block"><span class="ln">/write-plan "docs/.../design.md"</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 10 : Claude / GRILL-ME -->
+      <section class="slide is-dense" data-index="9">
+        <header class="slide-head">
+          <span class="tag-eyebrow">CLAUDE</span>
+          <h2 class="slide-title">Claude에서 Grill-me 사용하는 방법</h2>
+        </header>
+        <div class="slide-body">
+          <div class="info-section">
+            <h3>설치</h3>
+            <div class="code-block"><div class="code-row"><span class="ln">npx skills add https://github.com/mattpocock/skills --skill grill-me</span><button type="button" class="copy-btn" data-copy="npx skills add https://github.com/mattpocock/skills --skill grill-me">복사</button></div></div>
+          </div>
+          <div class="info-section">
+            <h3>트리거 방식</h3>
+            <div class="trigger-grid">
+              <div class="trigger-col">
+                <h4>자연어 요청</h4>
+                <div class="code-block"><span class="ln">"grill me on this spec"</span></div>
+              </div>
+              <div class="trigger-col">
+                <h4>슬래시 커맨드</h4>
+                <div class="code-block"><span class="ln">$grill-me</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="info-section">
+            <h3>진행 흐름</h3>
+            <ul class="feature-list">
+              <li>결정 트리 분기마다 하나씩 질문</li>
+              <li>코드베이스로 답 가능한 질문은 직접 확인 후 통과</li>
+              <li>매 질문에 추천 답변을 제시해 진행 속도 유지</li>
+              <li>고정된 질문 개수 없이 공유된 이해에 도달할 때까지 진행</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 11 : Claude / GRILL-ME 사용 예시 -->
+      <section class="slide" data-index="10">
+        <header class="slide-head">
+          <span class="tag-eyebrow">CLAUDE</span>
+          <h2 class="slide-title">Grill-me 사용 예시</h2>
+        </header>
+        <div class="slide-body">
+          <div class="prompt-list">
+            <div class="prompt-item">Grill me on this feature spec before I start building</div>
+            <div class="prompt-item">Run grill-me on my plan for the auth refactor</div>
+            <div class="prompt-item">Walk me through every decision in this architecture before I commit to it</div>
+          </div>
+          <div class="compare-grid">
+            <div class="compare-card is-before">
+              <span class="compare-label">BEFORE — grill-me 없이</span>
+              <ul>
+                <li>프롬프트 한 번 전달</li>
+                <li>잘못된 가정에 기반한 계획 생성</li>
+                <li>이후 계속 수정하며 시간 소모</li>
+              </ul>
+            </div>
+            <div class="compare-card is-after">
+              <span class="compare-label">AFTER — $grill-me 실행</span>
+              <ul>
+                <li>질문을 하나씩 받으며 함께 결정</li>
+                <li>고려하지 못했던 맥락까지 반영</li>
+                <li>공유된 이해 확보 → 적은 실수로 구현</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 12 : Claude / skills 설치 명령어 -->
+      <section class="slide" data-index="11">
+        <header class="slide-head">
+          <span class="tag-eyebrow">CLAUDE · SKILLS</span>
+          <h2 class="slide-title">설치 명령어 한눈에 보기</h2>
+        </header>
+        <div class="slide-body">
+          <table class="data-table">
+            <thead>
+              <tr><th>스킬</th><th>저장소</th><th>설치 명령</th><th>사용 시점</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tool-tag" data-tool="brainstorming">brainstorming</span></td>
+                <td>obra/superpowers</td>
+                <td style="font-family:var(--font-mono); font-size:10.5pt;">npx skills add obra/superpowers --skill brainstorming</td>
+                <td>아이디어 구체화</td>
+              </tr>
+              <tr>
+                <td><span class="tool-tag" data-tool="grill-me">grill-me</span></td>
+                <td>mattpocock/skills</td>
+                <td style="font-family:var(--font-mono); font-size:10.5pt;">npx skills add https://github.com/mattpocock/skills --skill grill-me</td>
+                <td>스펙 검증</td>
+              </tr>
+              <tr>
+                <td><span class="tool-tag" data-tool="writing-plans">writing-plans</span></td>
+                <td>obra/superpowers</td>
+                <td style="font-family:var(--font-mono); font-size:10.5pt;">npx skills add obra/superpowers --skill writing-plans</td>
+                <td>실행 계획 작성</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="closing-line">막연한 아이디어 → <strong>검증된 계획</strong> → 실행까지, 세 스킬의 조합으로 완성됩니다.</p>
+        </div>
+      </section>
+
+      <!-- Slide 13 : Codex / SUPERPOWERS -->
+      <section class="slide" data-index="12">
+        <header class="slide-head">
+          <span class="tag-eyebrow">CODEX</span>
+          <h2 class="slide-title">Codex에서 Superpowers 사용하는 방법</h2>
+        </header>
+        <div class="slide-body">
+          <p class="note-line">Superpowers는 Codex 플러그인입니다.</p>
+          <div class="dual-col">
+            <div class="col-card">
+              <h3>brainstorming</h3>
+              <p class="col-caption">질문 → 대안 비교 → 스펙</p>
+              <ul><li>질문으로 요구사항을 좁히고, 대안을 비교해 디자인 · 스펙을 만듭니다.</li></ul>
+            </div>
+            <div class="col-card">
+              <h3>writing-plans</h3>
+              <p class="col-caption">승인된 스펙 → 구현 계획</p>
+              <ul><li>승인된 스펙을 파일 · 작업 · 테스트 · 완료 기준이 있는 구현 계획으로 분해합니다.</li></ul>
+            </div>
+          </div>
+          <div class="info-section" style="margin-top:20px;">
+            <h3>설치</h3>
+            <p class="indent-hang" style="font-size:var(--fs-small); margin-bottom:8px;">· Codex 앱: 사이드바 Plugins → Coding → Superpowers → +</p>
+            <p class="note-line" style="margin-top:10px;">설치 후 새 대화에서 자연어로 기획을 요청하면 관련 스킬이 적용됩니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 14 : Codex / GRILL-ME -->
+      <section class="slide" data-index="13">
+        <header class="slide-head">
+          <span class="tag-eyebrow">CODEX</span>
+          <h2 class="slide-title">Codex에서 grill-me 사용하는 방법</h2>
+        </header>
+        <div class="slide-body">
+          <p class="note-line">grill-me는 Github Skill로 설치가 필요합니다.</p>
+          <div class="info-section">
+            <h3>설치</h3>
+            <div class="code-block"><div class="code-row"><span class="ln">npx skills add hiDaDeng/grill-me</span><button type="button" class="copy-btn" data-copy="npx skills add hiDaDeng/grill-me">복사</button></div></div>
+          </div>
+          <div class="info-section">
+            <h3>$grill-me 실행 예시</h3>
+            <div class="quote-block">
+              <span class="ln">$grill-me  다음 스펙의 가정, 의존성, 누락된 결정, 검증 불가능한</span>
+              <span class="ln">부분을 질문으로 압박해줘.</span>
+              <span class="ln">충분히 명확해지면 확정 결론 · 미해결 쟁점 · 다음 실험으로</span>
+              <span class="ln">정리해줘.</span>
+              <span class="ln">[brainstorming에서 만든 스펙 붙여넣기]</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <p class="stage-hint">화면을 클릭하면 다음 슬라이드로 이동합니다 · <kbd>←</kbd> <kbd>→</kbd> 방향키로도 이동할 수 있습니다</p>
+  </main>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ------------------------------------------------------------------
+     DOM Caching : 초기화 시점에 주요 노드를 한 번만 조회하여 캐싱
+     ------------------------------------------------------------------ */
+  var dom = {
+    app:            document.getElementById('app'),
+    sidebar:        document.getElementById('sidebar'),
+    agenda:         document.getElementById('agenda'),
+    agendaItems:    Array.prototype.slice.call(document.querySelectorAll('.agenda-item')),
+    mainStage:      document.getElementById('mainStage'),
+    slideViewport:  document.getElementById('slideViewport'),
+    slides:         Array.prototype.slice.call(document.querySelectorAll('.slide')),
+    progressFill:   document.getElementById('progressFill'),
+    progressPct:    document.getElementById('progressPct'),
+    progressCount:  document.getElementById('progressCount')
+  };
+
+  var state = {
+    total: dom.slides.length,
+    current: 0
+  };
+
+  /* ------------------------------------------------------------------
+     렌더링 : 캐싱된 노드만 갱신 (재조회 없음)
+     ------------------------------------------------------------------ */
+  function pad2(n){ return n < 10 ? '0' + n : String(n); }
+
+  function render(){
+    var i;
+    for (i = 0; i < dom.slides.length; i++){
+      dom.slides[i].classList.toggle('is-active', i === state.current);
+    }
+    for (i = 0; i < dom.agendaItems.length; i++){
+      dom.agendaItems[i].classList.toggle('is-active', i === state.current);
+    }
+
+    var pct = Math.round(((state.current + 1) / state.total) * 100);
+    dom.progressFill.style.width = pct + '%';
+    dom.progressPct.textContent = pct + '%';
+    dom.progressCount.textContent = pad2(state.current + 1) + ' / ' + pad2(state.total);
+
+    var activeItem = dom.agendaItems[state.current];
+    if (activeItem && typeof activeItem.scrollIntoView === 'function'){
+      activeItem.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function goTo(index){
+    var next = ((index % state.total) + state.total) % state.total; // 순환 이동
+    if (next === state.current) return;
+    state.current = next;
+    render();
+  }
+
+  function goNext(){ goTo(state.current + 1); }
+  function goPrev(){ goTo(state.current - 1); }
+
+  /* ------------------------------------------------------------------
+     Event Delegation : 상위 노드 하나에만 리스너를 등록하고
+     이벤트 전파(stopPropagation)를 제어해 중복 실행을 방지
+     ------------------------------------------------------------------ */
+
+  // 사이드바 아젠다 클릭 — 개별 버튼이 아닌 nav 컨테이너에 위임
+  dom.agenda.addEventListener('click', function(e){
+    var item = e.target.closest('.agenda-item');
+    if (!item) return;
+    e.stopPropagation(); // 메인 스테이지 등 상위 클릭 핸들러로 전파 차단
+    goTo(Number(item.getAttribute('data-index')));
+  });
+
+  // 설치 명령어 복사 버튼 — 슬라이드 뷰포트에 위임, 클릭 시 메인 스테이지로 전파 차단
+  dom.slideViewport.addEventListener('click', function(e){
+    var btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    e.stopPropagation(); // 슬라이드 이동(goNext)으로 전파되지 않도록 차단
+    copyInstallCommand(btn);
+  });
+
+  function copyInstallCommand(btn){
+    var text = btn.getAttribute('data-copy') || '';
+    var original = btn.textContent;
+    function showResult(ok){
+      btn.textContent = ok ? '복사됨' : '복사 실패';
+      btn.classList.toggle('is-copied', ok);
+      setTimeout(function(){
+        btn.textContent = original;
+        btn.classList.remove('is-copied');
+      }, 1500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        showResult(true);
+      }).catch(function(){
+        showResult(fallbackCopyText(text));
+      });
+    } else {
+      showResult(fallbackCopyText(text));
+    }
+  }
+
+  function fallbackCopyText(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  // 메인 스테이지 클릭 — 다음 슬라이드로 이동 (사이드바 클릭과 분리)
+  dom.mainStage.addEventListener('click', function(e){
+    e.stopPropagation();
+    goNext();
+  });
+
+  // 방향키 탐색 — 문서 레벨 위임 1회 등록
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Spacebar'){
+      e.stopPropagation();
+      e.preventDefault();
+      goNext();
+    } else if (e.key === 'ArrowLeft'){
+      e.stopPropagation();
+      e.preventDefault();
+      goPrev();
+    } else if (e.key === 'ArrowDown'){
+      e.stopPropagation();
+      e.preventDefault();
+      goNext(); // 사이드바 목록 커서를 아래 항목으로 이동
+    } else if (e.key === 'ArrowUp'){
+      e.stopPropagation();
+      e.preventDefault();
+      goPrev(); // 사이드바 목록 커서를 위 항목으로 이동
+    }
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
