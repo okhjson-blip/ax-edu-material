@@ -19,6 +19,10 @@ export default async function HomePage() {
       />
       <div className="fixed inset-0 bg-slate-950/35" aria-hidden />
 
+      <p className="fixed right-3 top-2 z-20 text-[22px] font-light tracking-wide text-white/70 drop-shadow">
+        All rights reserved. Created and owned by Heejung Son
+      </p>
+
       <div className="relative z-10 flex min-h-screen w-full justify-center px-[4vw] pb-8 pt-[42vh]">
           {categories.length === 0 ? (
             <p className="rounded-xl border border-white/30 bg-white/80 p-8 text-slate-700">
