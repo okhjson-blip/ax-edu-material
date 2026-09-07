@@ -38,7 +38,7 @@ export default async function HomePage() {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={`${publicCoverUrl(item.slug, item.cover)}?v=20260907a`}
+                      src={`${publicCoverUrl(item.slug, item.cover)}?v=20260907b`}
                       alt={item.title}
                       decoding="async"
                       className="absolute inset-0 h-full w-full object-cover object-center transition duration-300 group-hover:scale-[1.03]"

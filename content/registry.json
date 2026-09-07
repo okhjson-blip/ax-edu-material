@@ -87,6 +87,30 @@
       "cover": "cover.jpg",
       "htmlFile": "contents/visionAI_yolo_tutorial.html",
       "showCaption": true
+    },
+    {
+      "slug": "ai-engineering-stack",
+      "title": "AI 엔지니어링 스택",
+      "description": "프롬프트에서 그래프까지\n5개 레이어 가이드",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/AI_engineering_stack.html",
+      "showCaption": true
+    },
+    {
+      "slug": "openai-models",
+      "title": "OpenAI 최신 모델 이해",
+      "description": "모델 구조 · 비용 · Coding Agent",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/OpenAI_models.html",
+      "showCaption": true
+    },
+    {
+      "slug": "claude-models",
+      "title": "Claude 최신 모델 이해",
+      "description": "Haiku · Sonnet · Opus · Fable",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/Claude_models.html",
+      "showCaption": true
     }
   ]
 }

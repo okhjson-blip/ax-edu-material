@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 최신 모델 이해</title>
+<style>
+:root{
+  --primary:#1F3BB3;
+  --primary-dark:#102766;
+  --primary-light:#EEF2FC;
+  --accent:#86C832;
+  --accent-light:#f7fee7;
+  --text-dark:#1D1D1F;
+  --text-muted:#6E6E73;
+  --bg-white:#FFFFFF;
+  --border-color:#E5E5EA;
+  --panel:#F4F7FB;
+  --sidebar-width:280px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  height:100%;
+  width:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+  font-size:14pt;
+  line-height:1.55;
+  color:var(--text-dark);
+  background:#F8F9FA;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+#app{
+  display:flex;
+  width:100%;
+  height:100vh;
+  height:100dvh;
+  overflow:hidden;
+}
+#sidebar{
+  width:var(--sidebar-width);
+  flex-shrink:0;
+  height:100%;
+  background:#0f172a;
+  color:#eef1fa;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  user-select:none;
+}
+.progress-header{padding:20px 18px;flex:0 0 auto;}
+.sidebar-brand{
+  color:#fff;
+  font-size:clamp(17px,1.2vw,21px);
+  font-weight:850;
+  line-height:1.3;
+  letter-spacing:-.02em;
+  margin-bottom:14px;
+}
+.sidebar-brand span{
+  display:block;
+  margin-top:4px;
+  color:rgba(255,255,255,.62);
+  font-size:11px;
+  font-weight:650;
+  letter-spacing:.08em;
+}
+.progress-title{
+  font-size:11pt;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+#progress-track{
+  width:100%;
+  height:8px;
+  background:rgba(255,255,255,.25);
+  border-radius:4px;
+  overflow:hidden;
+  margin-bottom:6px;
+}
+#progress-fill{
+  height:100%;
+  width:0%;
+  background:var(--accent);
+  border-radius:4px;
+  transition:width .25s ease;
+}
+.progress-text{
+  font-size:9.5pt;
+  color:rgba(255,255,255,.85);
+  display:flex;
+  justify-content:space-between;
+}
+#agenda-list{
+  list-style:none;
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding:12px 0;
+}
+#agenda-list li{
+  padding:8px 18px;
+  font-size:11pt;
+  color:rgba(255,255,255,.74);
+  cursor:pointer;
+  margin-bottom:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:background .15s ease,color .15s ease;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#agenda-list li .num{
+  flex:0 0 auto;
+  font-size:9.5pt;
+  color:rgba(255,255,255,.7);
+  min-width:22px;
+}
+#agenda-list li:hover{background:rgba(255,255,255,.09);color:#fff;}
+#agenda-list li.active{background:var(--text-muted);color:#fff;font-weight:400;}
+#agenda-list li.active .num{color:#bfe98a;}
+.sidebar-home{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:52px;
+  padding:13px 18px;
+  border-top:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.84);
+  font-size:13px;
+  text-decoration:none;
+  transition:background-color .15s ease,color .15s ease;
+}
+.sidebar-home:hover,
+.sidebar-home:focus-visible{color:#fff;background:rgba(255,255,255,.09);outline:none;}
+.sidebar-home::before{content:"←";color:#a3e635;font-size:18px;line-height:1;}
+#main-stage{
+  flex:1;
+  min-width:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:#F4F6F9;
+  padding:24px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+#card-viewport{
+  width:100%;
+  max-width:min(1280px, calc((100dvh - 48px) * 1.7778));
+  aspect-ratio:16 / 9;
+  max-height:calc(100dvh - 48px);
+  min-height:0;
+  position:relative;
+}
+.slide-card{
+  position:absolute;
+  inset:0;
+  background:var(--bg-white);
+  border:1px solid #DCE2EC;
+  border-radius:10px;
+  box-shadow:0 5px 18px rgba(16,39,102,.08);
+  padding:clamp(24px,3.5vh,40px) clamp(28px,3.8vw,56px);
+  overflow-y:auto;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(6px);
+  transition:opacity .25s ease, transform .25s ease;
+}
+.slide-card.compact{padding:18px 28px;line-height:1.4;}
+.slide-card.compact .card-title{font-size:1.35em;margin-bottom:4px;}
+.slide-card.compact .card-subtitle{margin-bottom:10px;}
+.slide-card.compact .card-body p{margin-bottom:8px;}
+.slide-card.compact .box{padding:10px 14px;margin-bottom:8px;}
+.slide-card.compact table.data-table{margin:8px 0 10px;font-size:0.72em;}
+.slide-card.compact table.data-table th,
+.slide-card.compact table.data-table td{padding:5px 8px;}
+.slide-card.compact .flow-list li{padding:4px 0 4px 34px;}
+.slide-card.compact-2{padding:14px 22px;line-height:1.3;}
+.slide-card.compact-2 .card-title{font-size:1.2em;}
+.slide-card.compact-2 .box{padding:8px 12px;margin-bottom:6px;}
+.slide-card.compact-2 table.data-table{font-size:0.66em;}
+.slide-card.compact-2 table.data-table th,
+.slide-card.compact-2 table.data-table td{padding:3px 6px;}
+.slide-card.active{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.eyebrow{
+  display:inline-block;
+  font-size:clamp(11px,.76vw,13px);
+  font-weight:800;
+  color:var(--primary);
+  background:var(--primary-light);
+  padding:4px 12px;
+  border-radius:20px;
+  margin-bottom:12px;
+  letter-spacing:1.15px;
+  text-transform:uppercase;
+}
+.card-title{
+  font-size:clamp(24px,2.05vw,34px);
+  font-weight:800;
+  color:var(--primary-dark);
+  margin-bottom:6px;
+  line-height:1.22;
+}
+.card-subtitle{
+  font-size:clamp(15px,1.08vw,18px);
+  color:var(--text-muted);
+  margin-bottom:18px;
+}
+.card-body p{
+  margin-bottom:12px;
+  font-size:1em;
+  color:var(--text-dark);
+}
+.slide-card.overview-slide .card-subtitle{margin-bottom:28px;}
+.slide-card.overview-slide .card-body p{margin-bottom:28px;}
+.slide-card.overview-slide .card-body .data-table{margin:8px 0 32px;}
+.slide-card.overview-slide .card-body .box{margin-top:8px;margin-bottom:0;}
+.card-body .continued{
+  display:block;
+  padding-left:1.1em;
+  color:var(--text-dark);
+}
+.card-body strong{color:var(--primary);font-weight:700;}
+.highlight{
+  background:linear-gradient(180deg, transparent 60%, rgba(134,200,50,.28) 60%);
+  font-weight:700;
+  color:var(--text-dark);
+  padding:0 2px;
+}
+.badge-tip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--accent);
+  color:#fff;
+  font-size:0.62em;
+  font-weight:700;
+  padding:5px 12px;
+  border-radius:20px;
+  margin-bottom:14px;
+}
+.badge-tip::before{content:"TIP";font-size:0.9em;letter-spacing:0.04em;}
+table.data-table{
+  width:100%;
+  border-collapse:collapse;
+  margin:14px 0 20px;
+  font-size:0.82em;
+}
+table.data-table th, table.data-table td{
+  border:1px solid var(--border-color);
+  padding:9px 10px;
+  text-align:left;
+  vertical-align:top;
+}
+table.data-table th{
+  background:var(--primary-dark);
+  color:#fff;
+  font-weight:700;
+}
+table.data-table tr:nth-child(even) td{background:var(--panel);}
+table.data-table td code{
+  background:var(--primary-light);
+  color:var(--primary-dark);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:0.92em;
+}
+.table-compact{font-size:0.74em;}
+.two-col{display:flex;gap:28px;flex-wrap:wrap;}
+.two-col .col{flex:1;min-width:260px;}
+.box{
+  background:var(--panel);
+  border-left:4px solid var(--primary);
+  border-radius:10px;
+  padding:16px 18px;
+  margin-bottom:14px;
+}
+.box.pro{border-left-color:var(--accent);background:var(--accent-light);}
+.box.con{border-left-color:#c0392b;}
+.box-label{
+  font-size:0.66em;
+  font-weight:800;
+  letter-spacing:0.04em;
+  margin-bottom:6px;
+  color:var(--primary);
+}
+.box.pro .box-label{color:#5a9012;}
+.box.con .box-label{color:#c0392b;}
+.flow-list{counter-reset:flow;margin:12px 0;}
+.flow-list li{
+  list-style:none;
+  counter-increment:flow;
+  position:relative;
+  padding:8px 0 8px 34px;
+  font-size:0.95em;
+}
+.flow-list li::before{
+  content:counter(flow);
+  position:absolute;
+  left:0;top:6px;
+  width:24px;height:24px;
+  background:var(--primary);
+  color:#fff;
+  border-radius:50%;
+  font-size:0.72em;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.cover-card{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+}
+.cover-title{
+  font-size:clamp(32px,3.2vw,48px);
+  font-weight:800;
+  color:var(--primary-dark);
+  line-height:1.25;
+  margin-bottom:12px;
+}
+.cover-sub{
+  font-size:clamp(18px,1.4vw,24px);
+  color:var(--primary);
+  font-weight:700;
+  margin-bottom:20px;
+}
+.cover-desc{font-size:1em;color:var(--text-muted);max-width:640px;margin-bottom:24px;}
+.cover-chip-row{display:flex;gap:10px;flex-wrap:wrap;}
+.cover-chip{
+  background:var(--primary-light);
+  color:var(--primary);
+  font-weight:700;
+  font-size:0.75em;
+  padding:7px 14px;
+  border-radius:20px;
+}
+@media (max-width:900px){
+  #app{flex-direction:column;height:auto;min-height:100dvh;}
+  body{height:auto;min-height:100dvh;overflow:auto;}
+  #sidebar{width:100%;height:auto;}
+  #agenda-list,.sidebar-home{display:none;}
+  #main-stage{padding:10px;overflow:visible;}
+  #card-viewport{aspect-ratio:auto;max-height:none;min-height:calc(100dvh - 140px);}
+  .slide-card{position:relative;opacity:1;visibility:visible;transform:none;display:none;}
+  .slide-card.active{display:block;}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;}
+}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside id="sidebar">
+    <div class="progress-header" id="progress-wrap">
+      <div class="sidebar-brand">
+        Claude 최신 모델 이해
+        <span>HAIKU · SONNET · OPUS · FABLE</span>
+      </div>
+      <div class="progress-title">
+        <span>학습 진행률</span>
+        <span id="progress-percent">0%</span>
+      </div>
+      <div id="progress-track"><div id="progress-fill"></div></div>
+      <div class="progress-text">
+        <span>Claude 모델 가이드</span>
+        <span id="progress-count">1 / 12</span>
+      </div>
+    </div>
+    <ul id="agenda-list"><!-- JS로 렌더링 --></ul>
+    <a class="sidebar-home" href="/" target="_top" aria-label="교육 자료 목록으로 이동">목록으로</a>
+  </aside>
+
+  <!-- ===================== MAIN STAGE ===================== -->
+  <main id="main-stage">
+    <div id="card-viewport"><!-- 슬라이드 카드 JS로 렌더링 --></div>
+  </main>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     1. DATA — 슬라이드 콘텐츠 정의
+     (출처: Claude_모델_4종_비교_가이드.md)
+     ============================================================ */
+  var SLIDES = [
+    {
+      agenda: "표지",
+      num: "",
+      html:
+        '<div class="slide-card cover-card">' +
+          '<div class="eyebrow">사내 교육자료</div>' +
+          '<div class="cover-title">Claude 최신 모델 이해</div>' +
+          '<div class="cover-sub">Haiku 4.5 · Sonnet 5 · Opus 5 · Fable 5.1</div>' +
+          '<div class="cover-desc">Claude API / Claude Platform에서 제공되는 4종 최신 모델의 <br class="continued">' +
+          '포지셔닝, 스펙, 가격, 사용 가이드를 한 장씩 정리했습니다.</div>' +
+          '<div class="cover-chip-row">' +
+            '<span class="cover-chip">claude-haiku-4-5-20251001</span>' +
+            '<span class="cover-chip">claude-sonnet-5</span>' +
+            '<span class="cover-chip">claude-opus-5</span>' +
+            '<span class="cover-chip">claude-fable-5-1</span>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "1. 개요",
+      num: "1",
+      html:
+        '<div class="slide-card overview-slide">' +
+          '<div class="eyebrow">Overview</div>' +
+          '<div class="card-title">개요</div>' +
+          '<div class="card-subtitle">4개 모델, 4개의 model ID</div>' +
+          '<div class="card-body">' +
+            '<p>Claude API/Claude Platform에서 제공되는 가장 최신 모델은 4개입니다.<br class="continued">' +
+            '각각 별도의 model ID를 가지며, <span class="highlight">속도·지능·비용이 서로 다른 지점</span>에 위치합니다.</p>' +
+            '<table class="data-table">' +
+              '<tr><th>모델</th><th>모델 ID</th></tr>' +
+              '<tr><td>Claude Haiku 4.5</td><td><code>claude-haiku-4-5-20251001</code></td></tr>' +
+              '<tr><td>Claude Sonnet 5</td><td><code>claude-sonnet-5</code></td></tr>' +
+              '<tr><td>Claude Opus 5</td><td><code>claude-opus-5</code></td></tr>' +
+              '<tr><td>Claude Fable 5.1</td><td><code>claude-fable-5-1</code></td></tr>' +
+            '</table>' +
+            '<div class="box">' +
+              '<div class="box-label">참고</div>' +
+              '이 4개 위에 <strong>Claude Mythos 5.1</strong>이라는 모델이 하나 더 있지만,<br class="continued">' +
+              'Fable 5.1과 완전히 동일한 기반 모델에 사이버보안·생명과학 분야<br class="continued">' +
+              '안전장치만 낮춘 버전이며 Project Glasswing 참가 조직에만 초대제로 제공됩니다.<br class="continued">' +
+              '일반적으로 "현재 선택 가능한 모델"을 논할 때는 이 4개를 기준으로 삼습니다. (7장 참고)' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "2. 비교표",
+      num: "2",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">Comparison</div>' +
+          '<div class="card-title">한눈에 보는 비교표</div>' +
+          '<div class="card-subtitle">항목별 4개 모델 스펙 비교</div>' +
+          '<table class="data-table table-compact">' +
+            '<tr><th>항목</th><th>Haiku 4.5</th><th>Sonnet 5</th><th>Opus 5</th><th>Fable 5.1</th></tr>' +
+            '<tr><td>포지셔닝</td><td>가장 빠르고 저렴, near-frontier 지능</td><td>속도와 지능의 최적 균형</td><td>복잡한 에이전틱 코딩·엔터프라이즈 업무</td><td>고난도 추론·장기 자율 작업</td></tr>' +
+            '<tr><td>컨텍스트 윈도우</td><td>200K 토큰</td><td>1M 토큰</td><td>1M 토큰</td><td>1M 토큰</td></tr>' +
+            '<tr><td>최대 출력</td><td>64K 토큰</td><td>128K 토큰</td><td>128K 토큰</td><td>128K 토큰</td></tr>' +
+            '<tr><td>입력 가격 (/MTok)</td><td>$1</td><td>$2</td><td>$5</td><td>$10</td></tr>' +
+            '<tr><td>출력 가격 (/MTok)</td><td>$5</td><td>$10</td><td>$25</td><td>$50</td></tr>' +
+            '<tr><td>지연시간(체감 속도)</td><td>가장 빠름</td><td>빠름</td><td>보통</td><td>느림</td></tr>' +
+            '<tr><td>사고(Thinking) 방식</td><td>수동 Extended Thinking</td><td>Adaptive(자동)</td><td>Adaptive(자동)</td><td>Adaptive(항상 켜짐)</td></tr>' +
+            '<tr><td>기본 effort</td><td>미지원</td><td>high</td><td>high</td><td>high</td></tr>' +
+            '<tr><td>지식 컷오프</td><td>2025년 2월</td><td>2026년 1월</td><td>2026년 5월</td><td>2026년 6월</td></tr>' +
+            '<tr><td>출시일</td><td>2025.10.15</td><td>2026.6.30</td><td>2026.7.24</td><td>2026.9.1</td></tr>' +
+          '</table>' +
+        '</div>'
+    },
+    {
+      agenda: "3-1. Haiku 4.5",
+      num: "3",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">모델 상세 · 🟢</div>' +
+          '<div class="card-title">Claude Haiku 4.5</div>' +
+          '<div class="card-subtitle">"가장 빠른, 실용주의자"</div>' +
+          '<span class="badge-tip">고빈도·저지연 워크로드 전용</span>' +
+          '<div class="card-body">' +
+            '<p><strong>동작 원리</strong> — 4개 모델 중 유일하게 <span class="highlight">수동(manual) Extended Thinking</span> 방식을 씁니다.<br class="continued">' +
+            '나머지처럼 상황에 맞게 스스로 사고량을 조절(Adaptive)하는 게 아니라,<br class="continued">' +
+            '개발자가 budget_tokens로 사고 토큰량을 직접 지정해야 합니다. effort 파라미터 자체를 지원하지 않습니다.</p>' +
+            '<div class="two-col">' +
+              '<div class="col"><div class="box pro"><div class="box-label">장점</div>압도적으로 저렴하고 빠름.<br class="continued">대량 트래픽·저지연이 필요한<br class="continued">프로덕션 워크로드에 적합.</div></div>' +
+              '<div class="col"><div class="box con"><div class="box-label">단점</div>컨텍스트 윈도우 200K(나머지 1/5), 최대 출력 64K(절반).<br class="continued">지식 컷오프 2025년 2월로 가장 오래됨.<br class="continued">복잡한 다단계 추론에서 품질 격차.</div></div>' +
+            '</div>' +
+            '<div class="box"><div class="box-label">비용 구조</div>입력 $1 / 출력 $5 · 캐시 읽기 $0.10(정가의 10%)<br class="continued">5분 캐시 쓰기 $1.25 · 1시간 캐시 쓰기 $2 · Batch 이용 시 입출력 모두 50% 할인</div>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "3-2. Sonnet 5",
+      num: "3",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">모델 상세 · 🔵</div>' +
+          '<div class="card-title">Claude Sonnet 5</div>' +
+          '<div class="card-subtitle">"속도와 지능의 균형"</div>' +
+          '<span class="badge-tip">대부분의 워크로드는 여기서 시작</span>' +
+          '<div class="card-body">' +
+            '<p><strong>동작 원리</strong> — Sonnet 4.6의 드롭인 업그레이드로, <span class="highlight">Adaptive Thinking이 기본 켜짐</span> 상태입니다.<br class="continued">' +
+            '수동 extended thinking 설정이나 temperature/top_p/top_k를 임의값으로 바꾸면 400 에러가 반환되어,<br class="continued">' +
+            '세부 튜닝보다는 effort 레벨 조절로 사고 깊이를 제어합니다.</p>' +
+            '<div class="two-col">' +
+              '<div class="col"><div class="box pro"><div class="box-label">장점</div>1M 컨텍스트 + 128K 출력.<br class="continued">대부분의 프로덕션 워크로드에 충분한 지능을<br class="continued">가장 합리적인 가격에 제공.</div></div>' +
+              '<div class="col"><div class="box con"><div class="box-label">단점</div>세밀한 샘플링 파라미터 제어 불가(400 에러).<br class="continued">Opus/Fable 대비 최고난도 추론·장기 자율 작업에는 한계.</div></div>' +
+            '</div>' +
+            '<div class="box"><div class="box-label">비용 구조</div>입력 $2 / 출력 $10 · 캐시 읽기 $0.20<br class="continued">5분 캐시 쓰기 $2.50 · 1시간 캐시 쓰기 $4 · Batch 50% 할인</div>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "3-3. Opus 5",
+      num: "3",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">모델 상세 · 🟣</div>' +
+          '<div class="card-title">Claude Opus 5</div>' +
+          '<div class="card-subtitle">"복잡한 에이전틱 작업의 주력"</div>' +
+          '<span class="badge-tip">복잡한 코딩 · 엔터프라이즈 업무 공식 권장</span>' +
+          '<div class="card-body">' +
+            '<p><strong>동작 원리</strong> — Opus 4.8 대비 <span class="highlight">딥 리서닝·에이전틱·장기 작업·테스트타임 컴퓨트 스케일링</span>에서 대폭 개선.<br class="continued">' +
+            'Adaptive Thinking이 기본 켜짐이며, thinking을 끄려면 effort를 high 이하로 낮춰야만 가능합니다.<br class="continued">' +
+            '별도로 Fast mode(리서치 프리뷰)를 통해 표준 대비 약 2.5배 빠른 속도로도 이용 가능합니다.</p>' +
+            '<div class="two-col">' +
+              '<div class="col"><div class="box pro"><div class="box-label">장점</div>복잡한 코딩·엔터프라이즈 워크로드에서<br class="continued">가장 검증된 선택지.<br class="continued">Fast mode로 속도-비용 트레이드오프 조정 가능.</div></div>' +
+              '<div class="col"><div class="box con"><div class="box-label">단점</div>Sonnet 대비 2.5배 비쌈.<br class="continued">지연시간 "보통(Moderate)" 수준이라<br class="continued">초저지연 요구 서비스엔 부적합.</div></div>' +
+            '</div>' +
+            '<div class="box"><div class="box-label">비용 구조</div>입력 $5 / 출력 $25 · 캐시 읽기 $0.50<br class="continued">5분 캐시 쓰기 $6.25 · 1시간 캐시 쓰기 $10 · Batch 50% 할인<br class="continued">Fast mode는 $10/$50로 별도 과금</div>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "3-4. Fable 5.1",
+      num: "3",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">모델 상세 · ⚫</div>' +
+          '<div class="card-title">Claude Fable 5.1</div>' +
+          '<div class="card-subtitle">"가장 어려운 문제 전용"</div>' +
+          '<span class="badge-tip">Opus 5 high effort로도 부족할 때</span>' +
+          '<div class="card-body">' +
+            '<p><strong>동작 원리</strong> — Fable 5를 계승하며 가격은 동일하게 유지하되<br class="continued">' +
+            '<span class="highlight">캐시 읽기 비용을 1/4로 인하</span>($0.25/MTok, 4개 모델 중 정가 대비 가장 낮은 비율).<br class="continued">' +
+            'Adaptive Thinking이 항상 켜져 있어 끌 수 없음 — 4개 모델 중 유일.</p>' +
+            '<div class="two-col">' +
+              '<div class="col"><div class="box pro"><div class="box-label">장점</div>"Opus 5를 high effort로 써도<br class="continued">기준에 못 미칠 때" 쓰라고 명시한 최상위 모델.<br class="continued">반복 호출 많은 워크로드는 저렴해진 캐시 읽기로<br class="continued">실질 비용이 크게 줄어듦.</div></div>' +
+              '<div class="col"><div class="box con"><div class="box-label">단점</div>정가 기준 가장 비쌈(Sonnet의 5배).<br class="continued">지연시간 "느림(Slower)"으로 가장 답답함.<br class="continued">일반 워크로드엔 과함.</div></div>' +
+            '</div>' +
+            '<div class="box"><div class="box-label">비용 구조</div>입력 $10 / 출력 $50 · 캐시 읽기 $0.25(최대 45%까지 실질 절감 가능)<br class="continued">5분 캐시 쓰기 $12.50 · 1시간 캐시 쓰기 $20 · Batch 50% 할인</div>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "4. 비용 메커니즘",
+      num: "4",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">Pricing Mechanism</div>' +
+          '<div class="card-title">비용 구조 공통 메커니즘</div>' +
+          '<div class="card-subtitle">4개 모델에 공통 적용되는 규칙</div>' +
+          '<div class="card-body">' +
+            '<div class="box"><div class="box-label">MTok</div>100만 토큰 기준 가격</div>' +
+            '<div class="box"><div class="box-label">프롬프트 캐싱</div>반복되는 컨텍스트(시스템 프롬프트, 대규모 문서 등)를 캐시에 저장하면<br class="continued">' +
+            '재사용 시 <span class="highlight">캐시 읽기 단가(정가의 5~10% 수준)</span>로 크게 절감.<br class="continued">최소 캐시 가능 길이는 512토큰.</div>' +
+            '<div class="box"><div class="box-label">Batch API</div>실시간 응답이 필요 없는 작업은 입출력 모두 <span class="highlight">50% 할인</span> — 4개 모델 공통.</div>' +
+            '<div class="box"><div class="box-label">effort 파라미터</div>Haiku를 제외한 3개 모델은 effort(low~high)로 사고 깊이를 조절할 수 있어,<br class="continued">' +
+            '같은 모델이라도 effort를 낮추면 사고 토큰 소모가 줄어 실질 비용이 낮아짐.</div>' +
+            '<div class="box"><div class="box-label">1M 컨텍스트 과금 방식</div>Sonnet 5·Opus 5·Fable 5.1은 100만 토큰 전체 구간에서<br class="continued">' +
+            '동일한 단가가 적용됩니다(예: 90만 토큰 요청도 9천 토큰 요청과 같은 토큰당 단가).</div>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "5. 선택 가이드",
+      num: "5",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">Selection Guide</div>' +
+          '<div class="card-title">실무 선택 가이드 (일반 워크로드)</div>' +
+          '<span class="badge-tip">공식 권장 흐름</span>' +
+          '<div class="card-body">' +
+            '<p>Anthropic 공식 권장 흐름은<br class="continued">' +
+            '<span class="highlight">Sonnet 5로 시작 → 부족하면 Opus 5로 escalate → 그래도 안 되면 Fable 5.1</span>입니다.</p>' +
+            '<p>Haiku 4.5는 이 흐름과 별개로, 애초에 지능보다 속도·비용이 우선인<br class="continued">' +
+            '고빈도·저복잡도 작업(분류, 짧은 요약, 실시간 챗봇 응답 등)에 씁니다.</p>' +
+            '<ol class="flow-list">' +
+              '<li>기본값은 <strong>Sonnet 5</strong>로 시작</li>' +
+              '<li>결과 품질이 부족하면 <strong>Opus 5</strong>로 escalate</li>' +
+              '<li>정말 어려운 문제만 <strong>Fable 5.1</strong></li>' +
+              '<li>반복적인 단순 작업은 <strong>Haiku 4.5</strong>로 분리</li>' +
+            '</ol>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "6. 코딩 가이드",
+      num: "6",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">Coding Guide</div>' +
+          '<div class="card-title">코딩 작업 특화 가이드</div>' +
+          '<span class="badge-tip">공식 답변: Opus 5</span>' +
+          '<div class="card-body">' +
+            '<p>Anthropic 공식 문서는 "어떤 모델을 써야 할지 모르겠다면 복잡한 에이전틱 코딩과<br class="continued">' +
+            '엔터프라이즈 업무에는 Opus 5로 시작하라"고 명시합니다.<br class="continued">' +
+            'Claude Code에서도 Max 플랜·API 사용자에게는 기본값이 <strong>Opus 5</strong>로 연결됩니다.</p>' +
+            '<table class="data-table table-compact">' +
+              '<tr><th>작업 유형</th><th>추천 모델</th><th>이유</th></tr>' +
+              '<tr><td>일상적 코딩(버그 수정, 테스트, 리뷰, 작은 기능)</td><td><strong>Sonnet 5</strong></td><td>속도·비용 대비 Opus급에 근접한 품질</td></tr>' +
+              '<tr><td>복잡한 에이전틱 코딩(대규모 리팩터링, 아키텍처 변경)</td><td><strong>Opus 5</strong></td><td>딥 리서닝·장기 작업 개선폭 최대</td></tr>' +
+              '<tr><td>프론티어급 작업(대규모 마이그레이션, 하루 이상 자율 세션)</td><td><strong>Fable 5.1</strong></td><td>Opus 5 high effort로도 기준 미달일 때</td></tr>' +
+              '<tr><td>고빈도·단순 작업(단순 분류, 짧은 자동완성)</td><td><strong>Haiku 4.5</strong></td><td>압도적으로 빠르고 저렴</td></tr>' +
+            '</table>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "7. 참고 모델",
+      num: "7",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">Appendix</div>' +
+          '<div class="card-title">참고: 4개 모델 외 알아두면 좋은 모델</div>' +
+          '<div class="card-body">' +
+            '<div class="box"><div class="box-label">Claude Mythos 5.1</div>' +
+            'Fable 5.1과 동일한 기반 모델·동일 스펙·동일 가격($10/$50)이지만,<br class="continued">' +
+            '사이버보안 방어·생명과학 연구 등 특수 목적에서 안전장치를 낮춘 버전.<br class="continued">' +
+            '일반 구독(Free/Pro/Max/Team)으로는 접근 불가하며 Project Glasswing을 통해<br class="continued">' +
+            '검증된 조직에만 초대제로 제공됩니다.</div>' +
+            '<div class="box"><div class="box-label">Claude Opus 4.8</div>' +
+            'Opus 5의 이전 세대로, 공식적으로 <strong>"Legacy(레거시)"</strong> 상태입니다.<br class="continued">' +
+            '컨텍스트·출력·가격이 Opus 5와 완전히 동일($5/$25)하지만<br class="continued">' +
+            '지식 컷오프가 더 오래되었고(2026년 1월 vs 5월), 딥 리서닝·에이전틱·장기 작업에서의<br class="continued">' +
+            '성능 개선분이 빠져 있습니다. Anthropic은 "아직 사용 가능하지만 Opus 5로<br class="continued">' +
+            '마이그레이션을 권장"한다고 명시합니다.</div>' +
+          '</div>' +
+        '</div>'
+    },
+    {
+      agenda: "요약",
+      num: "",
+      html:
+        '<div class="slide-card">' +
+          '<div class="eyebrow">Summary</div>' +
+          '<div class="card-title">요약</div>' +
+          '<div class="card-body">' +
+            '<ol class="flow-list">' +
+              '<li><strong>Haiku 4.5</strong> — 가장 빠르고 저렴, 고빈도·저복잡도 작업</li>' +
+              '<li><strong>Sonnet 5</strong> — 대부분의 워크로드가 시작할 기본값</li>' +
+              '<li><strong>Opus 5</strong> — 복잡한 에이전틱 코딩·엔터프라이즈 업무의 주력</li>' +
+              '<li><strong>Fable 5.1</strong> — Opus 5로도 안 되는 가장 어려운 문제 전용</li>' +
+            '</ol>' +
+          '</div>' +
+        '</div>'
+    }
+  ];
+
+  /* ============================================================
+     2. STATE
+     ============================================================ */
+  var state = { current: 0, total: SLIDES.length };
+
+  /* ============================================================
+     3. DOM CACHE (초기화 시점에 1회만 조회)
+     ============================================================ */
+  var dom = {
+    viewport: document.getElementById("card-viewport"),
+    agendaList: document.getElementById("agenda-list"),
+    progressFill: document.getElementById("progress-fill"),
+    progressPercent: document.getElementById("progress-percent"),
+    progressCount: document.getElementById("progress-count"),
+    mainStage: document.getElementById("main-stage")
+  };
+  var cardNodes = [];      // 슬라이드 카드 DOM 노드 캐시
+  var agendaItemNodes = []; // 아젠다 li 노드 캐시
+
+  /* ============================================================
+     4. RENDER (최초 1회 DOM 생성 → 이후에는 클래스 토글만 수행)
+     ============================================================ */
+  function buildDOM() {
+    var cardsHtml = "";
+    var agendaHtml = "";
+    for (var i = 0; i < SLIDES.length; i++) {
+      cardsHtml += SLIDES[i].html;
+      agendaHtml += '<li data-index="' + i + '">' +
+                      '<span class="num">' + (SLIDES[i].num || "·") + '</span>' +
+                      '<span class="label">' + SLIDES[i].agenda + '</span>' +
+                    '</li>';
+    }
+    dom.viewport.innerHTML = cardsHtml;
+    dom.agendaList.innerHTML = agendaHtml;
+
+    cardNodes = dom.viewport.querySelectorAll(".slide-card");
+    agendaItemNodes = dom.agendaList.querySelectorAll("li");
+  }
+
+  function render() {
+    // 카드 전환
+    for (var i = 0; i < cardNodes.length; i++) {
+      if (i === state.current) {
+        cardNodes[i].classList.add("active");
+        cardNodes[i].classList.remove("compact", "compact-2");
+        cardNodes[i].scrollTop = 0;
+      } else {
+        cardNodes[i].classList.remove("active");
+        cardNodes[i].classList.remove("compact", "compact-2");
+      }
+    }
+    // 아젠다 하이라이트
+    for (var j = 0; j < agendaItemNodes.length; j++) {
+      if (j === state.current) {
+        agendaItemNodes[j].classList.add("active");
+        agendaItemNodes[j].scrollIntoView({ block: "nearest" });
+      } else {
+        agendaItemNodes[j].classList.remove("active");
+      }
+    }
+    // 진행률 바
+    var percent = Math.round(((state.current + 1) / state.total) * 100);
+    dom.progressFill.style.width = percent + "%";
+    dom.progressPercent.textContent = percent + "%";
+    dom.progressCount.textContent = (state.current + 1) + " / " + state.total;
+    requestAnimationFrame(fitCard);
+  }
+
+  function fitCard() {
+    var card = cardNodes[state.current];
+    if (!card) return;
+    card.classList.remove("compact", "compact-2");
+    if (card.scrollHeight > card.clientHeight + 1) {
+      card.classList.add("compact");
+    }
+    if (card.scrollHeight > card.clientHeight + 1) {
+      card.classList.add("compact-2");
+    }
+  }
+
+  /* ============================================================
+     5. NAVIGATION
+     ============================================================ */
+  function goTo(index) {
+    if (index < 0 || index >= state.total || index === state.current) return;
+    state.current = index;
+    render();
+  }
+  function next() { goTo(state.current + 1); }
+  function prev() { goTo(state.current - 1); }
+
+  /* ============================================================
+     6. EVENTS (Event Delegation — 리스너 최소화)
+     ============================================================ */
+  function bindEvents() {
+    // 6-1. 메인 스테이지 클릭 → 다음 페이지 (링크 클릭은 제외)
+    dom.mainStage.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("a")) return;
+      next();
+    });
+
+    // 6-2. 사이드바 아젠다 클릭 → 해당 페이지로 이동 (위임, 메인 스테이지로 전파 방지)
+    dom.agendaList.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var li = e.target.closest("li[data-index]");
+      if (!li) return;
+      goTo(parseInt(li.getAttribute("data-index"), 10));
+    });
+
+    // 6-3. 진행률 영역 클릭 시 메인 스테이지 전파 방지
+    document.getElementById("progress-wrap").addEventListener("click", function (e) {
+      e.stopPropagation();
+    });
+
+    // 6-4. 키보드 방향키로 이동 (사이드바 목록 상하 이동 포함)
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        e.preventDefault();
+        next();
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        prev();
+      }
+    });
+  }
+
+  /* ============================================================
+     7. INIT
+     ============================================================ */
+  function init() {
+    buildDOM();
+    render();
+    bindEvents();
+    window.addEventListener("resize", fitCard);
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>

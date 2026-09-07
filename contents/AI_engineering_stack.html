@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 엔지니어링 스택</title>
+<style>
+:root{
+  --primary:#1F3BB3;
+  --primary-dark:#102766;
+  --primary-light:#EEF2FC;
+  --accent:#86C832;
+  --accent-light:#f7fee7;
+  --text-dark:#1D1D1F;
+  --text-muted:#6E6E73;
+  --bg-white:#FFFFFF;
+  --border-color:#E5E5EA;
+  --panel:#F4F7FB;
+  --sidebar-width:280px;
+  --font-title:clamp(24px,2.05vw,34px);
+  --font-body:clamp(13px,.98vw,16px);
+  --font-caption:clamp(11px,.76vw,13px);
+  --radius-md:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  width:100%;height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+  color:var(--text-dark);
+  background:#F8F9FA;
+  font-size:var(--font-body);
+  line-height:1.55;
+  overflow:hidden;
+}
+ul,ol{margin:0;padding-left:1.35em;}
+li{margin-bottom:.4em;word-break:keep-all;overflow-wrap:break-word;}
+p{margin:0 0 .7em 0;word-break:keep-all;overflow-wrap:break-word;}
+h1,h2,h3,h4{word-break:keep-all;margin:0;}
+b,strong{color:var(--primary);font-weight:700;}
+code{
+  background:var(--primary-light);
+  border:1px solid var(--border-color);
+  border-radius:4px;
+  padding:.1em .4em;
+  font-family:Consolas,Menlo,monospace;
+  font-size:.92em;
+  color:var(--primary-dark);
+}
+.app-container{
+  display:flex;
+  width:100%;
+  height:100vh;
+  height:100dvh;
+  overflow:hidden;
+}
+.sidebar{
+  width:var(--sidebar-width);
+  flex-shrink:0;
+  height:100%;
+  background:#0f172a;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  user-select:none;
+}
+.progress-header{
+  padding:20px 18px;
+  flex:0 0 auto;
+}
+.sidebar-brand{
+  color:#fff;
+  font-size:clamp(17px,1.2vw,21px);
+  font-weight:850;
+  line-height:1.3;
+  letter-spacing:-.02em;
+  margin-bottom:14px;
+}
+.sidebar-brand span{
+  display:block;
+  margin-top:4px;
+  color:rgba(255,255,255,.62);
+  font-size:11px;
+  font-weight:650;
+  letter-spacing:.08em;
+}
+.progress-title{
+  font-size:11pt;
+  font-weight:400;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.progress-track{
+  width:100%;
+  height:8px;
+  background:rgba(255,255,255,.25);
+  border-radius:4px;
+  overflow:hidden;
+  margin-bottom:6px;
+}
+.progress-fill{
+  height:100%;
+  width:10%;
+  background:var(--accent);
+  border-radius:4px;
+  transition:width .3s ease;
+}
+.progress-text{
+  font-size:9.5pt;
+  color:rgba(255,255,255,.85);
+  display:flex;
+  justify-content:space-between;
+}
+.agenda-list{
+  list-style:none;
+  margin:0;
+  padding:12px 0;
+  overflow-y:auto;
+  flex:1;
+  min-height:0;
+}
+.agenda-list::-webkit-scrollbar{width:6px;}
+.agenda-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:4px;}
+.agenda-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 18px;
+  cursor:pointer;
+  font-size:11pt;
+  color:rgba(255,255,255,.74);
+  transition:background .15s ease,color .15s ease;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.agenda-item:hover{background:rgba(255,255,255,.09);color:#fff;}
+.agenda-item.active{
+  background:var(--text-muted);
+  color:#fff;
+  font-weight:400;
+}
+.agenda-index{
+  flex:0 0 auto;
+  font-size:9.5pt;
+  opacity:.78;
+  min-width:22px;
+}
+.sidebar-home{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:52px;
+  padding:13px 18px;
+  border-top:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.84);
+  font-size:13px;
+  font-weight:400;
+  text-decoration:none;
+  transition:background-color .15s ease,color .15s ease;
+}
+.sidebar-home:hover,
+.sidebar-home:focus-visible{
+  color:#fff;
+  background:rgba(255,255,255,.09);
+  outline:none;
+}
+.sidebar-home::before{
+  content:"←";
+  color:#a3e635;
+  font-size:18px;
+  line-height:1;
+}
+.main-stage{
+  flex:1;
+  min-width:0;
+  height:100%;
+  background:#F4F6F9;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:24px;
+  overflow:hidden;
+  cursor:pointer;
+  position:relative;
+}
+.slide-viewport{
+  width:100%;
+  max-width:min(1280px, calc((100dvh - 88px) * 1.7778));
+  aspect-ratio:16 / 9;
+  max-height:calc(100dvh - 88px);
+  min-height:0;
+  position:relative;
+  background:var(--bg-white);
+  border-radius:10px;
+  box-shadow:0 5px 18px rgba(16,39,102,.08);
+  border:1px solid #DCE2EC;
+  overflow:hidden;
+}
+.slide{
+  display:none;
+  position:absolute;
+  inset:0;
+  overflow-y:auto;
+  padding:clamp(24px,3.5vh,40px) clamp(28px,3.8vw,56px);
+  background:var(--bg-white);
+}
+.slide.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(6px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.slide.compact{padding:18px 28px 14px;line-height:1.4;}
+.slide.compact .slide-title{margin-bottom:4px;}
+.slide.compact .slide-subtitle{margin-bottom:10px;}
+.slide.compact .section-label{margin:8px 0 5px;}
+.slide.compact p{margin-bottom:.35em;}
+.slide.compact li{margin-bottom:.18em;}
+.slide.compact .panel,
+.slide.compact .panel-callout,
+.slide.compact .panel-case,
+.slide.compact .panel-quote{padding:10px 14px;margin-bottom:8px;}
+.slide.compact table.data-table{margin-bottom:8px;font-size:11.5pt;}
+.slide.compact table.data-table th,
+.slide.compact table.data-table td{padding:5px 8px;}
+.slide.compact .checklist li{padding:8px 12px;margin-bottom:6px;}
+.slide.compact .stack-diagram{padding:12px 16px;line-height:1.65;margin-bottom:10px;}
+.slide.compact-2{padding:14px 22px 10px;line-height:1.28;}
+.slide.compact-2 .slide-title{font-size:20pt !important;margin-bottom:2px;}
+.slide.compact-2 .section-label{margin:6px 0 4px;}
+.slide.compact-2 p{margin-bottom:.25em;}
+.slide.compact-2 li{margin-bottom:.1em;}
+.slide.compact-2 .panel,
+.slide.compact-2 .panel-callout,
+.slide.compact-2 .panel-case,
+.slide.compact-2 .panel-quote{padding:8px 12px;margin-bottom:6px;}
+.slide.compact-2 table.data-table{margin-bottom:6px;font-size:10.5pt;}
+.slide.compact-2 table.data-table th,
+.slide.compact-2 table.data-table td{padding:3px 6px;}
+.slide-card{max-width:none;margin:0;height:100%;}
+.slide-eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:var(--font-caption);
+  font-weight:800;
+  color:var(--primary);
+  letter-spacing:1.15px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.layer-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;height:28px;
+  border-radius:50%;
+  background:var(--accent);
+  color:#fff;
+  font-weight:700;
+  font-size:12px;
+  flex:0 0 auto;
+}
+.slide-title{
+  font-size:var(--font-title);
+  font-weight:800;
+  color:var(--primary-dark);
+  line-height:1.22;
+  margin-bottom:8px;
+}
+.slide-subtitle{
+  font-size:clamp(15px,1.08vw,18px);
+  font-weight:400;
+  color:var(--text-muted);
+  margin-bottom:16px;
+  line-height:1.5;
+}
+.section-label{
+  font-size:var(--font-caption);
+  font-weight:800;
+  color:var(--primary);
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  margin:16.8px 0 9.6px 0;
+}
+.section-label:first-of-type{margin-top:0;}
+.section-label + p{margin-bottom:.84em;}
+.section-label + ul{margin-bottom:.84em;}
+.section-label + ul li{margin-bottom:.48em;}
+.section-label + .panel-case{margin-bottom:.84em;}
+.section-label + table.data-table{margin-bottom:.84em;}
+.slide[data-index="7"] .section-label{
+  margin:28px 0 12px 0;
+}
+.slide[data-index="7"] .section-label:first-of-type{margin-top:0;}
+.slide[data-index="7"] table.data-table{margin-bottom:4px;}
+.slide[data-index="7"] .section-label + ul{margin-bottom:4px;}
+.slide[data-index="7"] .section-label + .panel-case{margin-top:2px;}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-md);
+  padding:16px 20px;
+  margin-bottom:14px;
+}
+.panel-callout{
+  border-left:4px solid var(--accent);
+  background:var(--accent-light);
+  border-radius:var(--radius-md);
+  padding:14px 18px;
+}
+.panel-case{
+  border-left:4px solid var(--primary);
+  background:var(--primary-light);
+  border-radius:var(--radius-md);
+  padding:14px 18px;
+  font-size:11pt;
+}
+.panel-case p{font-size:12pt;}
+.panel-quote{
+  border-left:4px solid var(--primary-dark);
+  background:var(--panel);
+  border-radius:var(--radius-md);
+  padding:14px 18px;
+  font-style:italic;
+  color:var(--text-dark);
+}
+.highlight{
+  background:linear-gradient(transparent 60%, rgba(134,200,50,.28) 60%);
+  font-weight:700;
+}
+.stack-diagram{
+  background:var(--panel);
+  border-left:4px solid var(--primary);
+  border-radius:var(--radius-md);
+  padding:18px 22px;
+  font-family:Consolas,Menlo,monospace;
+  font-size:13px;
+  line-height:2;
+  margin-bottom:14px;
+}
+.stack-diagram .row{white-space:pre;color:var(--text-dark);}
+.stack-diagram .row b{color:var(--primary-dark);}
+.stack-diagram .row .desc{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+  color:var(--text-muted);
+  font-size:14px;
+}
+table.data-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12.5px;
+  margin-bottom:14px;
+}
+table.data-table th{
+  background:var(--primary-dark);
+  color:#fff;
+  padding:9px 11px;
+  text-align:left;
+  font-weight:700;
+  border:1px solid var(--primary-dark);
+}
+table.data-table td{
+  padding:9px 11px;
+  border:1px solid var(--border-color);
+  vertical-align:top;
+  word-break:keep-all;
+}
+table.data-table tr:nth-child(even) td{background:var(--panel);}
+.checklist{list-style:none;padding:0;margin:0;}
+.checklist li{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:12px 14px;
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-md);
+  margin-bottom:8px;
+  background:var(--panel);
+}
+.checklist .num{
+  flex:0 0 auto;
+  width:24px;height:24px;
+  border-radius:50%;
+  background:var(--accent);
+  color:#fff;
+  font-weight:700;
+  font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.stage-footer{
+  flex:0 0 auto;
+  margin-top:10px;
+  text-align:center;
+  font-size:11pt;
+  color:var(--text-muted);
+  background:transparent;
+  border:0;
+  padding:0;
+}
+@media (max-width:900px){
+  .app-container{flex-direction:column;height:auto;min-height:100dvh;}
+  body{height:auto;min-height:100dvh;overflow:auto;}
+  .sidebar{width:100%;height:auto;}
+  .agenda-list,.sidebar-home{display:none;}
+  .main-stage{padding:10px;overflow:visible;}
+  .slide-viewport{aspect-ratio:auto;max-height:none;min-height:calc(100dvh - 160px);}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;}
+}
+
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- ============ 사이드바 ============ -->
+  <aside class="sidebar">
+    <div class="progress-header">
+      <div class="sidebar-brand">
+        AI 엔지니어링 스택
+        <span>5 LAYER GUIDE</span>
+      </div>
+      <div class="progress-title">
+        <span>학습 진행률</span>
+        <span id="progressPercent">10%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-text">
+        <span>앱 서비스 개발자를 위한 가이드</span>
+        <span id="progressCount">1 / 10</span>
+      </div>
+    </div>
+
+    <ul class="agenda-list" id="agendaList">
+      <li class="agenda-item" data-index="0"><span class="agenda-index">00</span><span>표지</span></li>
+      <li class="agenda-item" data-index="1"><span class="agenda-index">01</span><span>AI 스택이란?</span></li>
+      <li class="agenda-item" data-index="2"><span class="agenda-index">02</span><span>예시 시나리오</span></li>
+      <li class="agenda-item" data-index="3"><span class="agenda-index">03</span><span>Prompt Engineering</span></li>
+      <li class="agenda-item" data-index="4"><span class="agenda-index">04</span><span>Context Engineering</span></li>
+      <li class="agenda-item" data-index="5"><span class="agenda-index">05</span><span>Harness Engineering</span></li>
+      <li class="agenda-item" data-index="6"><span class="agenda-index">06</span><span>Loop Engineering</span></li>
+      <li class="agenda-item" data-index="7"><span class="agenda-index">07</span><span>Graph Engineering</span></li>
+      <li class="agenda-item" data-index="8"><span class="agenda-index">08</span><span>한눈에 보는 비교</span></li>
+      <li class="agenda-item" data-index="9"><span class="agenda-index">09</span><span>실무 체크리스트</span></li>
+    </ul>
+    <a class="sidebar-home" href="/" target="_top" aria-label="교육 자료 목록으로 이동">목록으로</a>
+  </aside>
+
+  <!-- ============ 메인 스테이지 ============ -->
+  <main class="main-stage" id="mainStage">
+    <div class="slide-viewport" id="slideViewport">
+
+      <!-- Slide 0: 표지 -->
+      <section class="slide" data-index="0">
+        <div class="slide-card" style="display:flex; flex-direction:column; justify-content:center; min-height:100%;">
+          <div class="slide-eyebrow"><span class="layer-badge">AI</span>교육 자료</div>
+          <h1 class="slide-title">AI 엔지니어링 스택</h1>
+          <div class="slide-subtitle">프롬프트에서 그래프까지,<br>앱 서비스 개발자를 위한 5개 레이어 가이드</div>
+
+          <div class="stack-diagram">
+            <div class="row"><b>Graph</b>      <span class="desc">— 여러 에이전트/작업 사이의 관계를 설계</span></div>
+            <div class="row">  └ <b>Loop</b>    <span class="desc">— 하나의 작업이 스스로 반복·종료되도록 설계</span></div>
+            <div class="row">      └ <b>Harness</b> <span class="desc">— 실행 환경과 권한, 완료 기준을 설계</span></div>
+            <div class="row">          └ <b>Context</b> <span class="desc">— 한 턴에 모델이 보는 정보를 설계</span></div>
+            <div class="row">              └ <b>Prompt</b> <span class="desc">— 한 번의 메시지를 설계</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 1: AI 스택이란? -->
+      <section class="slide" data-index="1">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">01</span>OVERVIEW</div>
+          <h2 class="slide-title">이 스택이란?</h2>
+
+          <p>AI 엔지니어링은 하나의 기술이 아니라 <strong>다섯 개 레이어로 쌓인 스택</strong>입니다.
+          각 레이어는 모델로부터 한 단계씩 더 바깥쪽 시스템을 다룹니다.</p>
+
+          <div class="stack-diagram">
+            <div class="row"><b>Graph</b>      <span class="desc">— 여러 에이전트/작업 사이의 관계를 설계</span></div>
+            <div class="row">  └ <b>Loop</b>    <span class="desc">— 하나의 작업이 스스로 반복·종료되도록 설계</span></div>
+            <div class="row">      └ <b>Harness</b> <span class="desc">— 실행 환경과 권한, 완료 기준을 설계</span></div>
+            <div class="row">          └ <b>Context</b> <span class="desc">— 한 턴에 모델이 보는 정보를 설계</span></div>
+            <div class="row">              └ <b>Prompt</b> <span class="desc">— 한 번의 메시지를 설계</span></div>
+          </div>
+
+          <div class="panel-callout">
+            <p style="margin-bottom:0;"><strong>중요한 원칙</strong>: 위 레이어로 올라간다고 아래 레이어가 필요 없어지는 게 아닙니다.
+            그래프는 여러 루프를 담고, 루프는 하나의 하네스 위에서 돌고, 하네스는 컨텍스트를 관리하고,
+            컨텍스트는 결국 프롬프트로 조립됩니다.
+            <span class="highlight">실제 앱 서비스 대부분은 1~3단계만으로 충분</span>하며,
+            5단계까지 필요한 건 사용자 개입 없이 장시간 자율적으로 처리해야 하는 기능을 만들 때뿐입니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 2: 예시 시나리오 -->
+      <section class="slide" data-index="2">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">02</span>SCENARIO</div>
+          <h2 class="slide-title">예시 시나리오: "일정관리 앱에 AI 비서 기능 넣기"</h2>
+
+          <p>아래 모든 레이어는 <strong>하나의 앱 서비스 개발 시나리오</strong>를 끝까지 관통시켜 설명합니다.</p>
+
+          <div class="panel-quote">
+            우리 팀은 캘린더 앱을 만들고 있고, "내일 오후 3시에 김대리랑 회의 잡아줘" 같은 자연어 한 줄로
+            일정을 잡아주는 <strong>AI 비서 기능</strong>을 이 앱에 추가하려 합니다.
+          </div>
+
+          <p style="margin-top:18px;">이 기능이 초기 MVP에서 완성형 자동화 기능으로 성장하는 과정을 5단계로 따라가 봅니다.</p>
+        </div>
+      </section>
+
+      <!-- Slide 3: 01. Prompt Engineering -->
+      <section class="slide" data-index="3">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">01</span>PROMPT ENGINEERING</div>
+          <h2 class="slide-title">한 번의 요청을 설계한다</h2>
+
+          <div class="section-label">설명</div>
+          <p>모델에게 <strong>단 한 번의 호출에서 무엇을, 어떻게 말할지</strong> 설계하는 가장 기본 레이어입니다.
+          모델은 이전 대화를 기억하지 못하므로 역할, 지시사항, 예시, 출력 형식을 그 한 번의 메시지 안에 모두 담아야 합니다.
+          앱 개발 관점에서는 <span class="highlight">가장 적은 개발 리소스로 가장 빠르게 기능을 검증할 수 있는 단계</span>입니다.</p>
+
+          <div class="section-label">사용법</div>
+          <ul>
+            <li><strong>역할·톤 고정</strong>: "당신은 일정 관리 비서입니다"로 응답 스타일 통일</li>
+            <li><strong>Few-shot 예시</strong>: "내일 3시 회의 잡아줘" → 파싱 결과 예시 2~3개 제공</li>
+            <li><strong>출력 형식 강제</strong>: 앱 프론트엔드가 바로 쓸 수 있도록 JSON 스키마(<code>{title, start, end, attendees}</code>)로 응답 고정</li>
+            <li><strong>Chain-of-Thought</strong>: "먼저 날짜·시간·참석자를 각각 추출한 뒤 JSON으로 정리하라"</li>
+          </ul>
+
+          <div class="section-label">사례 (앱 서비스 개발)</div>
+          <div class="panel-case">
+            <p style="margin-bottom:0;">캘린더 앱 개발팀이 <strong>자연어 → 일정 정보 추출 프롬프트</strong>를 작성해 API 응답으로 붙입니다.
+            "내일 오후 3시 김대리랑 회의"를 입력하면 <code>{title: "김대리 회의", start: "2026-09-08T15:00"}</code> 형태로 파싱됩니다.
+            데모에서는 잘 작동하지만, 곧 문제가 생깁니다 — 사용자가 이미 그 시간에 다른 일정이 있는지,
+            김대리가 누구인지(연락처에 여러 명일 수 있음) 모델은 전혀 알지 못합니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 4: 02. Context Engineering -->
+      <section class="slide" data-index="4">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">02</span>CONTEXT ENGINEERING</div>
+          <h2 class="slide-title">무엇을 보여줄지 설계한다</h2>
+
+          <div class="section-label">설명</div>
+          <p>프롬프트를 넘어, <strong>모델이 이번 턴에 실제로 보게 될 모든 정보</strong>를 설계하는 레이어입니다.
+          핵심은 "무엇을 더할까"가 아니라 <span class="highlight">"무엇을 정확히 골라 넣을까"</span>입니다.
+          앱 서비스에서는 사용자 데이터·기기 상태·앱 내 다른 화면 맥락까지 컨텍스트 설계 대상이 됩니다.</p>
+
+          <div class="section-label">사용법</div>
+          <ul>
+            <li><strong>개인화 데이터 주입</strong>: 사용자의 기존 일정, 자주 만나는 연락처, 선호 회의 시간대</li>
+            <li><strong>모호성 해소 정보 포함</strong>: 연락처에 동명이인이 있으면 최근 통화·메시지 빈도로 우선순위 후보 추림</li>
+            <li><strong>관련 없는 정보 제거</strong>: 1년 전 일정, 삭제된 연락처 등은 컨텍스트에서 배제해 토큰 낭비·혼선 방지</li>
+            <li><strong>디바이스/앱 상태 반영</strong>: 현재 보고 있는 화면(주간 뷰/월간 뷰)에 맞춰 응답 형식 조정</li>
+          </ul>
+
+          <div class="section-label">사례 (앱 서비스 개발)</div>
+          <div class="panel-case">
+            <p style="margin-bottom:0;">개발팀이 요청을 처리하기 전, <strong>오늘 기준 앞뒤 2주 일정 + 연락처에서 "김대리"와 일치하는
+            후보 목록 + 사용자의 평소 회의 선호 시간</strong>을 컨텍스트에 포함시킵니다.
+            이제 모델은 "김대리가 이미 그 시간에 다른 미팅이 잡혀 있다"거나 "김대리라는 이름이 2명이라 확인이 필요하다"는
+            것까지 알고 응답합니다. 하지만 여전히 <strong>실제로 캘린더에 일정을 등록하거나 상대방에게 초대를 보내는 건
+            못 합니다</strong>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 5: 03. Harness Engineering -->
+      <section class="slide" data-index="5">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">03</span>HARNESS ENGINEERING</div>
+          <h2 class="slide-title">실행 환경과 권한, 완료 기준을 설계한다</h2>
+
+          <div class="section-label">설명</div>
+          <p>모델을 <strong>실제로 무언가를 실행할 수 있는 환경</strong>에 연결하는 레이어입니다.
+          앱의 실제 API, 알림 시스템, 권한 체계, 그리고 결과가 맞는지 검증하는 장치까지 포함한
+          "모델 주변의 발판"을 설계합니다.</p>
+
+          <div class="section-label">사용법</div>
+          <ul>
+            <li><strong>도구(Tool) 범위 설계</strong>: "캘린더 조회"는 자유롭게, "타인 초대 발송"은 확인 절차 후에만 허용</li>
+            <li><strong>권한 경계</strong>: 회사 캘린더 앱이라면 팀 캘린더 조회는 허용하되 임원 캘린더 수정은 금지</li>
+            <li><strong>검증기 분리</strong>: 일정 등록 결과가 실제로 시간 충돌 없이 저장됐는지 별도 로직으로 채점</li>
+            <li><strong>실패 복구 경로</strong>: 캘린더 API 호출 실패 시 사용자에게 알리고 재시도하는 규칙 정의</li>
+          </ul>
+
+          <div class="section-label">사례 (앱 서비스 개발)</div>
+          <div class="panel-case">
+            <p style="margin-bottom:0;">개발팀이 AI 비서에게 <strong>"캘린더 조회 API", "일정 생성 API", "알림 발송 API"</strong>를
+            도구로 연결합니다. 단, 참석자가 3명 이상이거나 외부 인원이 포함된 일정은 자동 발송 대신
+            "사용자 확인 후 발송"으로 권한을 제한합니다. 별도의 검증 로직이 "시간 충돌 여부"를 앱 DB에서 재확인합니다.
+            이제 AI 비서는 실제로 일정을 등록할 수 있지만, 아직은 사용자가 앱을 열어 요청을 입력할 때만 동작합니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 6: 04. Loop Engineering -->
+      <section class="slide" data-index="6">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">04</span>LOOP ENGINEERING</div>
+          <h2 class="slide-title">시스템이 스스로 반복하도록 설계한다</h2>
+
+          <div class="section-label">설명</div>
+          <p>설계의 초점이 "이번 요청에 뭐라고 답할까"에서
+          <span class="highlight">"목표와 종료 조건을 미리 정해두고, 시스템이 관찰(observe)→실행(act)→검증(verify)→복구(recover)를
+          스스로 반복하게 만들 것"</span>으로 옮겨갑니다.
+          사용자가 매번 개입하지 않아도 하나의 작업이 끝까지 처리됩니다.</p>
+
+          <div class="section-label">사용법</div>
+          <ul>
+            <li><strong>목표·종료 조건 명시</strong>: "빈 시간대를 찾고, 참석자 전원이 수락하거나 3회 재제안 후 종료"</li>
+            <li><strong>관찰-실행-검증 사이클</strong>: 제안한 시간에 상대가 거절하면, 그 결과를 반영해 다음 후보 시간을 자동 재탐색</li>
+            <li><strong>컨텍스트 관리</strong>: 재탐색이 길어질수록 이전 실패 이유를 요약해 누적, 전체 기록을 다 넣지 않음</li>
+            <li><strong>채점기 재사용</strong>: harness 단계의 시간 충돌 검증 로직을 루프의 매 반복마다 재사용</li>
+          </ul>
+
+          <div class="section-label">사례 (앱 서비스 개발)</div>
+          <div class="panel-case">
+            <p style="margin-bottom:0;">사용자가 "다음 주 안에 팀 전체랑 회식 자리 잡아줘"라고 한 번만 요청하면,
+            AI 비서가 <strong>팀원 전체의 빈 시간 탐색 → 후보 3개 제안 → 각자에게 알림 발송 → 응답 수집 →
+            과반수가 되는 시간으로 자동 확정(또는 안 되면 재탐색)</strong>을 사용자 개입 없이 반복합니다.
+            앱은 이제 "회식 잡아줘" 한 마디로 하루 이상 걸리는 조율까지 자동으로 처리합니다.
+            하지만 이 기능이 "회식 잡기", "출장 일정 조율", "화상회의 세팅" 등 여러 종류로 늘어나면 —
+            각기 다른 전문 로직이 서로 얽히기 시작합니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 7: 05. Graph Engineering -->
+      <section class="slide" data-index="7">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">05</span>GRAPH ENGINEERING</div>
+          <h2 class="slide-title">여러 작업과 실행 사이의 관계를 설계한다</h2>
+
+          <div class="section-label">설명</div>
+          <p>하나의 루프로는 부족해지는 시점, 즉 <strong>여러 전문 에이전트(또는 여러 루프)가 협업하는 구조</strong>를
+          설계하는 레이어입니다. 다음 4가지 요소로 구성됩니다.</p>
+
+          <table class="data-table">
+            <thead>
+              <tr><th>현상</th><th>이름</th><th>앱 서비스 관점 의미</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>계획과 수행의 분리</td><td><strong>Node</strong></td><td>회식 조율 담당, 출장 조율 담당, 화상회의 세팅 담당처럼 역할별 독립 처리 단위</td></tr>
+              <tr><td>무엇을 기다릴지</td><td><strong>Edge</strong></td><td>"참석자 5명 이상이면 회식 조율 Node로", "해외 출장이면 출장 Node로" 같은 라우팅 조건</td></tr>
+              <tr><td>진행 상황 보존</td><td><strong>State</strong></td><td>어떤 요청이든 공유하는 "이 사용자의 이번 주 일정 현황" 같은 공통 맥락</td></tr>
+              <tr><td>완료 판단</td><td><strong>Verifier</strong></td><td>개별 Node 결과뿐 아니라, 최종적으로 사용자 캘린더에 충돌 없이 반영됐는지 최종 검사</td></tr>
+            </tbody>
+          </table>
+
+          <div class="section-label">사용법</div>
+          <ul>
+            <li><strong>Node 분리</strong>: 요청 분류(triage) → 회식/출장/화상회의 등 전문 Node로 위임</li>
+            <li><strong>Edge(라우팅) 설계</strong>: 참석자 규모, 외부 인원 포함 여부, 예산 승인 필요 여부에 따라 다음 Node 결정</li>
+            <li><strong>State 공유</strong>: 모든 Node가 같은 "사용자 주간 일정 State"를 참조해 서로 다른 Node가 같은
+            시간대에 중복 예약하지 않도록 방지</li>
+            <li><strong>Verifier 배치</strong>: 각 Node 출력과 별개로, 그래프 전체 완료 시점에 캘린더 최종 상태를 한 번 더 검증</li>
+            <li><strong>사람 승인 Edge</strong>: 예산이 드는 출장·행사 예약은 자동 확정 대신 관리자 승인 Node로 흐르게 설계</li>
+          </ul>
+
+          <div class="section-label">사례 (앱 서비스 개발)</div>
+          <div class="panel-case">
+            <p style="margin-bottom:0;">사용자가 "다음 달 부산 워크숍 잡아줘"라고 요청하면 <strong>분류 Node</strong>가 이를
+            "출장/행사" 유형으로 라우팅합니다. <strong>출장 조율 Node</strong>는 항공권·숙소 API를 조회하고,
+            <strong>일정 조율 Node</strong>는 참석자 빈 시간을 맞추고, 예산이 일정 금액을 넘으면
+            <strong>관리자 승인 Node</strong>로 흐릅니다(Edge). 모든 Node는 같은 "이번 워크숍 State"를 공유해
+            중복 예약을 막고, 마지막에 <strong>Verifier</strong>가 항공권·숙소·일정이 모두 충돌 없이 확정됐는지
+            검사한 뒤에야 사용자에게 최종 알림을 보냅니다. 이것이 캘린더 앱의 AI 비서가 "회의 하나 잡는 기능"에서
+            "여러 팀의 복잡한 일정·예산·승인까지 조율하는 기능"으로 성장한 최종 형태입니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 8: 한눈에 보는 비교 -->
+      <section class="slide" data-index="8">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">08</span>SUMMARY</div>
+          <h2 class="slide-title">한눈에 보는 비교 (앱 서비스 개발 기준)</h2>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>레이어</th><th>설계 단위</th><th>핵심 질문</th><th>앱 개발 관점 산출물</th><th>이 단계만으론 부족해지는 시점</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Prompt</strong></td><td>한 번의 메시지</td><td>어떻게 말할까?</td><td>자연어 → 구조화 응답 프롬프트</td><td>사용자 데이터가 필요할 때</td></tr>
+              <tr><td><strong>Context</strong></td><td>한 턴에 보이는 정보</td><td>무엇을 골라 보여줄까?</td><td>개인화 데이터 주입 로직</td><td>실제 액션 실행이 필요할 때</td></tr>
+              <tr><td><strong>Harness</strong></td><td>실행 환경 전체</td><td>어디까지 권한을 줄까?</td><td>API 연동 + 권한 경계 + 검증 로직</td><td>사용자가 매번 트리거해야 할 때</td></tr>
+              <tr><td><strong>Loop</strong></td><td>작업 하나 전체</td><td>언제 멈출까?</td><td>자동 재시도·조율 로직</td><td>기능 종류가 여러 개로 늘어날 때</td></tr>
+              <tr><td><strong>Graph</strong></td><td>작업들 사이 관계</td><td>누가 누구에게 넘길까?</td><td>멀티 에이전트 라우팅·승인 플로우</td><td>(대부분의 앱 기능은 여기까지 안 가도 됨)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Slide 9: 실무 체크리스트 -->
+      <section class="slide" data-index="9">
+        <div class="slide-card">
+          <div class="slide-eyebrow"><span class="layer-badge">09</span>CHECKLIST</div>
+          <h2 class="slide-title">실무 체크리스트</h2>
+          <p>새 AI 기능을 앱에 추가할 때, 아래 순서로 자문해보세요.</p>
+
+          <ul class="checklist">
+            <li><span class="num">1</span><span><strong>Prompt</strong>: 이 기능이 "한 번의 응답"으로 끝나는가? → 그렇다면 여기서 멈춰도 충분</span></li>
+            <li><span class="num">2</span><span><strong>Context</strong>: 응답 품질이 사용자별 데이터 부족 때문에 떨어지는가? → Context 레이어 보강</span></li>
+            <li><span class="num">3</span><span><strong>Harness</strong>: 실제로 뭔가를 실행(등록/발송/결제 등)해야 하는가? → 도구 연동과 권한 설계 필요</span></li>
+            <li><span class="num">4</span><span><strong>Loop</strong>: 사용자가 결과가 나올 때까지 앱 앞에서 기다려야 하는가? → 자율 반복·재시도 로직 필요</span></li>
+            <li><span class="num">5</span><span><strong>Graph</strong>: 서로 다른 전문성이 필요한 하위 작업이 3개 이상 얽혀 있는가? → 멀티 에이전트 구조 검토</span></li>
+          </ul>
+
+          <div class="panel-callout" style="margin-top:18px;">
+            <p style="margin-bottom:0;">대부분의 앱 기능은 <span class="highlight">1~3단계에서 멈춥니다</span>.
+            5단계까지 필요한 건 "사람 개입 없이 장시간, 여러 하위 작업을 스스로 조율해야 할 때" 뿐입니다.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="stage-footer">화면을 클릭하면 다음 슬라이드로 이동합니다 · ↑ / ↓ 방향키로 목차를 이동할 수 있습니다</div>
+  </main>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ===== DOM 캐싱 ===== */
+  var slides       = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var agendaItems  = Array.prototype.slice.call(document.querySelectorAll('.agenda-item'));
+  var agendaList   = document.getElementById('agendaList');
+  var mainStage    = document.getElementById('mainStage');
+  var progressFill = document.getElementById('progressFill');
+  var progressPct  = document.getElementById('progressPercent');
+  var progressCnt  = document.getElementById('progressCount');
+  var total        = slides.length;
+  var current      = 0;
+
+  /* ===== 렌더링 ===== */
+  function render(){
+    for (var i = 0; i < total; i++){
+      var isActive = (i === current);
+      slides[i].classList.toggle('active', isActive);
+      if (!isActive) slides[i].classList.remove('compact', 'compact-2');
+      agendaItems[i].classList.toggle('active', isActive);
+    }
+    var pct = Math.round(((current + 1) / total) * 100);
+    progressFill.style.width = pct + '%';
+    progressPct.textContent  = pct + '%';
+    progressCnt.textContent  = (current + 1) + ' / ' + total;
+
+    var activeItem = agendaItems[current];
+    if (activeItem && activeItem.scrollIntoView){
+      activeItem.scrollIntoView({block:'nearest'});
+    }
+    requestAnimationFrame(fitActiveSlide);
+  }
+
+  function fitActiveSlide(){
+    var el = slides[current];
+    if (!el) return;
+    el.classList.remove('compact', 'compact-2');
+    if (el.scrollHeight > el.clientHeight + 1){
+      el.classList.add('compact');
+    }
+    if (el.scrollHeight > el.clientHeight + 1){
+      el.classList.add('compact-2');
+    }
+  }
+
+  function goTo(index){
+    if (index < 0) index = 0;
+    if (index > total - 1) index = total - 1;
+    if (index === current) return;
+    current = index;
+    render();
+  }
+
+  /* ===== 메인 스테이지 클릭 → 다음 슬라이드 ===== */
+  mainStage.addEventListener('click', function(e){
+    if (e.target.closest && e.target.closest('a')) return;
+    goTo(current + 1 >= total ? 0 : current + 1);
+  });
+
+  /* ===== 사이드바 목록 클릭 (이벤트 위임 + 전파 제어) ===== */
+  agendaList.addEventListener('click', function(e){
+    var item = e.target.closest ? e.target.closest('.agenda-item') : null;
+    if (!item) return;
+    e.stopPropagation();
+    var idx = Number(item.getAttribute('data-index'));
+    goTo(idx);
+  });
+
+  /* ===== 키보드 상하 이동 (사이드바 목록) ===== */
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowDown'){
+      e.preventDefault();
+      goTo(current + 1);
+    } else if (e.key === 'ArrowUp'){
+      e.preventDefault();
+      goTo(current - 1);
+    }
+  });
+
+  window.addEventListener('resize', fitActiveSlide);
+
+  render();
+})();
+</script>
+
+</body>
+</html>
