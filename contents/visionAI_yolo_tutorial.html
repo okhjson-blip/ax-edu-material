@@ -683,6 +683,12 @@ function bindEvents(app){
     } else if(e.key === 'ArrowLeft'){
       e.preventDefault();
       goTo(app, app.current - 1);
+    } else if(e.key === 'ArrowDown'){
+      e.preventDefault();
+      goAgenda(app, 1);
+    } else if(e.key === 'ArrowUp'){
+      e.preventDefault();
+      goAgenda(app, -1);
     }
   });
 }
@@ -690,6 +696,18 @@ function bindEvents(app){
 function goTo(app, index){
   app.current = Math.max(0, Math.min(app.total - 1, index));
   render(app);
+}
+
+/** 사이드바 아젠다(챕터) 단위 이동 — ↑↓ */
+function goAgenda(app, delta){
+  const curChapter = Number(app.slides[app.current].dataset.chapter);
+  const curAgenda = app.agendaItems.findIndex(function(li){
+    return Number(li.dataset.chapter) === curChapter;
+  });
+  if(curAgenda < 0) return;
+  const next = Math.max(0, Math.min(app.agendaItems.length - 1, curAgenda + delta));
+  if(next === curAgenda) return;
+  goTo(app, Number(app.agendaItems[next].dataset.targetIndex));
 }
 
 function render(app){
@@ -711,8 +729,8 @@ function render(app){
   });
 
   app.hintEl.textContent = (app.current === app.total - 1)
-    ? '마지막 슬라이드입니다. 좌측 아젠다를 클릭해 원하는 챕터로 이동하세요.'
-    : '화면을 클릭하면 다음 내용으로 이동합니다 (← → 방향키도 사용 가능)';
+    ? '마지막 슬라이드입니다. 좌측 아젠다를 클릭하거나 ↑↓로 챕터를 이동하세요.'
+    : '클릭 또는 ← → 로 슬라이드 이동 · ↑ ↓ 로 사이드바 챕터 이동';
 }
 </script>
 </body>
