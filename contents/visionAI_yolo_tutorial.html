@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOLO로 PCB 불량 자동검출 시스템 만들기 · 실습 튜토리얼</title>
+<style>
+/* =====================================================================
+   0. DESIGN TOKENS (브랜드 컬러 / 타이포그래피)
+   ---------------------------------------------------------------------
+   색상·폰트·크기를 여기서만 관리합니다. 색상을 바꾸려면 이 블록만 수정하세요.
+===================================================================== */
+:root{
+  --color-bg:#FFFFFF;
+  --color-sidebar:#0A1E5C;
+  --color-primary:#034EA2;
+  --color-primary-dark:#002B66;
+  --color-accent:#78BE20;
+  --color-text:#1B222E;
+  --color-text-soft:#4A5568;
+  --color-border:#DCE6F2;
+  --color-table-stripe:#F4F8FC;
+  --font-base:'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo',sans-serif;
+  --font-mono:'Consolas','D2Coding','Courier New',monospace;
+}
+
+/* =====================================================================
+   1. RESET & BASE
+===================================================================== */
+*{box-sizing:border-box;}
+html{font-size:14pt;} /* 본문 14pt 기준 - 이하 rem 단위는 이 값을 기준으로 비례 */
+body{
+  margin:0;
+  font-family:var(--font-base);
+  color:var(--color-text);
+  background:var(--color-bg);
+  height:100vh;
+  overflow:hidden;
+  word-break:keep-all;     /* 한국어 줄바꿈: 단어(의미 단위) 중간에서 끊기지 않도록 */
+  overflow-wrap:break-word; /* 단어 자체가 너무 길어 넘칠 때만 예외적으로 줄바꿈 */
+}
+
+/* =====================================================================
+   2. 전체 레이아웃 (Flexbox 2-Column)
+===================================================================== */
+.app{display:flex;height:100vh;width:100%;}
+
+/* ---- 2-1. 좌측 사이드바 (아젠다) : 전체 너비의 30% 이하, 280px 고정 ---- */
+.sidebar{
+  flex:0 0 280px;
+  width:280px;
+  max-width:30%;
+  background:var(--color-sidebar);
+  color:#EAF1FB;
+  display:flex;
+  flex-direction:column;
+}
+/* ---- 2-2. 진행률(Progress) 영역 : 11pt 기준 ---- */
+.progress-section{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.14);}
+.progress-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.progress-meta span, .progress-meta strong{font-size:11pt;}
+.progress-meta span{color:#B9C6E8;}
+.progress-meta strong{color:var(--color-accent);}
+.progress-track{width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,.16);overflow:hidden;}
+.progress-fill{height:100%;width:0%;background:var(--color-accent);transition:width .35s ease;}
+
+/* ---- 2-3. 아젠다 목록 ---- */
+.agenda-wrap{flex:1;overflow-y:auto;padding:10px 0 16px;}
+.agenda-wrap::-webkit-scrollbar{width:6px;}
+.agenda-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:3px;}
+ul#agendaList{list-style:none;margin:0;padding:0;}
+.agenda-item{
+  display:flex; gap:10px; align-items:flex-start;
+  padding:11px 20px; cursor:pointer;
+  border-left:3px solid transparent;
+  color:#B9C6E8;
+}
+.agenda-item .num{font-weight:700;color:var(--color-accent);font-size:.8rem;min-width:18px;}
+.agenda-item .label{font-size:.88rem;line-height:1.4;}
+.agenda-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.agenda-item.active{background:rgba(255,255,255,.11);border-left-color:var(--color-accent);color:#fff;font-weight:700;}
+
+/* ---- 2-3b. 목록으로 (홈 이동) ---- */
+.home-link{
+  display:block;
+  margin:0 20px 18px;
+  padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.14);
+  color:rgba(255,255,255,.82);
+  font-size:11pt;
+  line-height:1.4;
+  text-decoration:none;
+}
+.home-link:hover{color:#fff;}
+
+/* ---- 2-4. 메인 스테이지 (우측) ---- */
+.stage-wrapper{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--color-bg);}
+#stage{flex:1;overflow-y:auto;cursor:pointer;padding:52px 68px 30px;}
+.stage-footer{
+  flex:0 0 auto;padding:9px 24px;text-align:center;
+  font-size:11pt;color:var(--color-primary);
+  border-top:1px solid var(--color-border);background:#fff;
+}
+
+/* =====================================================================
+   3. 슬라이드 카드 공통 스타일 (1문서 1단락 = 1카드)
+===================================================================== */
+.slide{display:none;max-width:1180px;margin:0 auto;background:var(--color-bg);}
+.slide.active{display:block;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.eyebrow{font-size:.85rem;color:var(--color-primary);font-weight:700;margin:0 0 6px;}
+.slide-title{
+  font-size:1.9rem;color:var(--color-primary-dark);
+  margin:0 0 18px;padding-left:16px;
+  border-left:6px solid var(--color-accent);
+  line-height:1.35;
+}
+.slide h3{font-size:1.2rem;color:var(--color-primary);margin:26px 0 10px;}
+.slide p{font-size:1rem;line-height:1.75;margin:0 0 12px;color:var(--color-text);}
+
+.badge-lab{
+  display:inline-block;background:var(--color-accent);color:#0A1E5C;
+  font-weight:700;font-size:.7rem;padding:3px 10px;border-radius:11px;
+  margin-left:10px;vertical-align:middle;
+}
+
+/* ---- 표 ---- */
+table{width:100%;border-collapse:collapse;margin:14px 0 20px;font-size:.92rem;}
+th{background:var(--color-primary);color:#fff;text-align:left;padding:9px 12px;font-weight:700;}
+td{padding:9px 12px;border-bottom:1px solid var(--color-border);vertical-align:top;color:var(--color-text);}
+tbody tr:nth-child(even) td{background:var(--color-table-stripe);}
+
+/* ---- 코드/에러 블록 ---- */
+pre.code{
+  background:var(--color-primary-dark);color:#EAF1FB;
+  padding:16px 18px;border-radius:8px;overflow-x:auto;
+  font-family:var(--font-mono);font-size:.82rem;line-height:1.6;
+  margin:8px 0 18px; white-space:pre-wrap; word-break:break-word;
+}
+pre.code .cmt{color:var(--color-accent);}
+.io-label{font-size:.8rem;font-weight:700;color:var(--color-text-soft);margin:0 0 4px;}
+
+/* ---- 강조 콜아웃 (연두색 포인트) ---- */
+.callout{
+  border-left:4px solid var(--color-accent);background:#F4FAEC;
+  padding:14px 18px;margin:16px 0;border-radius:0 6px 6px 0;
+}
+.callout p{margin:0;font-weight:600;color:var(--color-primary-dark);}
+
+/* ---- 목록 ---- */
+ul.plain{margin:0 0 14px;padding-left:20px;}
+ul.plain li{margin-bottom:7px;line-height:1.7;}
+ul.check{list-style:none;margin:0;padding:0;}
+ul.check li{position:relative;padding-left:22px;margin-bottom:9px;line-height:1.7;}
+ul.check li::before{content:'✓';position:absolute;left:0;color:var(--color-accent);font-weight:700;}
+
+.two-col{display:flex;gap:36px;flex-wrap:wrap;}
+.two-col > div{flex:1;min-width:280px;}
+
+/* ---- 표지 슬라이드 ---- */
+.slide.cover.active{display:flex;flex-direction:column;justify-content:center;min-height:58vh;}
+.cover h2{font-size:2.3rem;color:var(--color-primary-dark);line-height:1.4;margin:0 0 20px;padding:0 0 20px;border:none;border-bottom:1px solid var(--color-border);}
+.cover p.sub{font-size:1.05rem;color:var(--color-text-soft);font-style:italic;margin:0 0 26px;line-height:1.7;}
+
+.doc-end{text-align:right;color:var(--color-text-soft);font-size:.85rem;margin-top:24px;}
+
+@media (max-width:1300px){ #stage{padding:40px 40px 24px;} }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============================== 사이드바 ============================== -->
+  <aside class="sidebar">
+    <div class="progress-section">
+      <div class="progress-meta">
+        <span>진행률 <strong id="progressPercent">0%</strong></span>
+        <span id="progressPage">1 / 19</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <nav class="agenda-wrap">
+      <ul id="agendaList"><!-- JS(buildAgenda)가 자동 생성 --></ul>
+    </nav>
+    <a class="home-link" href="/" target="_top">목록으로</a>
+  </aside>
+
+  <!-- ============================== 메인 스테이지 ============================== -->
+  <div class="stage-wrapper">
+    <main id="stage">
+
+      <!-- ============ SLIDE 0 : 표지 ============ -->
+      <section class="slide cover" data-chapter="0">
+        <h2>YOLO로 PCB 불량<br>자동검출 시스템 만들기</h2>
+        <p class="sub">초보자를 위한 실습 튜토리얼 — 합성 데이터부터 실제 PCB 데이터 학습, GPU 가속, 결과 해석까지</p>
+        <p>이 문서는 실제로 진행했던 전체 과정을 순서대로 정리한 것입니다. 코드를 그대로 따라 하면 동일하게 재현할 수 있습니다.</p>
+      </section>
+
+      <!-- ============ CHAPTER 01 : 왜 YOLO인가? ============ -->
+      <section class="slide" data-chapter="1" data-part="1/1">
+        <p class="eyebrow">CHAPTER 01</p>
+        <h2 class="slide-title">왜 YOLO인가?</h2>
+        <p>YOLO(You Only Look Once)는 사진 속에서 '무엇이(class) 어디에(위치, bounding box) 있는지'를 한 번에 찾아내는 객체 탐지(Object Detection) AI 모델입니다.
+        PCB(회로기판) 사진 한 장을 넣으면, 결함의 종류와 정확한 위치를 박스로 표시해줍니다.</p>
+
+        <h3>이번 튜토리얼에서 쓴 버전</h3>
+        <ul class="plain">
+          <li>YOLOv8n (nano) → YOLOv8s (small)로 실험 확장</li>
+          <li>라이브러리: ultralytics (Python 패키지)</li>
+          <li>실행 환경: Windows 노트북, GPU는 NVIDIA RTX 4070 Laptop (8GB)</li>
+        </ul>
+
+        <h3>YOLO 버전과 크기 정리</h3>
+        <table>
+          <thead><tr><th>구분</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>버전 계보</td><td>YOLOv1~v3(Redmon) → v4 → v5/v8/v11(Ultralytics) → v9,v10(연구기관) → 최신 YOLO26</td></tr>
+            <tr><td>크기(같은 버전 내)</td><td>n(nano) &lt; s(small) &lt; m(medium) &lt; l(large) &lt; x(xlarge)</td></tr>
+            <tr><td>크기가 커지면</td><td>정확도 ↑, 확신도(confidence) 더 뚜렷해짐, 대신 느려지고 GPU 메모리 더 씀</td></tr>
+            <tr><td>태스크 종류</td><td>detect(객체탐지, 이번에 사용) / segment / pose / classify / obb</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============ CHAPTER 02 - PART 1/2 : 설치 방법 ============ -->
+      <section class="slide" data-chapter="2" data-part="1/2">
+        <p class="eyebrow">CHAPTER 02 · 1/2</p>
+        <h2 class="slide-title">개발 환경 준비 (설치) · 설치 방법<span class="badge-lab">실습</span></h2>
+        <p>사내망처럼 SSL 인증서를 가로채는(인터셉션) 환경에서는 pip 설치 시 인증서 오류가 자주 발생합니다. 이럴 때는 --trusted-host 옵션으로 우회합니다.</p>
+
+        <h3>2-1. CPU만 쓸 경우</h3>
+        <pre class="code">pip install ultralytics --trusted-host pypi.org --trusted-host files.pythonhosted.org</pre>
+
+        <h3>2-2. GPU(NVIDIA)가 있을 경우 — 반드시 이 순서로</h3>
+        <p class="io-label">① CUDA 지원 torch를 먼저 설치 (일반 pip install torch는 CPU 버전이 깔림)</p>
+        <pre class="code">pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124 --trusted-host pypi.org --trusted-host files.pythonhosted.org --trusted-host download.pytorch.org --trusted-host download-r2.pytorch.org</pre>
+        <p class="io-label">② 그다음 ultralytics 설치</p>
+        <pre class="code">pip install ultralytics --trusted-host pypi.org --trusted-host files.pythonhosted.org</pre>
+      </section>
+
+      <!-- ============ CHAPTER 02 - PART 2/2 : 설치 확인 및 팁 ============ -->
+      <section class="slide" data-chapter="2" data-part="2/2">
+        <p class="eyebrow">CHAPTER 02 · 2/2</p>
+        <h2 class="slide-title">개발 환경 준비 (설치) · 설치 확인 및 팁<span class="badge-lab">실습</span></h2>
+
+        <h3>2-3. 설치 확인</h3>
+        <pre class="code">python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"</pre>
+        <p class="io-label">출력 예시 (실제로 확인된 결과)</p>
+        <pre class="code">2.6.0+cu124 True NVIDIA GeForce RTX 4070 Laptop GPU</pre>
+
+        <div class="callout">
+          <p>실전 팁: GPU 드라이버 확인은 nvidia-smi 명령어로 합니다. 여기 나오는 CUDA 버전 이하로 torch의 cu버전(cu121/cu124/cu128 등)을 맞추면 됩니다.</p>
+        </div>
+      </section>
+
+      <!-- ============ CHAPTER 03 ============ -->
+      <section class="slide" data-chapter="3" data-part="1/1">
+        <p class="eyebrow">CHAPTER 03</p>
+        <h2 class="slide-title">첫 번째 실수: 가짜 데이터로 학습했던 이야기</h2>
+        <p>처음에는 실제 PCB 사진이 없어서, 그림판으로 그린 것 같은 인위적인 합성 이미지(사각형, 선, 원으로 회로판을 흉내낸 것) 125장을 만들어 학습했습니다. 결과는 다음과 같았습니다.</p>
+
+        <table>
+          <thead><tr><th>지표</th><th>값</th></tr></thead>
+          <tbody>
+            <tr><td>mAP50</td><td>99.5%</td></tr>
+            <tr><td>mAP50-95</td><td>96%</td></tr>
+            <tr><td>추론 속도</td><td>22.3ms</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p>숫자만 보면 완벽해 보이지만, 이는 '진짜 함정'이었습니다. 그림이 너무 단순해서 모델이 진짜 PCB의 복잡한 패턴이 아니라 단순한 도형 형태만 외워버린 것입니다.
+          실제 현장 사진에서는 전혀 통하지 않을 가능성이 높았습니다.</p>
+        </div>
+
+        <p>교훈: 합성 데이터의 높은 정확도는 '진짜 성능'이 아니라 '문제가 너무 쉬웠다'는 신호일 수 있습니다. 실전에 쓸 모델은 반드시 실제 데이터로 검증해야 합니다.</p>
+      </section>
+
+      <!-- ============ CHAPTER 04 ============ -->
+      <section class="slide" data-chapter="4" data-part="1/1">
+        <p class="eyebrow">CHAPTER 04</p>
+        <h2 class="slide-title">진짜 데이터 구하기 (Roboflow)</h2>
+        <p>공개된 PCB 불량 데이터셋 중 실무에서 참고할 만한 것들:</p>
+
+        <table>
+          <thead><tr><th>데이터셋</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td>PKU-Market-PCB (HRIPCB)</td><td>북경대 공개, 693장, 6종 결함. 여러 파생 데이터셋의 원본</td></tr>
+            <tr><td>Roboflow Universe</td><td>PKU-PCB 계열을 augmentation(회전/반전)으로 확장. 이번에 사용한 데이터셋(9,114장)</td></tr>
+            <tr><td>DeepPCB (GitHub)</td><td>1,500쌍(양품 대조), 6종 결함, YOLO 포맷 아님(변환 필요)</td></tr>
+            <tr><td>MVTec AD (PCB1~4)</td><td>정상 이미지만으로 학습하는 이상탐지 방식. 결함 샘플이 적을 때 보완용</td></tr>
+          </tbody>
+        </table>
+
+        <p>Roboflow Universe(universe.roboflow.com)에서 'PCB defect'로 검색 → Open Source 필터 적용 → YOLOv8 포맷으로 다운로드하면 됩니다.
+        사내망에서는 API 다운로드가 SSL로 막힐 수 있어 웹 브라우저로 직접 다운로드하는 방법을 사용했습니다.</p>
+
+        <h3>실제로 받은 데이터셋 구성</h3>
+        <table>
+          <thead><tr><th>구분</th><th>이미지 수</th></tr></thead>
+          <tbody>
+            <tr><td>train</td><td>8,020장</td></tr>
+            <tr><td>valid</td><td>1,094장</td></tr>
+            <tr><td>test</td><td>552장</td></tr>
+            <tr><td>합계</td><td>9,666장</td></tr>
+          </tbody>
+        </table>
+        <p>결함 클래스 8종: falsecopper, missinghole, mousebite, opencircuit, pinhole, scratch, shortcircuit, spur</p>
+      </section>
+
+      <!-- ============ CHAPTER 05 ============ -->
+      <section class="slide" data-chapter="5" data-part="1/1">
+        <p class="eyebrow">CHAPTER 05</p>
+        <h2 class="slide-title">YOLO 라벨 포맷 이해하기</h2>
+        <p>Roboflow에서 받은 라벨 파일(.txt)을 열어보면 이런 줄이 있습니다:</p>
+        <pre class="code">1 0.86171875 0.165625 0.021875 0.04375</pre>
+
+        <h3>각 숫자의 의미</h3>
+        <table>
+          <thead><tr><th>위치</th><th>값</th><th>의미</th></tr></thead>
+          <tbody>
+            <tr><td>1번째</td><td>1</td><td>클래스 번호 (data.yaml의 names 리스트에서 index 1번 = 두 번째 클래스)</td></tr>
+            <tr><td>2번째</td><td>0.8617...</td><td>박스 중심의 x좌표 (이미지 가로폭 대비 비율, 0~1)</td></tr>
+            <tr><td>3번째</td><td>0.1656...</td><td>박스 중심의 y좌표 (이미지 세로폭 대비 비율, 0~1)</td></tr>
+            <tr><td>4번째</td><td>0.0219...</td><td>박스 너비 (이미지 가로폭 대비 비율)</td></tr>
+            <tr><td>5번째</td><td>0.0438...</td><td>박스 높이 (이미지 세로폭 대비 비율)</td></tr>
+          </tbody>
+        </table>
+
+        <p>핵심은 '정규화(normalized)'되어 있다는 것입니다. 픽셀 좌표가 아니라 0~1 사이 비율로 저장되어 있어서, 이미지 크기가 달라져도 라벨을 그대로 쓸 수 있습니다.</p>
+
+        <h3>data.yaml 파일</h3>
+        <p>data.yaml 파일은 클래스 목록과 이미지 경로를 정의합니다.</p>
+        <pre class="code">train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 8
+names: ['falsecopper', 'missinghole', 'mousebite', 'opencircuit',
+        'pinhole', 'scratch', 'shortcircuit', 'spur']</pre>
+      </section>
+
+      <!-- ============ CHAPTER 06 - PART 1/2 : 학습 코드 ============ -->
+      <section class="slide" data-chapter="6" data-part="1/2">
+        <p class="eyebrow">CHAPTER 06 · 1/2</p>
+        <h2 class="slide-title">모델 학습시키기 (Fine-tuning) · 학습 코드<span class="badge-lab">실습</span></h2>
+        <p>'파인튜닝(fine-tuning)'이란 처음부터 학습시키는 게 아니라, 이미 대량의 일반 이미지(COCO 데이터셋)로 학습된 기본 모델(yolov8n.pt)을 가져와서,
+        우리 PCB 데이터로 '추가 학습'시키는 방법입니다. 훨씬 적은 데이터와 시간으로 좋은 성능을 낼 수 있습니다.</p>
+
+        <h3>6-1. 전체 학습 코드</h3>
+        <pre class="code">from pathlib import Path
+from ultralytics import YOLO
+
+def main():
+    model = YOLO('yolov8n.pt')  <span class="cmt"># 기본 모델 불러오기</span>
+    model.train(
+        data='roboflow_pcb_data/data.yaml',
+        epochs=100,        <span class="cmt"># 전체 데이터를 100번 반복 학습</span>
+        imgsz=640,         <span class="cmt"># 입력 이미지 크기</span>
+        device=0,          <span class="cmt"># GPU 0번 사용 (CPU는 'cpu')</span>
+        batch=16,          <span class="cmt"># 한 번에 16장씩 묶어서 학습</span>
+        patience=30,       <span class="cmt"># 30 epoch 동안 개선 없으면 조기 종료</span>
+        optimizer='AdamW',
+    )
+
+if __name__ == '__main__':   <span class="cmt"># Windows에서는 필수!</span>
+    main()</pre>
+      </section>
+
+      <!-- ============ CHAPTER 06 - PART 2/2 : 속도 비교 ============ -->
+      <section class="slide" data-chapter="6" data-part="2/2">
+        <p class="eyebrow">CHAPTER 06 · 2/2</p>
+        <h2 class="slide-title">모델 학습시키기 (Fine-tuning) · CPU vs GPU 속도 비교</h2>
+
+        <h3>6-2. CPU vs GPU 속도 비교 (실측)</h3>
+        <table>
+          <thead><tr><th>환경</th><th>1 epoch 소요시간</th><th>100 epoch 예상 총 시간</th></tr></thead>
+          <tbody>
+            <tr><td>CPU (Intel Core Ultra 9 185H)</td><td>약 16~17분</td><td>약 27시간 (비현실적)</td></tr>
+            <tr><td>GPU (RTX 4070 Laptop, yolov8n)</td><td>약 2.4분</td><td>4시간 (실측)</td></tr>
+            <tr><td>GPU (RTX 4070 Laptop, yolov8s)</td><td>약 4.6분</td><td>약 7.6~8시간 (추정)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p>같은 데이터인데도 GPU가 CPU보다 약 7배 빠릅니다. 실무에서 이미지 수천 장 이상을 학습할 때는 GPU가 사실상 필수입니다.</p>
+        </div>
+      </section>
+
+      <!-- ============ CHAPTER 07 - PART 1/3 : 문제 1 ============ -->
+      <section class="slide" data-chapter="7" data-part="1/3">
+        <p class="eyebrow">CHAPTER 07 · 1/3</p>
+        <h2 class="slide-title">학습 중 만난 오류와 해결법 · 문제 1<span class="badge-lab">실습</span></h2>
+        <p>실전에서는 크고 작은 오류를 반드시 만나게 됩니다. 실제로 겪었던 3가지 문제와 해결책입니다.</p>
+
+        <h3>문제 1: SSL 인증서 오류로 모델/패키지 다운로드 실패</h3>
+        <p class="io-label">증상</p>
+        <pre class="code">[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed</pre>
+        <p><strong>원인:</strong> 회사 네트워크가 보안을 위해 SSL 트래픽을 가로채기(인터셉션) 때문</p>
+        <p><strong>해결:</strong> pip 명령에 --trusted-host를 추가하거나, Python requests 라이브러리로 verify=False 옵션을 주고 수동 다운로드</p>
+      </section>
+
+      <!-- ============ CHAPTER 07 - PART 2/3 : 문제 2 ============ -->
+      <section class="slide" data-chapter="7" data-part="2/3">
+        <p class="eyebrow">CHAPTER 07 · 2/3</p>
+        <h2 class="slide-title">학습 중 만난 오류와 해결법 · 문제 2<span class="badge-lab">실습</span></h2>
+
+        <h3>문제 2: Windows에서 학습 시작 시 멀티프로세싱 오류</h3>
+        <p class="io-label">증상</p>
+        <pre class="code">RuntimeError: An attempt has been made to start a new process before
+the current process has finished its bootstrapping phase...</pre>
+        <p><strong>원인:</strong> YOLO는 데이터를 빠르게 불러오려고 여러 개의 프로세스(worker)를 동시에 씁니다. Windows에서는 이 방식(spawn)을 쓸 때
+        실행 코드를 반드시 if __name__ == '__main__': 안에 넣어야 합니다. 안 그러면 자식 프로세스가 전체 스크립트를 처음부터 다시 실행하면서 무한히 충돌합니다.</p>
+        <p><strong>해결:</strong> 학습 코드 전체를 main() 함수로 감싸고, 맨 아래에 다음 코드를 추가</p>
+        <pre class="code">if __name__ == '__main__':
+    main()</pre>
+      </section>
+
+      <!-- ============ CHAPTER 07 - PART 3/3 : 문제 3 ============ -->
+      <section class="slide" data-chapter="7" data-part="3/3">
+        <p class="eyebrow">CHAPTER 07 · 3/3</p>
+        <h2 class="slide-title">학습 중 만난 오류와 해결법 · 문제 3<span class="badge-lab">실습</span></h2>
+
+        <h3>문제 3: 최신 옵티마이저(muon)의 라이브러리 버그</h3>
+        <p class="io-label">증상</p>
+        <pre class="code">RuntimeError: view size is not compatible with input tensor's size and stride...</pre>
+        <p><strong>원인:</strong> 학습 시 'optimizer=auto'로 두면 라이브러리가 자동으로 최신 옵티마이저(muon)를 선택하는데, 이번에 사용한 ultralytics 버전에서
+        이 옵티마이저 자체에 버그가 있었습니다.</p>
+        <p><strong>해결:</strong> optimizer를 명시적으로 안정적인 것으로 지정</p>
+        <pre class="code">model.train(..., optimizer='AdamW')</pre>
+      </section>
+
+      <!-- ============ CHAPTER 08 - PART 1/3 : 핵심 용어 ============ -->
+      <section class="slide" data-chapter="8" data-part="1/3">
+        <p class="eyebrow">CHAPTER 08 · 1/3</p>
+        <h2 class="slide-title">결과 해석하기 · 핵심 용어 쉽게 이해하기</h2>
+        <p>학습이 끝나면 결과 폴더(runs.../weights/, results.png 등)에 여러 그래프가 자동 저장됩니다.</p>
+
+        <table>
+          <thead><tr><th>용어</th><th>쉬운 설명</th></tr></thead>
+          <tbody>
+            <tr><td>Precision (정밀도)</td><td>모델이 '불량이다'라고 말한 것 중에서 진짜 불량인 비율. 낮으면 '양치기 소년'처럼 오탐이 많음</td></tr>
+            <tr><td>Recall (재현율)</td><td>실제 불량 중에서 모델이 찾아낸 비율. 낮으면 불량을 많이 놓침(가장 위험)</td></tr>
+            <tr><td>mAP50</td><td>박스 위치가 대충 맞으면(50% 이상 겹치면) 정답으로 인정하는 종합 점수</td></tr>
+            <tr><td>mAP50-95</td><td>박스 위치를 훨씬 엄격하게 요구하는 종합 점수 (더 어려운 기준)</td></tr>
+            <tr><td>Confidence (확신도)</td><td>모델이 '이건 결함이다'라고 확신하는 정도 (0~1)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============ CHAPTER 08 - PART 2/3 : 실제 학습 결과 ============ -->
+      <section class="slide" data-chapter="8" data-part="2/3">
+        <p class="eyebrow">CHAPTER 08 · 2/3</p>
+        <h2 class="slide-title">결과 해석하기 · 실제 학습 결과</h2>
+        <p>YOLOv8n, 100 epoch, GPU 4시간 학습 기준 결과입니다.</p>
+
+        <table>
+          <thead><tr><th>지표</th><th>값</th></tr></thead>
+          <tbody>
+            <tr><td>Precision</td><td>0.853</td></tr>
+            <tr><td>Recall</td><td>0.821</td></tr>
+            <tr><td>mAP50</td><td>0.849</td></tr>
+            <tr><td>mAP50-95</td><td>0.416</td></tr>
+            <tr><td>추론 속도</td><td>이미지당 1.6ms (실시간 검사에 충분)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============ CHAPTER 08 - PART 3/3 : 클래스별 성능 ============ -->
+      <section class="slide" data-chapter="8" data-part="3/3">
+        <p class="eyebrow">CHAPTER 08 · 3/3</p>
+        <h2 class="slide-title">결과 해석하기 · 클래스별 성능 (강한 것 vs 약한 것)</h2>
+
+        <table>
+          <thead><tr><th>클래스</th><th>mAP50</th><th>평가</th></tr></thead>
+          <tbody>
+            <tr><td>scratch</td><td>0.951</td><td>매우 좋음</td></tr>
+            <tr><td>falsecopper</td><td>0.939</td><td>매우 좋음</td></tr>
+            <tr><td>mousebite</td><td>0.898</td><td>좋음 (단, 실제 낱장 테스트에서는 자주 놓침 — 아래 참고)</td></tr>
+            <tr><td>pinhole</td><td>0.900</td><td>좋음</td></tr>
+            <tr><td>spur</td><td>0.867</td><td>좋음</td></tr>
+            <tr><td>opencircuit</td><td>0.823</td><td>보통</td></tr>
+            <tr><td>shortcircuit</td><td>0.736</td><td>약함</td></tr>
+            <tr><td>missinghole</td><td>0.679</td><td>가장 약함</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p>흥미로운 점: mousebite는 종합 점수(mAP)는 높았지만, 실제 낱장 이미지 테스트에서는 반복적으로 놓치는 경우가 있었습니다.
+          이는 결함 자체가 육안으로도 구분하기 어려울 만큼 미세하기 때문으로 추정됩니다. 종합 지표 하나만 믿지 말고, 실제 이미지로 직접 눈으로 확인하는 과정이 중요합니다.</p>
+        </div>
+      </section>
+
+      <!-- ============ CHAPTER 09 - PART 1/2 : 비유 ============ -->
+      <section class="slide" data-chapter="9" data-part="1/2">
+        <p class="eyebrow">CHAPTER 09 · 1/2</p>
+        <h2 class="slide-title">Confidence(확신도)를 실무에 적용하는 법 · 비유로 이해하기</h2>
+        <p>실무에서 흔히 하는 질문: "확신도를 0.99 이상으로 높일 수는 없나요? 그러면 사람이 다시 검사할 필요가 없어서 인건비가 줄어들 텐데요."</p>
+
+        <div class="callout"><p>결론부터: 억지로 높이면 안 됩니다. 비유로 설명하겠습니다.</p></div>
+
+        <h3>비유: 신입 검사원 이야기</h3>
+        <p>AI 모델을 '방금 입사한 신입 검사원'이라고 생각해보세요. 이 검사원에게 '불량이라고 외칠 기준'을 정해줘야 합니다.</p>
+        <ul class="plain">
+          <li>기준을 너무 빡빡하게 잡으면 ("100% 확실할 때만 말해") → 신입은 그 정도로 확신하는 경우가 거의 없어서, 웬만하면 "정상입니다"라고 말해버립니다.
+          → 진짜 불량을 놓치고 그대로 출하됨 (가장 위험)</li>
+          <li>기준을 너무 느슨하게 잡으면 ("조금이라도 이상하면 다 말해") → 진짜 불량은 거의 다 잡지만, 멀쩡한 것도 불량이라 우김
+          → 사람이 매번 재확인 → 인건비 증가</li>
+        </ul>
+      </section>
+
+      <!-- ============ CHAPTER 09 - PART 2/2 : 실측 결과 및 정책 ============ -->
+      <section class="slide" data-chapter="9" data-part="2/2">
+        <p class="eyebrow">CHAPTER 09 · 2/2</p>
+        <h2 class="slide-title">Confidence(확신도)를 실무에 적용하는 법 · 실측 결과와 판정 정책</h2>
+
+        <h3>실제로 이번 모델을 시험해본 결과</h3>
+        <table>
+          <thead><tr><th>조건</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td>confidence 0.971 이상만 인정</td><td>Precision(정밀도) 1.00 달성 — 하지만 Recall(재현율)이 0에 가까워짐 → 대부분의 불량을 통과시켜버림</td></tr>
+            <tr><td>confidence 0 (필터링 없음)</td><td>Recall 최대 0.93 — threshold를 아무리 낮춰도 불량의 7%는 이 모델이 원천적으로 못 찾음 (모델 실력의 한계)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p>→ 확신도를 인위적으로 높이는 방법은 없으며, 대신 '애매해서 사람이 봐야 하는 구간'의 크기를 줄이는 것이 진짜 목표입니다.</p>
+        </div>
+
+        <h3>실무 3단계 판정 정책 제안</h3>
+        <table>
+          <thead><tr><th>Confidence 구간</th><th>판정</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td>0.7 이상</td><td>자동 불량 처리</td><td>Precision이 높은 구간 — 믿을 만함</td></tr>
+            <tr><td>0.05 ~ 0.7</td><td>사람이 재검토</td><td>인건비가 발생하는 구간 (줄여야 할 목표)</td></tr>
+            <tr><td>미검출 (박스 없음)</td><td>자동 정상 처리</td><td>단, 약 7%는 놓칠 리스크 있음을 감안</td></tr>
+          </tbody>
+        </table>
+        <p>'애매한 구간'을 줄이려면 confidence 계산식을 건드리는 게 아니라, 모델 자체를 더 똑똑하게 만들어야 합니다 (다음 장 참고).</p>
+      </section>
+
+      <!-- ============ CHAPTER 10 ============ -->
+      <section class="slide" data-chapter="10" data-part="1/1">
+        <p class="eyebrow">CHAPTER 10</p>
+        <h2 class="slide-title">더 큰 모델로 업그레이드하기</h2>
+        <p>약한 클래스(missinghole, shortcircuit, mousebite)를 개선하는 방법 중 하나는 더 큰 모델을 쓰는 것입니다.
+        같은 GPU에서 모델 크기별 메모리 사용량을 추정하면 다음과 같습니다.</p>
+
+        <table>
+          <thead><tr><th>모델</th><th>파라미터</th><th>학습 시 GPU 메모리(추정)</th><th>RTX 4070(8GB)에서</th></tr></thead>
+          <tbody>
+            <tr><td>yolov8n (사용함)</td><td>320만</td><td>약 2GB</td><td>여유 충분</td></tr>
+            <tr><td>yolov8s (실험함)</td><td>1,120만</td><td>약 3.4GB (실측)</td><td>문제없음</td></tr>
+            <tr><td>yolov8m</td><td>2,590만</td><td>약 5GB</td><td>문제없음</td></tr>
+            <tr><td>yolov8l</td><td>4,370만</td><td>약 6~7GB</td><td>배치 크기를 줄여야 안전</td></tr>
+            <tr><td>yolov8x</td><td>6,820만</td><td>8GB 이상</td><td>그대로는 메모리 부족 가능</td></tr>
+          </tbody>
+        </table>
+
+        <p>모델 파일 교체는 코드 한 줄만 바꾸면 됩니다: YOLO('yolov8n.pt') → YOLO('yolov8s.pt').
+        단, 학습 시간은 대략 비례해서 늘어납니다 (nano 4시간 → small 약 7.6~8시간, 실측 기준).</p>
+      </section>
+
+      <!-- ============ CHAPTER 11 ============ -->
+      <section class="slide" data-chapter="11" data-part="1/1">
+        <p class="eyebrow">CHAPTER 11</p>
+        <h2 class="slide-title">정리 및 다음 단계</h2>
+
+        <div class="two-col">
+          <div>
+            <h3>이번 튜토리얼에서 배운 핵심 포인트</h3>
+            <ul class="check">
+              <li>합성 데이터의 99% 정확도는 함정일 수 있다 — 반드시 실제 데이터로 검증할 것</li>
+              <li>YOLO 라벨은 정규화된 (class, x, y, w, h) 5개 숫자로 구성된다</li>
+              <li>파인튜닝은 기본 모델(yolov8n.pt)에 우리 데이터를 추가 학습시키는 방식이다</li>
+              <li>GPU는 CPU 대비 약 7배 빠르며, 대량 데이터 학습에는 사실상 필수다</li>
+              <li>Windows 학습 코드는 반드시 if __name__ == '__main__': 으로 감싸야 한다</li>
+              <li>optimizer='auto'보다 'AdamW'처럼 명시적으로 지정하는 것이 안전할 때가 있다</li>
+              <li>confidence를 억지로 높이면 recall(놓치지 않는 능력)이 희생된다 — 3단계 판정 정책으로 대응</li>
+              <li>mAP 같은 종합 지표만 보지 말고, 실제 이미지로 직접 검증하는 과정이 반드시 필요하다</li>
+            </ul>
+          </div>
+          <div>
+            <h3>다음에 시도해볼 것들</h3>
+            <ul class="check">
+              <li>yolov8s/m 학습을 끝까지 완료하고 nano와 정확도 비교</li>
+              <li>missinghole, shortcircuit, mousebite 클래스 데이터를 다른 공개 데이터셋(DeepPCB 등)에서 보강</li>
+              <li>이미지 해상도를 640 → 1280으로 올려서 미세 결함 인식률 개선</li>
+              <li>실제 생산 라인 카메라로 촬영한 이미지로 최종 현장 검증</li>
+              <li>confidence 3단계 판정 정책을 실제 검사 파이프라인(자동판정 + 재검토 대기열)으로 구현</li>
+            </ul>
+          </div>
+        </div>
+        <p class="doc-end">문서 끝</p>
+      </section>
+
+    </main>
+    <div class="stage-footer" id="stageHint">화면을 클릭하면 다음 내용으로 이동합니다 (← → 방향키도 사용 가능)</div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   AGENDA 데이터 : 챕터 번호/제목을 한 곳에서 관리 (유지보수 포인트)
+   - 슬라이드를 추가/삭제해도 이 배열과 각 <section data-chapter="N">만
+     맞으면 사이드바/진행률은 자동으로 재계산됩니다.
+===================================================================== */
+const AGENDA = [
+  {chapter:0,  title:'표지'},
+  {chapter:1,  title:'왜 YOLO인가?'},
+  {chapter:2,  title:'개발 환경 준비 (설치)'},
+  {chapter:3,  title:'첫 번째 실수: 가짜 데이터'},
+  {chapter:4,  title:'진짜 데이터 구하기 (Roboflow)'},
+  {chapter:5,  title:'YOLO 라벨 포맷 이해하기'},
+  {chapter:6,  title:'모델 학습시키기 (Fine-tuning)'},
+  {chapter:7,  title:'학습 중 만난 오류와 해결법'},
+  {chapter:8,  title:'결과 해석하기'},
+  {chapter:9,  title:'Confidence 실무 적용법'},
+  {chapter:10, title:'더 큰 모델로 업그레이드'},
+  {chapter:11, title:'정리 및 다음 단계'}
+];
+
+document.addEventListener('DOMContentLoaded', init);
+
+function init(){
+  /* ---- DOM 캐싱 : 초기 1회만 querySelector 수행 ---- */
+  const app = {
+    slides:            Array.from(document.querySelectorAll('.slide')),
+    agendaListEl:       document.getElementById('agendaList'),
+    progressFillEl:     document.getElementById('progressFill'),
+    progressPercentEl:  document.getElementById('progressPercent'),
+    progressPageEl:     document.getElementById('progressPage'),
+    stageEl:            document.getElementById('stage'),
+    hintEl:             document.getElementById('stageHint'),
+    current: 0
+  };
+  app.total = app.slides.length;
+
+  buildAgenda(app);
+  bindEvents(app);
+  render(app);
+}
+
+/* 아젠다 목록을 AGENDA 데이터로부터 동적 생성 */
+function buildAgenda(app){
+  const frag = document.createDocumentFragment();
+  AGENDA.forEach(function(item){
+    const firstIndex = app.slides.findIndex(function(s){
+      return Number(s.dataset.chapter) === item.chapter;
+    });
+    const li = document.createElement('li');
+    li.className = 'agenda-item';
+    li.dataset.targetIndex = firstIndex;
+    li.dataset.chapter = item.chapter;
+    li.innerHTML =
+      '<span class="num">' + String(item.chapter).padStart(2,'0') + '</span>' +
+      '<span class="label">' + item.title + '</span>';
+    frag.appendChild(li);
+  });
+  app.agendaListEl.appendChild(frag);
+  app.agendaItems = Array.from(app.agendaListEl.children); // 캐싱
+}
+
+/* 이벤트 위임 : stage 클릭, 아젠다 클릭, 키보드 내비게이션 */
+function bindEvents(app){
+  app.stageEl.addEventListener('click', function(){
+    goTo(app, app.current + 1);
+  });
+
+  app.agendaListEl.addEventListener('click', function(e){
+    e.stopPropagation(); // 상위(stage) 클릭 핸들러와의 중복 실행 방지
+    const item = e.target.closest('.agenda-item');
+    if(!item) return;
+    goTo(app, Number(item.dataset.targetIndex));
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === ' '){
+      e.preventDefault();
+      goTo(app, app.current + 1);
+    } else if(e.key === 'ArrowLeft'){
+      e.preventDefault();
+      goTo(app, app.current - 1);
+    }
+  });
+}
+
+function goTo(app, index){
+  app.current = Math.max(0, Math.min(app.total - 1, index));
+  render(app);
+}
+
+function render(app){
+  app.slides.forEach(function(s, i){
+    s.classList.toggle('active', i === app.current);
+  });
+
+  const pct = Math.round(((app.current + 1) / app.total) * 100);
+  app.progressFillEl.style.width = pct + '%';
+  app.progressPercentEl.textContent = pct + '%';
+  app.progressPageEl.textContent = (app.current + 1) + ' / ' + app.total;
+
+  const curChapter = Number(app.slides[app.current].dataset.chapter);
+
+  app.agendaItems.forEach(function(li){
+    const active = Number(li.dataset.chapter) === curChapter;
+    li.classList.toggle('active', active);
+    if(active) li.scrollIntoView({block:'nearest'});
+  });
+
+  app.hintEl.textContent = (app.current === app.total - 1)
+    ? '마지막 슬라이드입니다. 좌측 아젠다를 클릭해 원하는 챕터로 이동하세요.'
+    : '화면을 클릭하면 다음 내용으로 이동합니다 (← → 방향키도 사용 가능)';
+}
+</script>
+</body>
+</html>

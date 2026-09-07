@@ -79,6 +79,14 @@
       "cover": "cover.jpg",
       "htmlFile": "contents/skills_superpowers_grillme.html",
       "showCaption": true
+    },
+    {
+      "slug": "visionai-yolo",
+      "title": "Vision AI Tutorial",
+      "description": "YOLO로 PCB 불량 자동검출",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/visionAI_yolo_tutorial.html",
+      "showCaption": true
     }
   ]
 }
