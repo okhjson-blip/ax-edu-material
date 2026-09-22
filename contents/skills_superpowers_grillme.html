@@ -752,7 +752,7 @@ body{
 /* 8~9페이지: 카드 안 세로 스크롤이 생기지 않도록 간격 축소 */
 .slide.is-dense{
   padding: 22px 36px;
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 .slide.is-dense .slide-head{
   padding-bottom: 10px;
@@ -780,6 +780,44 @@ body{
   font-size: var(--fs-small);
   line-height: 1.45;
 }
+
+/* 08 Claude Superpowers: Desktop 안내를 작게 두고 한 화면에 맞춤 */
+.slide[data-index="8"]{
+  padding: 16px 32px 14px;
+  overflow-y: hidden;
+}
+.slide[data-index="8"] .slide-head{
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+.slide[data-index="8"] .info-section{ margin-bottom: 8px; }
+.slide[data-index="8"] .info-section h3{ margin-bottom: 4px; }
+.slide[data-index="8"] .note-line{
+  font-size: 11pt;
+  line-height: 1.4;
+  margin-bottom: 6px;
+  padding: 6px 10px;
+}
+.slide[data-index="8"] .desktop-flow{
+  font-size: 11pt;
+  line-height: 1.4;
+  margin: 6px 0 4px;
+  color: var(--c-ink);
+}
+.slide[data-index="8"] .callout-box{
+  margin-top: 6px;
+  padding: 8px 12px;
+}
+.slide[data-index="8"] .callout-box .callout-label{ margin-bottom: 2px; }
+.slide[data-index="8"] .callout-box p{
+  font-size: 10.5pt;
+  line-height: 1.4;
+}
+.slide[data-index="8"] .code-block{
+  padding: 5px 10px;
+  line-height: 1.35;
+}
+.slide[data-index="8"] .trigger-grid{ gap: 8px; }
 
 /* --- 사용 예시 / BEFORE·AFTER (Slide 11) --- */
 .prompt-list{ display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
@@ -1172,17 +1210,17 @@ body{
         <div class="slide-body">
           <div class="info-section">
             <h3>설치</h3>
+            <p class="note-line">Superpowers는 하나의 plugin이고, 그 안에 brainstorming·writing-plans·executing-plans 같은 skill들이 묶여있어요. 개별 skill만 따로 설치하는 게 아니라 marketplace를 등록한 뒤 plugin 전체를 설치하는 방식입니다.</p>
+            <p class="indent-hang" style="margin-bottom:8px;">Claude Code 안에서(대화창에 직접 입력):</p>
             <div class="code-block">
-              <div class="code-row"><span class="ln">npx skills add obra/superpowers</span><button type="button" class="copy-btn" data-copy="npx skills add obra/superpowers">복사</button></div>
-              <div class="code-row"><span class="ln">npx skills add obra/superpowers --skill brainstorming</span><button type="button" class="copy-btn" data-copy="npx skills add obra/superpowers --skill brainstorming">복사</button></div>
-              <div class="code-row"><span class="ln">npx skills add obra/superpowers --skill writing-plans</span><button type="button" class="copy-btn" data-copy="npx skills add obra/superpowers --skill writing-plans">복사</button></div>
+              <div class="code-row"><span class="ln">/plugin marketplace add obra/superpowers-marketplace</span><button type="button" class="copy-btn" data-copy="/plugin marketplace add obra/superpowers-marketplace">복사</button></div>
+              <div class="code-row"><span class="ln">/plugin install superpowers@superpowers-marketplace</span><button type="button" class="copy-btn" data-copy="/plugin install superpowers@superpowers-marketplace">복사</button></div>
             </div>
-          </div>
-          <div class="info-section">
-            <h3>저장 위치</h3>
-            <div class="code-block">
-              <span class="ln">docs/superpowers/specs/YYYY-MM-DD-&lt;주제&gt;-design.md</span>
-              <span class="ln">docs/superpowers/plans/YYYY-MM-DD-&lt;기능명&gt;.md</span>
+            <p class="desktop-flow">Claude Desktop 앱에는 터미널 명령어 없이 마우스로 커스텀 마켓플레이스를 추가하는 메뉴가 있어요. Superpowers 같은 GitHub 저장소 기반 marketplace를 추가하는 절차는 다음과 같습니다. 요약하면 흐름은 <strong>Customize → Plugins → Personal plugins(+) → Add marketplace → Add from a repository → obra/superpowers-marketplace 입력 → superpowers 설치</strong> 순서예요.</p>
+            <div class="callout-box is-warning" style="margin-top:10px;">
+              <span class="callout-label">참고</span>
+              <p class="indent-hang">· 공식 Anthropic 마켓플레이스(Knowledge Work, Legal 등)에는 superpowers가 없을 가능성이 높아요. Anthropic이 큐레이션한 목록이 아니라 obra(Jesse Vincent)가 만든 커뮤니티 저장소이기 때문에, 반드시 <strong>"Add from a repository"</strong>로 GitHub 경로를 직접 입력해야 합니다.</p>
+              <p class="indent-hang">· 조직 Enterprise 플랜에서 관리자가 plugin 설치를 제한했거나 로컬 MCP 서버를 비활성화했다면, "+" 버튼이나 "Add marketplace" 메뉴 자체가 안 보이거나 동작하지 않을 수 있어요.</p>
             </div>
           </div>
           <div class="info-section">
@@ -1195,8 +1233,8 @@ body{
               </div>
               <div class="trigger-col">
                 <h4>슬래시 커맨드</h4>
-                <div class="code-block"><span class="ln">/brainstorm "노트 앱에 실시간 협업 기능 추가"</span></div>
-                <div class="code-block"><span class="ln">/write-plan "docs/.../design.md"</span></div>
+                <div class="code-block"><span class="ln">/superpowers:brainstorm</span></div>
+                <div class="code-block"><span class="ln">/superpowers:write-plan</span></div>
               </div>
             </div>
           </div>
@@ -1212,7 +1250,10 @@ body{
         <div class="slide-body">
           <div class="info-section">
             <h3>설치</h3>
-            <div class="code-block"><div class="code-row"><span class="ln">npx skills add https://github.com/mattpocock/skills --skill grill-me</span><button type="button" class="copy-btn" data-copy="npx skills add https://github.com/mattpocock/skills --skill grill-me">복사</button></div></div>
+            <p class="indent-hang" style="margin-bottom:8px;">터미널에서 실행:</p>
+            <div class="code-block"><div class="code-row"><span class="ln">npx skills@latest add mattpocock/skills -s grill-me grilling -g</span><button type="button" class="copy-btn" data-copy="npx skills@latest add mattpocock/skills -s grill-me grilling -g">복사</button></div></div>
+            <p class="indent-hang" style="margin-top:8px;">· -g는 전역(global) 설치 옵션입니다. 프로젝트 단위로만 쓰고 싶으면 -g를 빼면 됩니다.</p>
+            <p class="note-line" style="margin-top:10px;">Grill-me는 mattpocock/skills 저장소 외에도 여러 개인 저장소에 동명의 skill이 올라와 있으니, 설치 전에 npx skills 명령으로 나오는 출처가 mattpocock/skills가 맞는지 확인하는 게 안전합니다.</p>
           </div>
           <div class="info-section">
             <h3>트리거 방식</h3>
@@ -1293,7 +1334,7 @@ body{
               <tr>
                 <td><span class="tool-tag" data-tool="grill-me">grill-me</span></td>
                 <td>mattpocock/skills</td>
-                <td style="font-family:var(--font-mono); font-size:10.5pt;">npx skills add https://github.com/mattpocock/skills --skill grill-me</td>
+                <td style="font-family:var(--font-mono); font-size:10.5pt;">npx skills@latest add mattpocock/skills -s grill-me grilling -g</td>
                 <td>스펙 검증</td>
               </tr>
               <tr>
@@ -1346,7 +1387,7 @@ body{
           <p class="note-line">grill-me는 Github Skill로 설치가 필요합니다.</p>
           <div class="info-section">
             <h3>설치</h3>
-            <div class="code-block"><div class="code-row"><span class="ln">npx skills add hiDaDeng/grill-me</span><button type="button" class="copy-btn" data-copy="npx skills add hiDaDeng/grill-me">복사</button></div></div>
+            <div class="code-block"><div class="code-row"><span class="ln">npx skills@latest add mattpocock/skills -s grill-me grilling -g</span><button type="button" class="copy-btn" data-copy="npx skills@latest add mattpocock/skills -s grill-me grilling -g">복사</button></div></div>
           </div>
           <div class="info-section">
             <h3>$grill-me 실행 예시</h3>
