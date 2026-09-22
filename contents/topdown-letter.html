@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top-Down 방식, AI 시대에는 가능한 이야기 | 미라클레터</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --sub:#5c5c5c;
+    --line:#e6e3dd;
+    --accent:#0b5cff;
+    --accent-soft:#eef3ff;
+    --bg:#f6f4f0;
+    --card:#ffffff;
+    --max:860px;        /* 본문 컬럼 폭 */
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* 15인치 노트북(약 1440px) 화면 기준, 본문을 중앙에 두고 좌우 여백 확보 */
+  .sheet{
+    width:100%; max-width:1440px; margin:0 auto;
+    background:var(--card); box-shadow:0 1px 40px rgba(0,0,0,.06);
+  }
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 40px;}
+
+  /* ── 레터 헤더 ── */
+  .masthead{border-bottom:3px solid var(--ink); padding:34px 0 22px;}
+  .masthead-row{display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;}
+  .brand{font-size:13px; font-weight:900; letter-spacing:.22em; color:var(--accent);}
+  .brand small{display:block; margin-top:6px; font-size:11px; font-weight:500; letter-spacing:.06em; color:var(--sub);}
+  .issue{font-size:12px; color:var(--sub); text-align:right; line-height:1.7;}
+
+  /* ── 타이틀 ── */
+  .title-area{padding:56px 0 40px; border-bottom:1px solid var(--line); text-align:center;}
+  .kicker{
+    display:inline-block; background:var(--ink); color:#fff;
+    font-size:12px; font-weight:700; letter-spacing:.12em;
+    padding:7px 14px; border-radius:2px; margin-bottom:24px;
+  }
+  h1{
+    margin:0; font-size:44px; line-height:1.28; font-weight:900; letter-spacing:-.02em;
+  }
+  h1 .hl{color:var(--accent);}
+  .deck{margin:22px auto 0; font-size:18px; line-height:1.8; color:var(--sub); font-weight:400; max-width:640px;}
+
+  /* ── 본문 ── */
+  article{padding:52px 0 64px;}
+  article p{font-size:17px; line-height:1.92; margin:0 0 22px; color:#26262a;}
+  article strong{font-weight:700; background:linear-gradient(transparent 62%, #ffe9a8 62%);}
+  h2{
+    font-size:27px; font-weight:900; letter-spacing:-.015em;
+    margin:52px 0 20px; padding-top:32px; border-top:1px solid var(--line); line-height:1.35;
+  }
+  h2:first-child{margin-top:0; padding-top:0; border-top:0;}
+
+  /* 번호 리스트 카드 */
+  .steps{list-style:none; margin:26px 0 30px; padding:0; counter-reset:s;}
+  .steps li{
+    counter-increment:s; position:relative;
+    background:#fafaf8; border:1px solid var(--line); border-radius:8px;
+    padding:20px 24px 20px 66px; margin-bottom:12px;
+    font-size:16.5px; line-height:1.75; font-weight:500;
+  }
+  .steps li::before{
+    content:counter(s); position:absolute; left:22px; top:19px;
+    width:28px; height:28px; border-radius:50%; background:var(--ink); color:#fff;
+    font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .steps li .note{display:block; margin-top:8px; font-size:15px; font-weight:400; color:var(--sub);}
+
+  /* 체크 리스트 */
+  .checks{list-style:none; margin:22px 0 28px; padding:0;}
+  .checks li{
+    position:relative; padding:11px 0 11px 34px; font-size:16.5px; line-height:1.7;
+    border-bottom:1px dashed var(--line);
+  }
+  .checks li::before{
+    content:"✓"; position:absolute; left:4px; top:11px;
+    color:var(--accent); font-weight:900;
+  }
+
+  /* 인용 */
+  blockquote{
+    margin:34px 0; padding:32px 36px;
+    background:var(--accent-soft); border-left:4px solid var(--accent); border-radius:0 8px 8px 0;
+  }
+  blockquote p{font-size:17.5px; line-height:1.92; margin:0 0 16px; color:#17223c;}
+  blockquote p:last-of-type{margin-bottom:0;}
+  blockquote .who{display:block; margin-top:18px; font-size:14px; font-weight:700; color:var(--accent);}
+
+  /* 인물 프로필 주석 카드 */
+  .profile-card{
+    display:flex; gap:22px; align-items:flex-start;
+    margin:30px 0 34px; padding:24px 26px;
+    background:#fcfbf9; border:1px solid var(--line); border-radius:8px;
+  }
+  .profile-card .avatar{
+    flex:0 0 auto; width:52px; height:52px; border-radius:50%;
+    background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:900;
+  }
+  .profile-card .info{flex:1;}
+  .profile-card .name{font-size:16px; font-weight:900; margin-bottom:2px;}
+  .profile-card .name span{font-weight:500; color:var(--sub); font-size:13px; margin-left:4px;}
+  .profile-card dl{display:grid; grid-template-columns:64px 1fr; gap:6px 14px; margin:12px 0 0;}
+  .profile-card dt{font-size:13px; color:var(--sub); font-weight:500;}
+  .profile-card dd{margin:0; font-size:14.5px; line-height:1.6; color:#3a3a3e;}
+
+  /* ── 마무리 ── */
+  .closing{
+    margin:0; padding:40px 0 56px; border-top:3px solid var(--ink); text-align:center;
+  }
+  .closing p{font-size:18px; line-height:1.9; margin:0; font-weight:500;}
+  .closing .big{font-size:23px; font-weight:900; line-height:1.55; margin-bottom:16px; letter-spacing:-.01em;}
+
+  footer{border-top:1px solid var(--line); padding:26px 0 44px; font-size:13px; color:var(--sub); line-height:1.8; text-align:center;}
+  footer b{color:var(--ink);}
+
+  .home-overlay{
+    position:fixed; left:22px; bottom:22px; z-index:120;
+    display:inline-flex; align-items:center; gap:8px;
+    padding:11px 18px 11px 14px;
+    border-radius:999px;
+    background:rgba(16,24,40,.9);
+    color:#fff; text-decoration:none;
+    font-size:14px; font-weight:650; letter-spacing:-.01em;
+    box-shadow:0 10px 28px rgba(15,23,42,.28);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.16);
+  }
+  .home-overlay::before{content:"←"; font-size:16px; line-height:1;}
+  .home-overlay:hover{background:#101828}
+
+  @media (max-width:900px){
+    h1{font-size:34px;}
+    .wrap{padding:0 24px;}
+    .profile-card{flex-direction:column;}
+    .home-overlay{left:14px;bottom:14px}
+  }
+  @media print{
+    .home-overlay{display:none!important}
+  }
+</style>
+</head>
+<body>
+<a class="home-overlay" href="/" target="_top" aria-label="교육 자료 목록으로 돌아가기">목록으로</a>
+<div class="sheet">
+
+  <!-- 헤더 -->
+  <header class="masthead">
+    <div class="wrap masthead-row">
+      <div class="brand">
+        MIRACLE LETTER
+        <small>출처 · 미라클레터</small>
+      </div>
+      <div class="issue">
+        AI &amp; LEARNING<br>
+        2026. 09. 21
+      </div>
+    </div>
+  </header>
+
+  <!-- 타이틀 -->
+  <div class="wrap title-area">
+    <span class="kicker">TOP-DOWN 방식</span>
+    <h1>AI 시대에는 <span class="hl">가능한 이야기</span></h1>
+    <p class="deck">
+      6년 전 안드레 카파시가 남긴 짧은 글이 지금 다시 화제입니다. 그리고 대학을 가지 않은 한 스웨덴 청년이
+      그 방법으로 OpenAI 연구원이 됐습니다. 오늘은 'Top-Down 학습법'이 왜 이제서야 유효해졌는지 이야기해 볼게요.
+    </p>
+  </div>
+
+  <!-- 본문 -->
+  <div class="wrap">
+    <article>
+
+      <h2>6년 만에 다시 화제가 된 글</h2>
+      <p>
+        2020년, 오픈AI의 공동 창립자인 <strong>안드레 카파시(Andrej Karpathy)</strong>는 SNS에
+        '전문가가 되는 법'이라는 글을 올렸습니다. 그런데 6년이 지난 지금 이 글이 화제가 되고 있는데요.
+        일단 내용부터 보겠습니다.
+      </p>
+
+      <p>그가 이야기한 '전문가가 되는 법'은 다음과 같습니다.</p>
+
+      <ol class="steps">
+        <li>
+          구체적인 프로젝트를 하나씩 맡아 끝까지 완성해라
+          <span class="note">프로젝트를 깊이 파고들면서 필요한 지식을 그때그때 배워라 (= 탑다운 학습법)</span>
+        </li>
+        <li>배운 모든 것을 자신의 말로 정리할 수 있어야 한다</li>
+        <li>남과 비교하지 마라. 과거의 자신이랑만 비교해라</li>
+      </ol>
+
+      <p>
+        사실 탑다운 학습법은 AI가 보편화되기 전이었던 이 당시에 시행하기엔 어려운 방법이었습니다.
+        탑다운은 내가 모르는 개념들을 필요할 때마다 찾아보면서 하나씩 알아가는 학습법이기 때문에,
+        옆에 붙어 하나하나 가르쳐 줄 사람이 필요하기 때문이죠.
+        이와 상반되는 개념은 이론부터 쌓아서 응용으로 넘어가는 방식인 <strong>바텀업</strong>입니다.
+        우리에겐 익숙한 방식이죠.
+      </p>
+
+      <p>
+        이제, AI가 나오고 나서 사정이 달라졌습니다. 언제 어디서 어떤 것을 물어봐도 화내지 않고 다 대답해 줍니다.
+        <strong>탑다운 방식의 문턱을 크게 낮춘 것이죠.</strong>
+      </p>
+
+      <h2>가브리엘 피터슨, 그가 증명하다</h2>
+
+      <p>
+        <strong>가브리엘 피터슨(Gabriel Petersson)</strong>. 간단하게 그의 발자취를 따라가 보겠습니다.
+        스웨덴 시골마을에서 태어났고, 대학을 가지 않았으며, 18살 때 사촌이 시작한 스타트업에 합류.
+        이후 미드저니를 거쳐, 오픈AI 연구원이 되었죠. 실제로 Sora2의 핵심 기여자 명단으로 올라가 있습니다.
+      </p>
+
+      <div class="profile-card">
+        <div class="avatar">GP</div>
+        <div class="info">
+          <div class="name">가브리엘 피터슨 <span>Gabriel Petersson</span></div>
+          <dl>
+            <dt>출신</dt><dd>스웨덴 시골마을 · 대학 미진학</dd>
+            <dt>커리어</dt><dd>18세, 사촌이 시작한 스타트업 합류 → 미드저니 → 오픈AI 연구원</dd>
+            <dt>주요 기여</dt><dd>Sora2 핵심 기여자 명단 등재</dd>
+          </dl>
+        </div>
+      </div>
+
+      <p>
+        그는 AI를 이용한 '탑다운 방식'으로 머신러닝 및 확산 모델(diffusion Models)에서 전문성을 쌓은 것으로
+        알려져 있는데요. 한 인터뷰에서 그는 탑다운 방식에 대해 다음과 같이 설명했습니다.
+      </p>
+
+      <blockquote>
+        <p>
+          "사람들이 가장 빨리 배우는 방법은 탑다운 방식이다. 문제에서 시작하면 아마 더 빨리 배울 것이다.
+          그다음에 그 문제를 풀기 위해 필요한 것을 전부 찾아본다. 그리고 또 다른 문제를 만나면 그것도 찾아보고,
+          그렇게 문제의 핵심까지 내려가게 된다.
+        </p>
+        <p>
+          기초부터 시작해야 하는 바텀업에는 배움의 순서가 정해져 있다. 스케일은 잘 되나, 엄청나게 비효율적이다.
+          실무 수준까지 가려면 굉장히 오래 걸리고 힘들다.
+        </p>
+        <p>
+          사람들은 탑다운 방식을 어떻게 활용해야 하는지 잘 모른다. 그들은 '그렇게 하면 문제를 제대로 이해를 하지
+          못한다'라고만 한다. 하지만 이것은 사실이 아니다. 문제에서 시작해서 재귀적으로 파고 내려가는 것,
+          이 변화가 교육 방식을 근본적으로 바꿀 것이라 생각한다."
+        </p>
+        <span class="who">출처 = AgentOS, 가브리엘 피터슨 인터뷰</span>
+      </blockquote>
+
+      <h2>제일 중요한 포인트는 스스로를 이해시키는 것</h2>
+      <p>
+        하지만 여기서 그가 얘기하는 주의점이 있습니다. 바로,
+        <strong>'AI를 사용한다고 하더라도 이해는 인간이 해야한다'</strong>인데요.
+        가브리엘에게는 질문 규칙이 있습니다.
+      </p>
+
+      <ul class="checks">
+        <li>AI에게 답변만 받지 않는다</li>
+        <li>중간 과정을 전부 보여달라고 한다</li>
+        <li>왜 되고, 왜 안되는지 묻는다</li>
+      </ul>
+
+      <p>
+        AI에게 작업을 시켜도 되지만, 진짜 제대로 된 내 것을 만들기 위해서는 그들에게 이해를 맡기면 안 된다는 것입니다.
+        이해를 하는 것은 온전히 <strong>'인간의 몫'</strong>이라는 것이죠. 실제 경험에서 시행착오를 겪어야 한다는
+        것입니다. 시도 → 결과 확인 → 검증 → 교정 → 시도 → 결과 확인 → 검증 → 교정 …. (무한반복). 이를
+        <strong>'피드백 사이클(feedback cycle)'</strong>이라고 합니다.
+      </p>
+
+      <p>
+        피터슨의 공부법은 카파시가 이야기한 내용과 일맥상통합니다. 우리가 명확하게 해야 할 것은
+      </p>
+
+      <ol class="steps">
+        <li>
+          명확한 목표
+          <span class="note">구체적인 목적 의식</span>
+        </li>
+        <li>
+          끊임없는 질문
+          <span class="note">AI에게 끊임없이 질문을 이어가서 스스로를 이해시켜야 함</span>
+        </li>
+      </ol>
+
+      <p>
+        입니다. 물론, 탑다운 방식만이 정답이라는 것은 아닙니다. 사실은 호불호가 많이 갈리는 방식이긴 한데요.
+        이는 사람마다 공부법도, 환경도 다 다르기 때문입니다.
+        그렇지만 확실한 것은 AI로 인해 <strong>'학습 속도는 높이고 비용은 낮아졌다는 것'</strong>입니다.
+      </p>
+
+    </article>
+  </div>
+
+  <footer class="wrap">
+    출처 · <b>미라클레터</b>
+  </footer>
+
+</div>
+</body>
+</html>

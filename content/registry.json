@@ -111,6 +111,30 @@
       "cover": "cover.jpg",
       "htmlFile": "contents/Claude_models.html",
       "showCaption": true
+    },
+    {
+      "slug": "playwright-mcp",
+      "title": "브라우저 작업 자동화",
+      "description": "Codex - Playwright MCP 활용",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/Playwright_MCP.html",
+      "showCaption": true
+    },
+    {
+      "slug": "cowork-ocr",
+      "title": "영수증 OCR로 Excel 기록",
+      "description": "Claude Cowork OCR 활용",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/cowork-ocr-training.html",
+      "showCaption": true
+    },
+    {
+      "slug": "topdown-letter",
+      "title": "Top-Down 방식",
+      "description": "AI 시대에는 가능한 이야기",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/topdown-letter.html",
+      "showCaption": true
     }
   ]
 }

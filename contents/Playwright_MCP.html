@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>브라우저 작업 자동화 — Playwright MCP</title>
+<style>
+:root{
+  --ink:#151c2a;
+  --muted:#667085;
+  --green:#1f3a8a;
+  --lime:#c5d4ff;
+  --bg:#f4f6fb;
+  --line:#dce3ef;
+  --accent:#2f6df6;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 "Malgun Gothic","Segoe UI",sans-serif}
+a{color:inherit}
+.hero{
+  background:#10203d;color:#fff;
+  padding:44px max(clamp(20px,3vw,56px),calc((100vw - 1568px)/2));
+  position:relative;
+}
+.eyebrow{text-transform:uppercase;font-size:12px;font-weight:800;letter-spacing:.13em;color:var(--accent)}
+.hero .eyebrow{color:var(--lime)}
+h1{font-size:clamp(36px,4.2vw,56px);line-height:1.2;letter-spacing:-.065em;margin:20px 0}
+h1 em{color:var(--lime);font-style:normal}
+.hero p{max-width:680px;color:#c9d6ef;font-size:18px}
+.layout{width:100%;max-width:1680px;margin:28px auto;display:block;padding:0 clamp(20px,3vw,56px)}
+main{min-width:0}
+h2{font-size:clamp(24px,2.4vw,29px);letter-spacing:-.045em;line-height:1.4;margin:4px 0 0}
+h3{margin:22px 0 8px;font-size:18px}
+.intro,.lesson,.resources{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px 36px;margin-bottom:24px}
+.intro p,.desc{color:#53607a}
+.flow{display:flex;gap:8px;flex-wrap:wrap}
+.flow span{background:#eef2fb;padding:8px 12px;font-size:13px;border-radius:7px}
+.lessonhead{display:flex;align-items:center;gap:18px}
+.num{font-size:30px;font-weight:300;color:var(--accent);border-right:1px solid var(--line);padding-right:18px}
+.desc{margin:22px 0}
+.action{border-left:3px solid var(--accent);padding:9px 16px;background:#f3f6ff;margin:16px 0}
+.action.warn{border-left-color:#b4690e;background:#fff6e6}
+.action.quote{border-left-color:#9aa3b0;background:#f1f3f6}
+.action b,.tip b{font-size:12px}
+.action p{margin:3px 0;font-size:14px}
+.tip{font-size:13px;margin-top:15px;color:#667268}
+.tip b{color:var(--accent);margin-right:8px}
+.prompt{background:#101828;color:#e8eefc;padding:23px;border-radius:10px;white-space:pre-wrap;font:14px/1.9 "Malgun Gothic",sans-serif;margin:14px 0}
+.prompt .lbl{display:block;color:#8ea6e0;font-size:12px;letter-spacing:.06em;margin-bottom:6px}
+.note{font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:20px 0}
+th,td{padding:12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#edf1fb}
+code{background:#eef2fb;padding:2px 6px;border-radius:5px;font-size:13.5px;font-family:"Cascadia Mono",Consolas,monospace}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:18px 0}
+ol.steps>li{counter-increment:s;position:relative;padding:12px 0 12px 46px;border-bottom:1px dashed var(--line)}
+ol.steps>li:last-child{border-bottom:0}
+ol.steps>li::before{
+  content:counter(s);position:absolute;left:0;top:12px;width:30px;height:30px;border-radius:50%;
+  background:var(--accent);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center
+}
+.home-overlay{
+  position:fixed;left:22px;bottom:22px;z-index:120;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 18px 11px 14px;border-radius:999px;
+  background:rgba(16,24,40,.9);color:#fff;text-decoration:none;
+  font-size:14px;font-weight:650;letter-spacing:-.01em;
+  box-shadow:0 10px 28px rgba(15,23,42,.28);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.16);
+}
+.home-overlay::before{content:"←";font-size:16px;line-height:1}
+.home-overlay:hover{background:#101828}
+@media(max-width:900px){.home-overlay{left:14px;bottom:14px}}
+@media(max-width:700px){
+  .layout{margin-top:22px;padding:0 16px}
+  .hero{padding:45px 24px}
+  .intro,.lesson,.resources{padding:22px}
+  .hero p{font-size:16px}
+}
+@media print{
+  .home-overlay{display:none!important}
+  .layout{display:block;margin:0;padding:0}
+  .hero{background:white;color:#10203d;padding:20px}
+  .hero p,.hero .eyebrow,h1 em{color:#10203d}
+  h1{font-size:36px}
+  .lesson,.resources{break-inside:avoid;border:0;padding:15px 0}
+  body{background:white}
+  .prompt{background:#f4f4f4;color:black}
+}
+</style>
+</head>
+<body>
+<a class="home-overlay" href="/" target="_top" aria-label="교육 자료 목록으로 돌아가기">목록으로</a>
+
+<div class="hero">
+  <div class="eyebrow">CODEX · PLAYWRIGHT MCP</div>
+  <h1>Playwright MCP로<br><em>브라우저 작업 자동화하기</em></h1>
+  <p>코드를 한 줄도 쓰지 않고, 프롬프트만으로 크롬 브라우저를 움직여 정보를 수집하는 방법입니다.</p>
+</div>
+
+<div class="layout">
+<main>
+  <section class="intro">
+    <div class="eyebrow">학습 목표</div>
+    <h2>이 교육을 마치면</h2>
+    <p>MCP가 생성형 AI와 외부 도구를 연결하는 규칙이라는 점을 설명할 수 있고, Codex에 Playwright MCP를 설치한 뒤 프롬프트만으로 브라우저 작업을 자동화할 수 있습니다.</p>
+    <div class="flow">
+      <span>01 MCP 이해</span>
+      <span>02 왜 필요한가</span>
+      <span>03 Playwright</span>
+      <span>04 Codex 설치</span>
+      <span>05 동작 확인</span>
+      <span>06 MCP 설치</span>
+      <span>07 브라우저 열기</span>
+      <span>08 뉴스 수집</span>
+      <span>09 정리</span>
+    </div>
+    <p class="note">프롬프트만으로 브라우저 열기 → 검색 → 항목 클릭 → 목록 추출까지 이어가는 실습 자료입니다.</p>
+  </section>
+
+  <section class="lesson" id="s1">
+    <div class="lessonhead">
+      <span class="num">01</span>
+      <div>
+        <div class="eyebrow">개념</div>
+        <h2>MCP란 무엇인가</h2>
+      </div>
+    </div>
+    <p class="desc">MCP는 <b>생성형 AI 모델이 외부에 있는 정보를 쓰기 위해 만든 규칙</b>입니다. 굳이 비슷한 것을 찾자면 <b>HTTP</b>와 비슷합니다.</p>
+    <p>웹사이트에 접속할 때 도메인 앞에 붙이는 <code>http</code>, 이것은 Hypertext Transfer Protocol, 즉 <b>둘 이상의 문서를 링크로 연결하는 규칙</b>입니다. MCP나 HTTP나 데이터를 주고받는다는 점에서는 동일한 규칙입니다. 차이는 <b>무엇을 주고받느냐</b>에 있습니다.</p>
+    <table>
+      <tr><th style="width:120px">구분</th><th>HTTP</th><th>MCP</th></tr>
+      <tr><td>연결 대상</td><td>웹 문서와 웹 문서</td><td>생성형 AI와 외부 도구·데이터</td></tr>
+      <tr><td>다룰 수 있는 것</td><td>웹 페이지의 데이터</td><td>앱, 브라우저, PC의 계산기·엑셀, 윈도우의 파일이나 폴더 등</td></tr>
+      <tr><td>할 수 있는 일</td><td>문서를 가져와 보여주기</td><td>외부 도구를 <b>실행하거나 작동</b>하게 하기</td></tr>
+    </table>
+    <div class="action"><b>핵심</b>
+      <p>HTTP가 "웹 페이지의 데이터를 주고받는 것"만 할 수 있다면, MCP는 앱·브라우저·계산기·엑셀·파일까지 <b>직접 작동시킬 수</b> 있습니다. AI에게 손과 발을 달아주는 규칙이라고 생각하면 쉽습니다.</p>
+    </div>
+    <aside class="tip"><b>기억할 점</b> AI가 도구를 쓰려면 도구마다 연결 방식을 새로 만들어야 했습니다. MCP는 그 연결 방식을 하나의 표준으로 통일한 것입니다. USB-C 단자가 충전기·모니터·저장장치를 하나의 규격으로 묶은 것과 같은 역할입니다.</aside>
+  </section>
+
+  <section class="lesson" id="s2">
+    <div class="lessonhead">
+      <span class="num">02</span>
+      <div>
+        <div class="eyebrow">배경</div>
+        <h2>비개발자에게 MCP가 필요한 이유</h2>
+      </div>
+    </div>
+    <p class="desc">이런 점에서 <b>비개발자가 MCP를 사용하면 비교적 간단한 방법으로 업무 자동화를 할 수 있습니다.</b> 예를 들어 PC에서 프롬프트만으로 브라우저나 계산기 앱을 자유자재로 동작하게 할 수 있고, 프롬프트를 정교화하면 자동으로 웹페이지에서 정보를 추출하여 엑셀로 저장할 수도 있습니다.</p>
+    <h3>개발자는 원래 어떻게 해왔나</h3>
+    <p>일반적으로 소프트웨어 개발자는 <b>VSCode 같은 개발 도구에 생성형 AI를 연결해서</b> 사용합니다. 요즘에는 이미 AI가 주도하는 개발 도구로 <b>Cursor AI, Antigravity, Claude Code, CODEX</b> 같은 것이 다양하게 있습니다.</p>
+    <p>이런 개발 도구는 <b>PC에 설치되기 때문에 PC의 앱이나 파일을 조작할 수 있습니다.</b> 바로 이 점이 비개발자에게도 중요합니다 — 웹 브라우저 안에서만 도는 챗봇과 달리, 내 PC를 실제로 움직일 수 있기 때문입니다.</p>
+    <div class="action"><b>한 줄 정리</b>
+      <p>"개발 도구 + 생성형 AI + MCP" 조합이면, 코드를 못 써도 PC 업무를 자동화할 수 있습니다.</p>
+    </div>
+  </section>
+
+  <section class="lesson" id="s3">
+    <div class="lessonhead">
+      <span class="num">03</span>
+      <div>
+        <div class="eyebrow">도구</div>
+        <h2>Playwright, 그리고 Playwright MCP</h2>
+      </div>
+    </div>
+    <p class="desc">예를 들어 MCP가 있기 전에 브라우저를 조작하려면 <b>직접 코딩하거나, 확장 프로그램을 써서 코드로 제어하거나, 브라우저 자동화 프레임워크를 사용</b>했습니다. 이때 많이 쓰는 자동화 프레임워크 중에 <b>Playwright</b>가 있습니다.</p>
+    <p>Playwright는 <b>사람이 하는 브라우저 작업을 프로그램이 대신 수행하게 하는 도구</b>입니다. 웹 사이트를 열거나, 버튼을 클릭하거나, 검색어를 입력하거나, 데이터를 추출하는 모든 작업이 가능합니다.</p>
+    <h3>그런데 문제는</h3>
+    <p>이런 Playwright를 사용하려면 <b>사람이 코드로 Playwright를 실행해야 합니다.</b> 그런데 생성형 AI가 Playwright를 실행하도록 연결하면, 사람은 코드를 짜지 않고 <b>자연어로만 얘기하면</b> Playwright를 실행할 수 있습니다.</p>
+    <p>그래서 <b>Playwright MCP를 개발 도구에 설치하기만 하면, 개발 도구에서 프롬프트만으로 브라우저 작업을 자동화</b>할 수 있습니다.</p>
+    <table>
+      <tr><th style="width:150px"></th><th>Playwright (기존)</th><th>Playwright MCP</th></tr>
+      <tr><td>실행 주체</td><td>사람이 코드를 작성해 실행</td><td>생성형 AI가 자연어를 해석해 실행</td></tr>
+      <tr><td>필요 역량</td><td>프로그래밍 지식</td><td>프롬프트 작성 능력</td></tr>
+      <tr><td>준비 작업</td><td>개발 환경 구성, 스크립트 작성</td><td>개발 도구에 MCP 설치 (클릭 몇 번)</td></tr>
+    </table>
+    <div class="action warn"><b>현실적인 이야기</b>
+      <p>사실 말씀은 이렇게 드렸지만, <b>막상 개발 도구를 설치하고 Playwright를 사용하게 만드는 것은 쉽지 않습니다.</b> 그래서 이 교육에서는 가장 빠른 길인 <b>ChatGPT의 Codex</b>를 이용합니다.</p>
+    </div>
+  </section>
+
+  <section class="lesson" id="s4">
+    <div class="lessonhead">
+      <span class="num">04</span>
+      <div>
+        <div class="eyebrow">준비</div>
+        <h2>실습 준비 — Codex 설치하기</h2>
+      </div>
+    </div>
+    <p class="desc">그런데 <b>ChatGPT의 CODEX를 쓰면 금방 PC 자동화를 할 수 있습니다.</b> 물론 <b>유료 사용자만 할 수 있기 때문에 유료 계정을 갖고 계셔야 합니다.</b></p>
+    <div class="action warn"><b>전제 조건</b>
+      <p>· ChatGPT <b>유료 계정</b> (무료 계정으로는 Codex 사용 불가)</p>
+      <p>· Windows PC</p>
+    </div>
+    <h3>설치 순서</h3>
+    <ol class="steps">
+      <li>ChatGPT 화면 <b>사이드 바의 'Codex'</b>를 눌러 Codex 화면으로 들어갑니다.</li>
+      <li>Codex 화면에서 <b>Codex 앱</b>을 찾아 다운로드합니다. 윈도우에서 얼마든지 설치 가능합니다.</li>
+      <li>설치가 끝나면 Codex를 실행합니다.</li>
+    </ol>
+    <h3>첫 실행 — 작업 폴더 선택</h3>
+    <p>Codex를 실행하면 처음 시작할 때 <b>폴더를 하나 선택하라고 나올 겁니다.</b> 실습용으로 <code>CodexP</code>처럼 폴더를 하나 만들어 두고 선택하면 됩니다. 필요하면 로그인하라고 나오니까, <b>ChatGPT 유료 계정이 있으면 그대로 로그인</b>하시면 됩니다.</p>
+    <aside class="tip"><b>기억할 점</b> Codex는 원래 개발 도구입니다. 작업 결과 파일을 저장할 기준 폴더가 필요해서 묻는 것입니다. 실습용으로 빈 폴더를 하나 새로 만들어 지정하면 기존 파일이 건드려질 걱정이 없습니다.</aside>
+  </section>
+
+  <section class="lesson" id="s5">
+    <div class="lessonhead">
+      <span class="num">05</span>
+      <div>
+        <div class="eyebrow">확인</div>
+        <h2>Codex 첫 실행과 동작 확인</h2>
+      </div>
+    </div>
+    <p class="desc"><b>PC 기반의 개발 도구에 여러 가지 AI까지 덧붙여져 있는 거라고 생각하시면 됩니다.</b> 처음에 보면 되게 어려워 보이는데요, 그냥 <b>"안녕"</b> 이라고 얘기해 보면 우리가 ChatGPT 웹 서비스에서 쓰는 방법과 아주 크게 다른 것은 아니라는 걸 알 수 있습니다.</p>
+    <div class="prompt"><span class="lbl">첫 테스트 프롬프트</span>안녕</div>
+    <p>웹 서비스에서는 금방 대답을 하는데 <b>여기서는 대답을 늦게 할 수 있습니다. 왜냐하면 중간중간에 필요한 프로그래밍 코딩 작업들이 있는 경우가 있기 때문입니다.</b></p>
+    <p>'안녕하세요! 무엇을 도와드릴까요?'라고 답하면서, 이게 기본적으로 AI 기반의 코딩 도구이다 보니까 <b>코딩 / 문서 정리 / 버그 수정 / 자동화</b> 같은 것들을 물어봅니다.</p>
+    <div class="action"><b>체크포인트</b>
+      <p>여기까지 답변이 돌아왔다면 설치와 로그인은 정상입니다. 응답이 웹 ChatGPT보다 느린 것은 정상 동작입니다.</p>
+    </div>
+  </section>
+
+  <section class="lesson" id="s6">
+    <div class="lessonhead">
+      <span class="num">06</span>
+      <div>
+        <div class="eyebrow">설치</div>
+        <h2>Playwright MCP 설치하기</h2>
+      </div>
+    </div>
+    <p class="desc">그럼 브라우저를 어떻게 조작하는지 한번 볼까요? 자, 크롬 브라우저를 한번 열어보겠습니다. <b>이때 크롬 브라우저 같은 걸 조작하기 위해 Playwright MCP를 추가해 줘야 한다는 거죠.</b></p>
+    <ol class="steps">
+      <li>왼쪽에 <b>'설정'</b>이 있습니다. 설정으로 들어갑니다.</li>
+      <li>설정의 메뉴를 보면 <b>'MCP 서버'</b>가 보일 겁니다.</li>
+      <li>여기 MCP 서버에 여러 가지가 있는데요, 밑에 보시면 <b>'Playwright'</b>가 있습니다.</li>
+      <li>만약 직접 추가를 하겠다고 하면 <b>'서버 추가'</b>를 눌러서 필요한 정보들을 넣어주면 됩니다.</li>
+      <li>목록에 있는 경우에는 <b>'설치하기'</b>를 눌러 그냥 설치하시면 됩니다.</li>
+    </ol>
+    <p>여기에 'Playwright'가 있으면 <b>'설치하기'를 눌러 설치</b>하면 됩니다. <b>Figma나 Notion 같은 게 필요하면 여기 '설치하기'를 눌러서 그냥 설치</b>하시면 됩니다. 필요한 경우에는 이런 식으로 <b>인증(로그인)이 필요한 경우</b>가 있습니다.</p>
+    <p>불필요한 것은 그대로 해제를 하면 되고요. 설치 후 <b>필요한 설정들이 있는데, 이 설정들은 이미 기본적으로 들어가 있으니까 그대로 놔두면 됩니다.</b></p>
+    <aside class="tip"><b>기억할 점</b> Linear, Notion, Figma, Playwright 등이 기본 목록으로 제공됩니다. 업무에서 쓰는 도구가 목록에 있으면 설치 버튼 한 번으로 AI와 연결되고, 없으면 '서버 추가'로 직접 등록합니다.</aside>
+  </section>
+
+  <section class="lesson" id="s7">
+    <div class="lessonhead">
+      <span class="num">07</span>
+      <div>
+        <div class="eyebrow">실행</div>
+        <h2>프롬프트로 크롬 브라우저 열기</h2>
+      </div>
+    </div>
+    <p class="desc">이제 프롬프트 입력하는 화면으로 돌아왔고요. <b>이제 여기에서 크롬 브라우저를 열면 됩니다.</b> 아까 Playwright를 설치했으니까요.</p>
+    <div class="prompt"><span class="lbl">프롬프트</span>크롬 브라우저를 열어줘 (Playwright를 사용해서)</div>
+    <h3>권한 승인 — 가장 중요한 단계</h3>
+    <p>그러면 Playwright를 이용해서 크롬 브라우저를 열기 위해서 <b>우리에게 승낙을 요구합니다.</b> Playwright MCP 서버가 <b>브라우저 내비게이터 툴을 작동하려고 하는데 허락할 거냐</b>고 묻는 것이고, 정확히는 <b>이번 세션에서 허락할 거냐</b>고 묻는 겁니다. <b>1번이나 2번을 눌러주시면 되고, 실습에서는 2번을 선택</b>하면 됩니다.</p>
+    <table>
+      <tr><th style="width:190px">선택지</th><th>의미</th><th>권장</th></tr>
+      <tr><td><code>1. Allow once</code></td><td>이번 한 번만 허용</td><td>처음 써보는 도구일 때</td></tr>
+      <tr><td><code>2. Allow for this session</code></td><td>이번 세션(작업) 동안 계속 허용</td><td>실습 시 권장 — 매번 묻지 않음</td></tr>
+      <tr><td><code>3. Cancel</code></td><td>거부</td><td>의도하지 않은 요청일 때</td></tr>
+    </table>
+    <div class="action warn"><b>주의</b>
+      <p>승인 창은 <b>AI가 내 PC의 프로그램을 실제로 건드리기 직전</b>에 뜹니다. 내가 시킨 작업과 관련된 요청인지 확인하고 승인하세요. 작업 중간중간 <b>새로운 작업을 해야 할 때마다</b> 다시 물어봅니다.</p>
+    </div>
+    <p>승인이 끝나면 <b>브라우저가 열립니다.</b> <b>오른쪽에 프롬프트 입력창, 왼쪽에 크롬 브라우저</b>로 화면을 나누면 AI의 동작을 눈으로 따라가기 좋습니다.</p>
+  </section>
+
+  <section class="lesson" id="s8">
+    <div class="lessonhead">
+      <span class="num">08</span>
+      <div>
+        <div class="eyebrow">실전</div>
+        <h2>실전 — 네이버 뉴스 수집 자동화</h2>
+      </div>
+    </div>
+    <p class="desc">그러면 Playwright를 이용해서 <b>왼쪽 크롬 브라우저를 작동하는 거죠.</b> 왼쪽 브라우저에서 입력하기 위해 또 필요한 툴이 있으니까 <b>이 툴을 사용할 건지 물어봅니다.</b> 2번을 선택합니다.</p>
+    <h3>① 검색어 입력</h3>
+    <p>바로 입력합니다. 그러면 <b>'삼성전자'가 입력된 화면에서 그대로 또 엔터를 치겠죠?</b></p>
+    <h3>② 카테고리 이동 + 목록 추출</h3>
+    <p>이번에는 여기 <b>뉴스 카테고리</b>가 있으니까, 삼성전자를 입력해서 여러 개 항목들 중 <b>'뉴스' 쪽을 클릭</b>하는 것을 볼 수 있습니다. 그리고 <b>필요한 뉴스 목록을 뽑아달라</b>고도 할 수 있겠죠.</p>
+    <div class="prompt"><span class="lbl">프롬프트 예시</span>네이버에서 '삼성전자'를 검색하고, 뉴스 탭으로 이동해서
+상위 뉴스 목록을 뽑아줘</div>
+    <p>그러면 왼쪽 크롬 브라우저의 네이버 뉴스 화면에서 뉴스 목록을 뽑아줍니다.</p>
+    <h3>③ 새 탭 열고 다른 사이트로</h3>
+    <p>이어서 <b>왼쪽 브라우저에서 새 탭을 열어서 구글에 접속</b>할 수 있습니다.</p>
+    <div class="action"><b>이 실습에서 AI가 수행한 브라우저 동작</b>
+      <p>브라우저 실행 → 주소 이동 → 검색어 입력 → 엔터 → 탭(카테고리) 클릭 → 목록 데이터 추출 → 새 탭 열기 → 다른 사이트 접속. <b>사람이 마우스로 하던 일을 그대로 문장으로 지시한 것</b>이 전부입니다.</p>
+    </div>
+    <aside class="tip"><b>업무 적용</b> 매일 아침 특정 키워드 뉴스 목록을 뽑아 정리하기, 경쟁사 사이트의 제품·가격 페이지에서 정보 수집하기, 사내 시스템의 반복 조회 화면을 열어 결과만 받아보기. 프롬프트를 정교화하면 추출 결과를 엑셀로 저장하는 데까지 이어갈 수 있습니다.</aside>
+  </section>
+
+  <section class="resources" id="s9">
+    <div class="eyebrow">정리</div>
+    <h2>정리와 다음 단계</h2>
+    <p class="note">생성형 AI를 이용해서 외부 정보나 도구, PC의 앱이나 파일을 자유자재로 다루는 방법은 많습니다. 그런데 이런 방법이 다 제각각이어서 뭔가 하나를 하려고 해도 쉽지가 않습니다.</p>
+    <p>점점 생성형 AI가 업무의 중심이 되고, 다양한 데이터·앱·도구가 AI를 중심으로 연결되고 있어서 비개발자도 쉽게 쓸 수 있는 연결 방법이 필요했습니다. 마침 적절한 때에 MCP가 나왔습니다.</p>
+    <div class="action quote"><b>도전해 보세요</b>
+      <p>물론 너무나도 낯선 개념이고 평소에 익숙하지 않은 개발자 마인드가 약간 필요하긴 합니다. 하지만 들이는 시간에 비해 효과가 크고, 결국 앞으로 이런 것을 직접 연결해서 일해야 하므로 지금 바로 도전해 보시기 바랍니다.</p>
+    </div>
+    <h3>오늘 배운 흐름 한눈에</h3>
+    <table>
+      <tr><th style="width:60px">단계</th><th>내용</th></tr>
+      <tr><td>1</td><td>MCP = AI와 외부 도구를 잇는 규칙 (HTTP의 확장판)</td></tr>
+      <tr><td>2</td><td>Playwright = 브라우저 작업 대행 도구, MCP로 연결하면 자연어로 조작</td></tr>
+      <tr><td>3</td><td>Codex 설치 → 폴더 선택 → 로그인</td></tr>
+      <tr><td>4</td><td>설정 &gt; MCP 서버 &gt; Playwright 설치하기</td></tr>
+      <tr><td>5</td><td>프롬프트로 브라우저 열기 + 권한 승인</td></tr>
+      <tr><td>6</td><td>검색·클릭·추출까지 자동 수행</td></tr>
+    </table>
+    <h3>용어 정리</h3>
+    <table>
+      <tr><th style="width:160px">용어</th><th>설명</th></tr>
+      <tr><td>MCP</td><td>생성형 AI가 외부 정보·도구를 사용하기 위해 만든 연결 규칙</td></tr>
+      <tr><td>MCP 서버</td><td>특정 도구(브라우저, Notion 등)를 AI가 쓸 수 있게 중개해 주는 프로그램</td></tr>
+      <tr><td>Playwright</td><td>Microsoft가 만든 브라우저 자동화 도구. 열기·클릭·입력·추출 수행</td></tr>
+      <tr><td>Codex</td><td>ChatGPT가 제공하는 AI 기반 코딩 도구. PC에 설치해 앱·파일을 다룸 (유료)</td></tr>
+      <tr><td>AI 개발 도구</td><td>Cursor AI, Antigravity, Claude Code, CODEX 등 AI가 주도하는 개발 환경</td></tr>
+      <tr><td>세션 허용</td><td>이번 작업 동안만 AI에게 해당 도구 사용을 허락하는 권한 설정</td></tr>
+    </table>
+  </section>
+</main>
+</div>
+</body>
+</html>
