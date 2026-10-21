@@ -25,6 +25,30 @@
       "showCaption": true
     },
     {
+      "slug": "topdown-letter",
+      "title": "Top-Down 방식",
+      "description": "AI 시대에는 가능한 이야기",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/topdown-letter.html",
+      "showCaption": true
+    },
+    {
+      "slug": "global-ai-trend",
+      "title": "Global AI Trend",
+      "description": "AI 2026: 단순 지원에서\n자율형 오케스트레이션으로",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/global_AI_trend.html",
+      "showCaption": true
+    },
+    {
+      "slug": "case-study-2026h1",
+      "title": "Case Study - 2026H1",
+      "description": "",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/case_26h1.html",
+      "showCaption": true
+    },
+    {
       "slug": "gemini-cursor",
       "title": "Gemini · Antigravity · Cursor",
       "description": "",
@@ -49,11 +73,27 @@
       "showCaption": true
     },
     {
-      "slug": "global-ai-trend",
-      "title": "Global AI Trend",
-      "description": "AI 2026: 단순 지원에서\n자율형 오케스트레이션으로",
+      "slug": "openai-models",
+      "title": "OpenAI 최신 모델 이해",
+      "description": "모델 구조 · 비용 · Coding Agent",
       "cover": "cover.jpg",
-      "htmlFile": "contents/global_AI_trend.html",
+      "htmlFile": "contents/OpenAI_models.html",
+      "showCaption": true
+    },
+    {
+      "slug": "claude-models",
+      "title": "Claude 최신 모델 이해",
+      "description": "Haiku · Sonnet · Opus · Fable",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/Claude_models.html",
+      "showCaption": true
+    },
+    {
+      "slug": "ai-engineering-stack",
+      "title": "AI 엔지니어링 스택",
+      "description": "프롬프트에서 그래프까지\n5개 레이어 가이드",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/AI_engineering_stack.html",
       "showCaption": true
     },
     {
@@ -62,14 +102,6 @@
       "description": "Streamlit · ChromaDB로 만드는 실습형 RAG",
       "cover": "cover.jpg",
       "htmlFile": "contents/rag_chatbot.html",
-      "showCaption": true
-    },
-    {
-      "slug": "case-study-2026h1",
-      "title": "Case Study - 2026H1",
-      "description": "",
-      "cover": "cover.jpg",
-      "htmlFile": "contents/case_26h1.html",
       "showCaption": true
     },
     {
@@ -89,30 +121,6 @@
       "showCaption": true
     },
     {
-      "slug": "ai-engineering-stack",
-      "title": "AI 엔지니어링 스택",
-      "description": "프롬프트에서 그래프까지\n5개 레이어 가이드",
-      "cover": "cover.jpg",
-      "htmlFile": "contents/AI_engineering_stack.html",
-      "showCaption": true
-    },
-    {
-      "slug": "openai-models",
-      "title": "OpenAI 최신 모델 이해",
-      "description": "모델 구조 · 비용 · Coding Agent",
-      "cover": "cover.jpg",
-      "htmlFile": "contents/OpenAI_models.html",
-      "showCaption": true
-    },
-    {
-      "slug": "claude-models",
-      "title": "Claude 최신 모델 이해",
-      "description": "Haiku · Sonnet · Opus · Fable",
-      "cover": "cover.jpg",
-      "htmlFile": "contents/Claude_models.html",
-      "showCaption": true
-    },
-    {
       "slug": "playwright-mcp",
       "title": "브라우저 작업 자동화",
       "description": "Codex - Playwright MCP 활용",
@@ -129,11 +137,27 @@
       "showCaption": true
     },
     {
-      "slug": "topdown-letter",
-      "title": "Top-Down 방식",
-      "description": "AI 시대에는 가능한 이야기",
+      "slug": "hype-cycle-2026",
+      "title": "미래 업무 하이프 사이클",
+      "description": "2026 가트너 · 네 가지 변화",
       "cover": "cover.jpg",
-      "htmlFile": "contents/topdown-letter.html",
+      "htmlFile": "contents/hype_cycle_future_of_work_2026.html",
+      "showCaption": true
+    },
+    {
+      "slug": "mobile-ocr",
+      "title": "Mobile OCR",
+      "description": "현장 사진을 업무 데이터로",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/mobile_ocr.html",
+      "showCaption": true
+    },
+    {
+      "slug": "rea",
+      "title": "Reverse Engineer Anything",
+      "description": "기존 기능을 이해하고\nAI Agent와 함께 구현하기",
+      "cover": "cover.jpg",
+      "htmlFile": "contents/rea.html",
       "showCaption": true
     }
   ]
